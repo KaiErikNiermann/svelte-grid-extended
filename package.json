@@ -1,8 +1,11 @@
 {
-	"name": "svelte-grid-extended",
+	"name": "@kaierikniermann/svelte-grid",
 	"version": "2.0.0",
 	"description": "A draggable and resizable grid layout, for Svelte 5",
-	"repository": "https://github.com/cuire/svelte-grid-extended",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/KaiErikNiermann/svelte-grid-extended.git"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && pnpm package",
@@ -22,8 +25,10 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		}
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./package.json": "./package.json"
 	},
 	"files": [
 		"dist",
@@ -44,8 +49,9 @@
 	"author": "cuire <garwes@icloud.com>",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/cuire/svelte-grid-extended/issues"
+		"url": "https://github.com/KaiErikNiermann/svelte-grid-extended/issues"
 	},
+	"homepage": "https://github.com/KaiErikNiermann/svelte-grid-extended#readme",
 	"peerDependencies": {
 		"svelte": "^5.0.0"
 	},
@@ -79,6 +85,9 @@
 		"vitest": "^2.1.0"
 	},
 	"type": "module",
+	"publishConfig": {
+		"access": "public"
+	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"packageManager": "pnpm@9.15.0"
