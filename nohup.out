@@ -270,3 +270,6 @@ https://svelte.dev/e/state_referenced_locally
 2:40:20 PM [vite] changed tsconfig file detected: /home/as_user/Projects/svelte-grid-extended/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
 2:40:48 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
 2:40:48 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+3:12:15 PM [vite] (ssr) page reload src/routes/+page.svelte
+3:12:32 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+3:12:32 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
