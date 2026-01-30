@@ -5,7 +5,9 @@
 <section>CONTENT</section>
 
 <Grid rows={20} cols={10} gap={8} class="grid">
-	<GridItem x={0} y={0} w={3} h={3}>Test</GridItem>
+	<GridItem x={0} y={0} w={3} h={3}>
+		{#snippet children()}Test{/snippet}
+	</GridItem>
 </Grid>
 
 <section>CONTENT</section>

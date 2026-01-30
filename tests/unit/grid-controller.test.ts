@@ -1,10 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import type { createEventDispatcher } from 'svelte';
 
 import { GridController } from '../../src/lib/GridController';
-import type { LayoutItem, GridParams } from '../../src/lib/types';
+import type { LayoutItem, GridParams, LayoutChangeDetail } from '../../src/lib/types';
 
-describe('🍦 GridController firstAvailablePosition', () => {
+describe('GridController firstAvailablePosition', () => {
 	type TestCase = {
 		items: Record<string, LayoutItem>;
 		maxCols: number;
@@ -34,7 +33,9 @@ describe('🍦 GridController firstAvailablePosition', () => {
 		updateGrid: () => {
 			/* .. */
 		},
-		dispatch: {} as ReturnType<typeof createEventDispatcher>
+		onchange: (_detail: LayoutChangeDetail) => {
+			/* .. */
+		}
 	};
 
 	test.each<TestCase>([

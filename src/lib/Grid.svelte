@@ -1,7 +1,11 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
+	import { getContext } from 'svelte';
+	import type { GridParams } from './types';
+	
 	const GRID_CONTEXT_NAME = Symbol('svelte-grid-extended-context');
-	export function getGridContext(): Readable<GridParams> {
-		let context: Writable<GridParams> | undefined = getContext(GRID_CONTEXT_NAME);
+	
+	export function getGridContext(): { current: GridParams } {
+		const context = getContext<{ current: GridParams }>(GRID_CONTEXT_NAME);
 		if (context === undefined) {
 			throw new Error(
 				`<GridItem /> is missing a parent <Grid /> component. Make sure you are using the component inside a <Grid />.`
@@ -12,7 +16,7 @@
 </script>
 
 <script lang="ts">
-	import { createEventDispatcher, getContext, onMount, setContext } from 'svelte';
+	import { setContext, onMount, type Snippet } from 'svelte';
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
@@ -25,164 +29,119 @@
 		GridSize,
 		LayoutItem,
 		LayoutChangeDetail,
-		GridParams,
 		Collision,
 		GridController as GridControllerType
 	} from './types';
-	import { writable, type Readable, type Writable } from 'svelte/store';
 
-	const dispatch = createEventDispatcher<{
-		change: LayoutChangeDetail;
-	}>();
-
-	/**
-	 * Number of columns in the grid.
-	 */
-	export let cols: GridSize = 0;
-
-	/**
-	 * Number of rows in the grid.
-	 */
-	export let rows: GridSize = 0;
-
-	/**
-	 * Size of the grid items.
-	 * @description
-	 * If not provided, the grid will try to calculate the size based on the container size.
-	 *
-	 * You can provide only one of the dimensions, the other will be calculated automatically or you can provide both.
-	 * @example
-	 * ```svelte
-	 * <Grid itemSize={{ width: 100, height: 100 }}>
-	 * <Grid itemSize={{ width: 100}}>
-	 * ```
-	 */
-	export let itemSize: Partial<ItemSize> = {};
-
-	/**
-	 * Gap between the grid items.
-	 */
-	export let gap = 10;
-
-	/**
-	 * Grid items.
-	 */
-	let items: Record<string, LayoutItem> = {};
-
-	/**
-	 * Breakpoints for the grid. That will be used to calculate the grid size.
-	 *
-	 * Important: numbers represent container width NOT document width.
-	 * @example
-	 * ```svelte
-	 * <Grid breakpoints={{ xs: 320, sm: 640, md: 768, lg: 1024, xl: 1280, xxl: 1536 }}>
-	 * ```
-	 */
-	export let breakpoints: Breakpoints = {
-		xxl: 1536,
-		xl: 1280,
-		lg: 1024,
-		md: 768,
-		sm: 640,
-		xs: 320
+	type Props = {
+		cols?: GridSize;
+		rows?: GridSize;
+		itemSize?: Partial<ItemSize>;
+		gap?: number;
+		breakpoints?: Breakpoints;
+		bounds?: boolean;
+		readOnly?: boolean;
+		debug?: boolean;
+		class?: string;
+		style?: string;
+		collision?: Collision;
+		autoCompress?: boolean;
+		controller?: GridControllerType;
+		onchange?: (detail: LayoutChangeDetail) => void;
+		children?: Snippet;
 	};
 
-	$: assertGridOptions({ cols, rows, itemSize, collision });
+	let {
+		cols = 0,
+		rows = 0,
+		itemSize = {},
+		gap = 10,
+		breakpoints = {
+			xxl: 1536,
+			xl: 1280,
+			lg: 1024,
+			md: 768,
+			sm: 640,
+			xs: 320
+		},
+		bounds = false,
+		readOnly = false,
+		debug = false,
+		class: classes = '',
+		style = '',
+		collision = 'none',
+		autoCompress = true,
+		controller = $bindable(),
+		onchange,
+		children
+	}: Props = $props();
 
-	/**
-	 * Bound the grid items to the grid container.
-	 */
-	export let bounds = false;
+	let items: Record<string, LayoutItem> = $state({});
 
-	/**
-	 * Disable the items interaction.
-	 */
-	export let readOnly = false;
+	$effect(() => {
+		assertGridOptions({ cols, rows, itemSize, collision });
+	});
 
-	/**
-	 * Enable the grid debug mode.
-	 * WIP
-	 */
-	export let debug = false;
+	let _cols = $state(typeof cols === 'number' ? cols : 0);
+	let _rows = $state(typeof rows === 'number' ? rows : 0);
+	let maxCols = $state(Infinity);
+	let maxRows = $state(Infinity);
+	let shouldExpandRows = $state(false);
+	let shouldExpandCols = $state(false);
+	let gridItemSize = $state<ItemSize | undefined>(
+		itemSize?.width && itemSize?.height ? { ...itemSize } as ItemSize : undefined
+	);
 
-	/**
-	 * Grid container class.
-	 */
-	let classes = '';
+	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
 
-	export { classes as class };
+	$effect(() => {
+		if (typeof cols === 'number') _cols = cols;
+	});
 
-	/**
-	 * This option set the collision strategy between grid items. If is not 'none' then it sets 'rows' option to 0.
-	 */
-	export let collision: Collision = 'none';
+	$effect(() => {
+		if (typeof rows === 'number') _rows = rows;
+	});
 
-	/**
-	 * Auto compress the grid items when programmatically changing grid items.
-	 * Only works with 'compress' collision strategy.
-	 * @default true
-	 */
-	export let autoCompress = true;
+	$effect(() => {
+		if (itemSize?.width && itemSize?.height) {
+			gridItemSize = { ...itemSize } as ItemSize;
+		}
+	});
 
-	let _cols: number;
+	$effect(() => {
+		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
+		maxCols = shouldExpandCols ? Infinity : _cols;
+	});
 
-	let _rows: number;
+	$effect(() => {
+		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
+		maxRows = shouldExpandRows ? Infinity : _rows;
+	});
 
-	let maxCols = Infinity;
+	$effect(() => {
+		if (collision !== 'none') {
+			_rows = 0;
+		}
+	});
 
-	let maxRows = Infinity;
+	const containerWidth = $derived.by(() => {
+		if (gridItemSize && cols === 0) {
+			return _cols * (gridItemSize.width + gap + 1);
+		}
+		return null;
+	});
 
-	let shouldExpandRows = false;
-
-	let shouldExpandCols = false;
-
-	let containerWidth: number | null = null;
-
-	let containerHeight: number | null = null;
-
-	// Check for colls / rows === 0 used to recalculate the grid container only if the grid is dynamic size
-	// #gh-48
-	$: if ($gridSettings.itemSize && cols === 0) {
-		containerWidth = _cols * ($gridSettings.itemSize.width + gap + 1);
-	} else {
-		containerWidth = null;
-	}
-
-	$: if ($gridSettings.itemSize && rows === 0) {
-		containerHeight = _rows * ($gridSettings.itemSize.height + gap + 1);
-	} else {
-		containerHeight = null;
-	}
-
-	$: if (typeof cols === 'number') _cols = cols;
-
-	$: if (typeof rows === 'number') _rows = rows;
-
-	$: if (itemSize?.width && itemSize?.height) $gridSettings.itemSize = { ...itemSize } as ItemSize;
-
-	$: calculatedGridSize = getGridDimensions(Object.values(items));
+	const containerHeight = $derived.by(() => {
+		if (gridItemSize && rows === 0) {
+			return _rows * (gridItemSize.height + gap + 1);
+		}
+		return null;
+	});
 
 	let gridContainer: HTMLDivElement;
 
-	$: {
-		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
-		maxCols = shouldExpandCols ? Infinity : _cols;
-	}
-
-	$: {
-		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
-		maxRows = shouldExpandRows ? Infinity : _rows;
-	}
-
-	$: if (collision !== 'none') {
-		_rows = 0;
-	}
-
-	/**
-	 * Force the grid to update. By default called when any of the grid items changes.
-	 */
 	function updateGrid() {
-		items = items;
+		items = { ...items };
 
 		if (autoCompress && collision === 'compress') {
 			_controller._internalCompress();
@@ -205,7 +164,7 @@
 			shouldExpandCols = _cols === 0;
 			shouldExpandRows = _rows === 0;
 
-			$gridSettings.itemSize = {
+			gridItemSize = {
 				width: itemSize.width ?? (width - (_cols + 1) * gap) / _cols,
 				height: itemSize.height ?? (height - (_rows + 1) * gap) / _rows
 			};
@@ -229,53 +188,53 @@
 		updateGrid();
 	}
 
-	const gridSettings = writable<GridParams>({
-		cols: 0,
-		rows: 0,
+	function handleChange(detail: LayoutChangeDetail): void {
+		onchange?.(detail);
+	}
+
+	// Create a reactive object that can be accessed from context
+	const gridSettings = $derived<GridParams>({
+		cols: _cols,
+		rows: _rows,
 		maxCols,
 		maxRows,
 		gap,
+		itemSize: gridItemSize,
 		items,
 		bounds,
+		boundsTo: gridContainer!,
 		readOnly,
 		debug,
 		collision,
 		registerItem,
 		unregisterItem,
 		updateGrid,
-		dispatch
+		onchange: handleChange
 	});
 
-	$: gridSettings.update((settings) => ({
-		...settings,
-		cols: _cols,
-		rows: _rows,
-		maxCols,
-		maxRows,
-		gap,
-		items,
-		bounds,
-		readOnly,
-		debug,
-		collision
-	}));
+	// Use a getter-based context object for proper reactivity
+	// The getter ensures we always get the current derived value
+	const contextRef = {
+		get current() {
+			return gridSettings;
+		}
+	};
 
-	const _controller = new GridController($gridSettings);
-	$: _controller.gridParams = $gridSettings;
+	const _controller = new GridController(contextRef);
 
-	export const controller = _controller as GridControllerType;
+	controller = _controller as GridControllerType;
 
-	setContext(GRID_CONTEXT_NAME, gridSettings);
+	setContext(GRID_CONTEXT_NAME, contextRef);
 </script>
 
 <div
 	class={`svelte-grid-extended ${classes}`}
 	bind:this={gridContainer}
 	style={`width: ${containerWidth ? `${containerWidth}px` : '100%'}; 
-	height: ${containerHeight ? `${containerHeight}px` : '100%'}; ${$$restProps.style ?? ''}`}
+	height: ${containerHeight ? `${containerHeight}px` : '100%'}; ${style}`}
 >
-	{#if $gridSettings.itemSize}
-		<slot />
+	{#if gridItemSize}
+		{@render children?.()}
 	{/if}
 </div>
 

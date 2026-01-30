@@ -2,14 +2,18 @@
 	import Grid, { type LayoutChangeDetail } from '$lib';
 	import GridItem from '$lib/GridItem.svelte';
 
-	function logItem(event: CustomEvent<LayoutChangeDetail>) {
-		console.log(event.detail.item);
+	function logItem(detail: LayoutChangeDetail) {
+		console.log(detail.item);
 	}
 </script>
 
-<Grid cols={10} rows={10} on:change={logItem}>
-	<GridItem x={1} y={0} class="item" on:change={logItem}>Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item" on:previewchange={logItem}>Hoy</GridItem>
+<Grid cols={10} rows={10} onchange={logItem}>
+	<GridItem x={1} y={0} class="item" onchange={logItem}>
+		{#snippet children()}Hey{/snippet}
+	</GridItem>
+	<GridItem x={3} y={3} w={4} class="item" onpreviewchange={logItem}>
+		{#snippet children()}Hoy{/snippet}
+	</GridItem>
 </Grid>
 
 <style>

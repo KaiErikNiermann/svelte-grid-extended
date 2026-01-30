@@ -4,8 +4,8 @@
 </script>
 
 <Grid cols={10} rows={10}>
-	<GridItem x={1} y={0} class="item">Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
+	<GridItem x={1} y={0} class="item">{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 
 <style>

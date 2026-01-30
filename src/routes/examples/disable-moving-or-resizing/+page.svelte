@@ -24,10 +24,12 @@
 			movable={item.movable}
 			resizable={item.resizable}
 		>
-			<div class="item">
-				{item.movable === false ? 'Cant move' : ''}
-				{item.resizable === false ? 'Cant resize' : ''}
-			</div>
+			{#snippet children()}
+				<div class="item">
+					{item.movable === false ? 'Cant move' : ''}
+					{item.resizable === false ? 'Cant resize' : ''}
+				</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>

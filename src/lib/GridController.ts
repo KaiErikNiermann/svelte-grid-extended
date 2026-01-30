@@ -2,10 +2,25 @@ import { getAvailablePosition, hasCollisions } from './utils/grid';
 import type { GridParams, GridController as GridControllerType, LayoutItem } from './types';
 
 export class GridController implements GridControllerType {
-	gridParams: GridParams;
+	private _gridParamsRef: { current: GridParams };
 
-	constructor(gridParams: GridParams) {
-		this.gridParams = gridParams;
+	constructor(gridParamsOrRef: GridParams | { current: GridParams }) {
+		// Support both direct gridParams (for tests/external use) and reference object (for internal use)
+		if ('current' in gridParamsOrRef) {
+			this._gridParamsRef = gridParamsOrRef;
+		} else {
+			// Wrap direct gridParams in a reference object
+			this._gridParamsRef = { current: gridParamsOrRef };
+		}
+	}
+
+	get gridParams(): GridParams {
+		return this._gridParamsRef.current;
+	}
+
+	set gridParams(value: GridParams) {
+		// Update the reference for external updates
+		this._gridParamsRef.current = value;
 	}
 
 	getFirstAvailablePosition(w: number, h: number) {

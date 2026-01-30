@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid from '$lib';
+	import Grid, { GridItem } from '$lib';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
@@ -15,8 +15,14 @@
 	const itemSize = { height: 100 };
 </script>
 
-<Grid {items} cols={10} {itemSize} collision={true} compress={false} let:item>
-	<div class="item">{item.id}</div>
+<Grid cols={10} {itemSize} collision="push">
+	{#each items as item}
+		<GridItem x={item.x} y={item.y} w={item.w} h={item.h} min={item.min} max={item.max}>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
+		</GridItem>
+	{/each}
 </Grid>
 
 <style>

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Grid, { GridItem } from '$lib';
 
-	let items = [
-		{ id: '1', x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
-		{ id: '2', x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } }
-	];
+	let items = $state([
+		{ id: '1', x: 6, y: 0, w: 2, h: 2, data: { text: 'A' } },
+		{ id: '2', x: 6, y: 2, w: 2, h: 2, data: { text: 'B' } }
+	]);
 
-	const itemsBackup = structuredClone(items);
+	const itemsBackup = structuredClone($state.snapshot(items));
 
 	const itemSize = { height: 40 };
 
@@ -17,12 +17,14 @@
 
 {JSON.stringify(items)}
 
-<button on:click={resetGrid}> RESET </button>
+<button onclick={resetGrid}> RESET </button>
 
 <Grid cols={10} {itemSize} collision="push">
 	{#each items as item, i (item.id)}
 		<GridItem bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
-			<div class="item">{item.data.text}</div>
+			{#snippet children()}
+				<div class="item">{item.data.text}</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>

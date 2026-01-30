@@ -1,5 +1,5 @@
-import type { createEventDispatcher } from 'svelte';
 import type { RequireAtLeastOne } from '$lib/utils/types';
+import type { Snippet } from 'svelte';
 
 export type LayoutItem = Size &
 	Position & {
@@ -57,11 +57,7 @@ export type GridParams = {
 	registerItem: (item: LayoutItem) => void;
 	unregisterItem: (item: LayoutItem) => void;
 	updateGrid: () => void;
-	dispatch: ReturnType<
-		typeof createEventDispatcher<{
-			change: LayoutChangeDetail;
-		}>
-	>;
+	onchange: (detail: LayoutChangeDetail) => void;
 };
 
 export type LayoutChangeDetail = {
@@ -74,4 +70,42 @@ export type GridController = {
 	gridParams: GridParams;
 	getFirstAvailablePosition: (w: number, h: number) => Position | null;
 	compress: () => void;
+};
+
+// Snippet types for GridItem
+export type MoveHandleSnippetProps = {
+	moveStart: (event: PointerEvent) => void;
+};
+
+export type ResizeHandleSnippetProps = {
+	resizeStart: (event: PointerEvent) => void;
+};
+
+export type GridItemDefaultSnippetProps = {
+	id: string;
+	active: boolean;
+	w: number;
+	h: number;
+};
+
+export type GridItemProps = {
+	id?: string;
+	x: number;
+	y: number;
+	w?: number;
+	h?: number;
+	min?: Size;
+	max?: Size;
+	movable?: boolean;
+	resizable?: boolean;
+	class?: string;
+	activeClass?: string;
+	previewClass?: string;
+	resizerClass?: string;
+	style?: string;
+	onchange?: (detail: LayoutChangeDetail) => void;
+	onpreviewchange?: (detail: LayoutChangeDetail) => void;
+	children?: Snippet<[GridItemDefaultSnippetProps]>;
+	moveHandle?: Snippet<[MoveHandleSnippetProps]>;
+	resizeHandle?: Snippet<[ResizeHandleSnippetProps]>;
 };

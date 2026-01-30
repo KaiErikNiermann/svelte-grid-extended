@@ -25,7 +25,9 @@
 			activeClass="grid-item-active"
 			previewClass="bg-green-500 rounded"
 		>
-			<div class="item">{item.id}</div>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>

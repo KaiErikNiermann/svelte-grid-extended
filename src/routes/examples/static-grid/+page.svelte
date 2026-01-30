@@ -19,7 +19,9 @@
 <Grid {itemSize} cols={10} rows={10}>
 	{#each items as item}
 		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
-			<div class="item">{item.id}</div>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>

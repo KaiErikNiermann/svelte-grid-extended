@@ -24,12 +24,14 @@
 	<Grid {itemSize} cols={10} collision="compress">
 		{#each items as item}
 			<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
-				<div class="item">{item.id}</div>
+				{#snippet children()}
+					<div class="item">{item.id}</div>
+				{/snippet}
 			</GridItem>
 		{/each}
 	</Grid>
 
-	<div style="height: 100px;" />
+	<div style="height: 100px;"></div>
 </div>
 
 <style>
