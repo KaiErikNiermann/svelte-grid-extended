@@ -1,53 +1,42 @@
-# svelte-grid-extended 🍾
+# svelte-grid-extended
 
-[![npm version](https://badge.fury.io/js/svelte-grid-extended.svg)](https://badge.fury.io/js/svelte-grid-extended)
+##### Example
 
-<!-- image at .github/images/santa.gif -->
-<img src=".github/images/santa.gif" width="100%" />
+```svelte
+<script lang="ts">
+	import Grid, { GridItem, type GridController } from 'svelte-grid-extended';
 
-## Description
+	let items = $state([
+		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
+		{ id: '2', x: 2, y: 2, w: 2, h: 2 }
+	]);
 
-Svelte-Grid-Extended is a draggable, resizable ~~and responsive~~ grid layout. The package is created as extended verison of [svelte-grid](https://github.com/vaheqelyan/svelte-grid).
+	let gridController: GridController;
 
-## Installation
+	function addNewItem() {
+		const w = Math.floor(Math.random() * 2) + 1;
+		const h = Math.floor(Math.random() * 5) + 1;
+		const newPosition = gridController.getFirstAvailablePosition(w, h);
+		items = newPosition
+			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
+			: items;
+	}
 
-With NPM:
+	const itemSize = { height: 40 };
+</script>
 
-```sh
-npm install svelte-grid-extended
+<button onclick={addNewItem}>Add New Item</button>
+
+<Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
+	{#each items as { id, x, y, w, h } (id)}
+		<GridItem {id} bind:x bind:y bind:w bind:h>
+			{#snippet children()}
+				<div>{id}</div>
+			{/snippet}
+		</GridItem>
+	{/each}
+</Grid>
 ```
-
-With Yarn:
-
-```shPackage currently in alpha, please consider that it **will** be changed in the future
-yarn add svelte-grid-extended
-```
-
-With pnpm:
-
-```sh
-pnpm add svelte-grid-extended
-```
-
-### Table of Contents
-
-- [Description](#description)
-- [Installation](#installation)
-- [Table of Contents](#table-of-contents)
-- [Usage](#usage)
-- [Basic](#basic)
-- [Static grid](#static-grid)
-- [Grid without bounds](#grid-without-bounds)
-- [Styling](#styling)
-- [Disable interactions](#disable-interactions)
-- [Collision Behavior](#collision-behavior)
-  - [None](#none)
-  - [Push](#push)
-  - [Compress](#compress)
-- [Custom move/resize handle](#custom-moveresize-handle)
-- [Two way binding](#two-way-binding)
-- [API Documentation](#api-documentation)
-- [Grid props](#grid-props)
 - [GridItem props](#griditem-props)
 - [Style related props:](#style-related-props)
 - [Events](#events)
@@ -55,13 +44,11 @@ pnpm add svelte-grid-extended
 - [Methods](#methods)
   - [getFirstAvailablePosition(w, h)](#getfirstavailablepositionw-h)
   - [Example](#example)
-- [📜 License](#-license)
+- [License](#-license)
 
 ## Usage
 
 ### Basic
-
-✨ [repl](https://svelte.dev/repl/effd88614c0c4372864ebeb582415a21?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -69,8 +56,8 @@ pnpm add svelte-grid-extended
 </script>
 
 <Grid cols={10} rows={10}>
-	<GridItem x={1} y={0} class="item">Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
+	<GridItem x={1} y={0} class="item">{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 ```
 
@@ -81,7 +68,6 @@ When `cols` or `rows` and `itemsSize` are set, grid becomes static and ignores t
 It can be set to both dimensions or just one.
 
 Both:
-✨ [repl](https://svelte.dev/repl/7d431c0884d343529e5e98fcbe74afbd?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -91,13 +77,12 @@ Both:
 </script>
 
 <Grid {itemSize} cols={10} rows={10}>
-	<GridItem x={1} y={0} class="item">Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
+	<GridItem x={1} y={0} class="item">{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 ```
 
 Only rows:
-✨ [repl](https://svelte.dev/repl/53994707c9f84d2cad2f9eac5a9f9ea6?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -107,18 +92,16 @@ Only rows:
 </script>
 
 <Grid {itemSize} cols={10} rows={10}>
-	<GridItem x={1} y={0} class="item">Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
+	<GridItem x={1} y={0} class="item">{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 ```
 
 ### Grid without bounds
 
-When `cols` or/and `rows` set to 0, grid grows infinitly. The grid container adapts its width and height to fit all elements.
+When `cols` or/and `rows` set to 0, grid grows infinitely. The grid container adapts its width and height to fit all elements.
 
 It can be set to both dimensions or just one.
-
-✨ [repl](https://svelte.dev/repl/ade95bbc3a7445518df6a51c3fd9be2e?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -128,16 +111,14 @@ It can be set to both dimensions or just one.
 </script>
 
 <Grid {itemSize} cols={0} rows={0}>
-	<GridItem x={1} y={0} class="item">Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
+	<GridItem x={1} y={0} class="item">{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 ```
 
 ### Styling
 
 Grid can be styled with classes passed to various props. Check [Style related props](#style-related-props) section for more info.
-
-✨ [repl](https://svelte.dev/repl/97243bc1472d42ff944e47c30b72d73d?version=4.1.1)
 
 ```svelte
 <script lang="ts">
@@ -153,7 +134,9 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 		previewClass="bg-green-500 rounded"
 		resizerClass=""
 	>
-		<div class="item">{item.id}</div>
+		{#snippet children()}
+			<div class="item">Content</div>
+		{/snippet}
 	</GridItem>
 </Grid>
 
@@ -175,9 +158,8 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 		opacity: 0.1;
 	}
 
-	/* tailwind classes */
-	:global(.bg-red-500) {
-		background-color: rgb(202, 33, 33);
+	:global(.bg-green-500) {
+		background-color: rgb(34, 197, 94);
 	}
 
 	:global(.rounded) {
@@ -190,7 +172,7 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 
 To disable interactions, set `readOnly` prop to `true`. Or set `movable` and/or `resizable` to `false` on specific item.
 
-Read Only grid: ✨ [repl](https://svelte.dev/repl/e7183ff3136c47fe94fcd5398573aef5?version=4.1.1)
+Read Only grid:
 
 ```svelte
 <script lang="ts">
@@ -198,12 +180,12 @@ Read Only grid: ✨ [repl](https://svelte.dev/repl/e7183ff3136c47fe94fcd5398573a
 </script>
 
 <Grid cols={10} rows={10} readOnly>
-	<GridItem x={1} y={0} class="item">Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item">Hoy</GridItem>
+	<GridItem x={1} y={0} class="item">{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item">{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 ```
 
-Make item non-interactive: ✨ [repl](https://svelte.dev/repl/50f1acb8be5b426896cb6d9b6c10e9f8?version=4.1.1)
+Make item non-interactive:
 
 ```svelte
 <script lang="ts">
@@ -211,8 +193,8 @@ Make item non-interactive: ✨ [repl](https://svelte.dev/repl/50f1acb8be5b426896
 </script>
 
 <Grid cols={10} rows={10}>
-	<GridItem x={1} y={0} class="item" movable={false}>Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item" resizable={false}>Hoy</GridItem>
+	<GridItem x={1} y={0} class="item" movable={false}>{#snippet children()}Hey{/snippet}</GridItem>
+	<GridItem x={3} y={3} w={4} class="item" resizable={false}>{#snippet children()}Hoy{/snippet}</GridItem>
 </Grid>
 ```
 
@@ -224,28 +206,28 @@ The `collision` prop controls how the grid handles collisions. There are three a
 
 Setting `collision` prop to `none` will ignore any collisions. This is the default behavior.
 
-✨ [repl](https://svelte.dev/repl/c549a05c30b84793b2bab156f49bedd3?version=4.1.1)
-
 ```svelte
 <script lang="ts">
 	import Grid, { GridItem } from 'svelte-grid-extended';
 
-	const items = [
+	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
 		{ id: '1', x: 2, y: 2, w: 2, h: 2 },
 		{ id: '2', x: 2, y: 0, w: 1, h: 2 },
 		{ id: '3', x: 3, y: 0, w: 2, h: 2 },
 		{ id: '4', x: 4, y: 2, w: 1, h: 3 },
 		{ id: '5', x: 8, y: 0, w: 2, h: 8 }
-	];
+	]);
 
 	const itemSize = { height: 40 };
 </script>
 
 <Grid {itemSize} cols={10} collision="none">
-	{#each items as item}
+	{#each items as item (item.id)}
 		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
-			<div class="item">{item.id}</div>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>
@@ -255,28 +237,28 @@ Setting `collision` prop to `none` will ignore any collisions. This is the defau
 
 Setting `collision` prop to `push` will cause grid items to move to the first available space when colliding. The grid will grow vertically as needed to accommodate all items.
 
-✨ [repl](https://svelte.dev/repl/36abb5e5be6f4b0ebe637b2676ccf606?version=4.1.1)
-
 ```svelte
 <script lang="ts">
 	import Grid, { GridItem } from 'svelte-grid-extended';
 
-	const items = [
+	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
 		{ id: '1', x: 2, y: 2, w: 2, h: 2 },
 		{ id: '2', x: 2, y: 0, w: 1, h: 2 },
 		{ id: '3', x: 3, y: 0, w: 2, h: 2 },
 		{ id: '4', x: 4, y: 2, w: 1, h: 3 },
 		{ id: '5', x: 8, y: 0, w: 2, h: 8 }
-	];
+	]);
 
 	const itemSize = { height: 40 };
 </script>
 
 <Grid {itemSize} cols={10} collision="push">
-	{#each items as item}
+	{#each items as item (item.id)}
 		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
-			<div class="item">{item.id}</div>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>
@@ -286,38 +268,38 @@ Setting `collision` prop to `push` will cause grid items to move to the first av
 
 Setting `collision` prop to `compress` will compress items vertically towards the top into any available space when colliding. The grid will grow vertically as needed to accommodate all items.
 
-✨ [repl](https://svelte.dev/repl/86cff54f2efa437285c3245ecb713702?version=4.1.1)
-
 ```svelte
 <script lang="ts">
 	import Grid, { GridItem } from 'svelte-grid-extended';
 
-	const items = [
+	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
 		{ id: '1', x: 2, y: 2, w: 2, h: 2 },
 		{ id: '2', x: 2, y: 0, w: 1, h: 2 },
 		{ id: '3', x: 3, y: 0, w: 2, h: 2 },
 		{ id: '4', x: 4, y: 2, w: 1, h: 3 },
 		{ id: '5', x: 8, y: 0, w: 2, h: 8 }
-	];
+	]);
 
 	const itemSize = { height: 40 };
 </script>
 
 <Grid {itemSize} cols={10} collision="compress">
-	{#each items as item}
+	{#each items as item (item.id)}
 		<GridItem x={item.x} y={item.y} w={item.w} h={item.h}>
-			<div class="item">{item.id}</div>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>
 ```
 
-> ⚠️ Setting `collision` to `push` or `compress` will set `rows` to `0` so `ItemSize.height` must be setted.
+> Setting `collision` to `push` or `compress` will set `rows` to `0` so `ItemSize.height` must be set.
 
 ### Custom move/resize handle
 
-✨ [repl](https://svelte.dev/repl/5f9dbbd845cc40f6a222734856fc9b1d?version=4.1.1)
+You can customize the move and resize handles using snippets:
 
 ```svelte
 <script lang="ts">
@@ -326,45 +308,50 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 
 <Grid cols={10} rows={10}>
 	<GridItem x={0} y={0}>
-		<div slot="moveHandle" let:moveStart>
-			<div on:pointerdown={moveStart}>MOVE</div>
-		</div>
+		{#snippet moveHandle(moveStart)}
+			<div onpointerdown={moveStart}>MOVE</div>
+		{/snippet}
 
-		<div slot="resizeHandle" let:resizeStart>
-			<div on:pointerdown={resizeStart}>Resize</div>
-		</div>
+		{#snippet resizeHandle(resizeStart)}
+			<div onpointerdown={resizeStart}>RESIZE</div>
+		{/snippet}
 
-		<!-- content -->
+		{#snippet children()}
+			<!-- content -->
+			<div>Content here</div>
+		{/snippet}
 	</GridItem>
 </Grid>
 ```
 
 ### Two way binding
 
-✨ [repl](https://svelte.dev/repl/ef5d5716505642b7a9212c3d0c7b6803?version=4.1.1)
-
 ```svelte
 <script lang="ts">
 	import Grid, { GridItem } from 'svelte-grid-extended';
 
-	let items = [
-		{ x: 6, y: 0, w: 2, h: 2, data: { text: '🎅' } },
-		{ x: 6, y: 2, w: 2, h: 2, data: { text: '🤶' } }
-	];
+	let items = $state([
+		{ x: 6, y: 0, w: 2, h: 2, data: { text: 'A' } },
+		{ x: 6, y: 2, w: 2, h: 2, data: { text: 'B' } }
+	]);
 
-	const itemsBackup = structuredClone(items);
+	const itemsBackup = structuredClone($state.snapshot(items));
 
 	function resetGrid() {
 		items = structuredClone(itemsBackup);
 	}
+
+	const itemSize = { height: 40 };
 </script>
 
-<button on:click={resetGrid}> RESET </button>
+<button onclick={resetGrid}>RESET</button>
 
 <Grid cols={10} {itemSize}>
-	{#each items as item}
+	{#each items as item (item.data.text)}
 		<GridItem bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
-			{item.data.text}
+			{#snippet children()}
+				{item.data.text}
+			{/snippet}
 		</GridItem>
 	{/each}
 </Grid>
@@ -384,10 +371,11 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 | readonly     | If true disables interaction with grid items.                                                                          | boolean                             | false   |
 | collision    | Collision behavior of grid items. [About](#collision-behavior)                                                         | none \| push \| compress            | none    |
 | autoCompress | Auto compress the grid items when programmatically changing grid items. Only works with 'compress' collision strategy. | boolean                             | true    |
+| onchange     | Callback when grid items are changed.                                                                                  | (detail: LayoutChangeDetail) => void | undefined |
 
-> ⚠️ if `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be setted.
+> If `cols` or/and `rows` are set to 0, `itemSize.width` or/and `itemSize.height` must be set.
 
-> ⚠️ Setting `collision` to `push` or `compress` will set `rows` to `0` so `ItemSize.height` must be setted.
+> Setting `collision` to `push` or `compress` will set `rows` to `0` so `ItemSize.height` must be set.
 
 ### GridItem props
 
@@ -402,6 +390,8 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 | max       | Maximum size of the item in Grid Units. If not provided, the item will be able to grow infinitely. | { w: number, h: number } \| undefined | undefined      |
 | movable   | If true, item can be moved by user.                                                                | boolean                               | true           |
 | resizable | If true, item can be resized by user.                                                              | boolean                               | true           |
+| onchange  | Callback when item position/size changes.                                                          | (detail: LayoutChangeDetail) => void  | undefined      |
+| onpreviewchange | Callback when preview position/size changes during drag.                                     | (detail: LayoutChangeDetail) => void  | undefined      |
 
 ### Style related props:
 
@@ -417,21 +407,21 @@ Component can be styled with css framework of your choice, global classes or `st
 
 To understand how to use these props, look at `<Grid />` component simplified structure.
 
-> 📄 `active` is variable that indicates if grid item is currently being dragged or resized:
+> `active` is a variable that indicates if grid item is currently being dragged or resized:
 
 ```svelte
 <!-- Grid -->
 <div class={class}>
 	<!-- GridItem -->
 	<div class={itemClass} class:activeClass={active}>
-		<slot />
+		{@render children?.()}
 		<!-- Resizer -->
 		<div class={resizerClass} />
 		<!-- Resizer -->
 	</div>
 
 	{#if active}
-		<!-- GridItemGhost -->
+		<!-- GridItemGhost (preview) -->
 		<div class={previewClass} />
 	{/if}
 
@@ -440,33 +430,39 @@ To understand how to use these props, look at `<Grid />` component simplified st
 <!-- /Grid -->
 ```
 
-## Events
 
-Grid emits the following events:
-
-| event name | description                          | payload            |
-| ---------- | ------------------------------------ | ------------------ |
-| change     | Emitted when grid items are changed. | {item: LayoutItem} |
+##### Example
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem, type LayoutChangeDetail } from 'svelte-grid-extended';
+	import Grid, { GridItem, type GridController } from 'svelte-grid-extended';
 
-	function logItem(event: CustomEvent<LayoutChangeDetail>) {
-		console.log(event.detail.item);
+	let items = $state([
+		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
+		{ id: '2', x: 2, y: 2, w: 2, h: 2 }
+	]);
+
+	let gridController: GridController;
+
+	function compressItems() {
+		gridController.compress();
 	}
+
+	const itemSize = { height: 40 };
 </script>
 
-<Grid cols={10} rows={10} on:change={logItem}>
-	<GridItem x={1} y={0} class="item" on:change={logItem}>Hey</GridItem>
-	<GridItem x={3} y={3} w={4} class="item" on:previewchange={logItem}>Hoy</GridItem>
+<button class="btn" onclick={compressItems}>Compress Items</button>
+
+<Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
+	{#each items as item (item.id)}
+		<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
+			{#snippet children()}
+				<div class="item">{item.id.slice(0, 5)}</div>
+			{/snippet}
+		</GridItem>
+	{/each}
 </Grid>
 ```
-
-## Grid Controller
-
-The Grid Controller provides utility functions that allow for more advanced control and customization of the grid. It's obtained from the Grid component using the `bind:controller` attribute, offering a way to interact with the grid in a programmatic and flexible manner.
-
 ### Methods
 
 #### getFirstAvailablePosition(w, h)
@@ -483,8 +479,6 @@ Finds the first available position within the grid that can accommodate an item 
 - An object containing the `x` and `y` coordinates of the first available position, or `null` if no position is available.
 
 ##### Example
-
-✨ [repl](https://svelte.dev/repl/6af014e1f754458dbc15c1823dbdca3c?version=4.1.2)
 
 ```svelte
 <script lang="ts">
@@ -528,8 +522,6 @@ Compresses all items vertically towards the top into any available space.
 
 ##### Example
 
-✨ [repl](https://svelte.dev/repl/79bcc70f11944d9e9b03970de731b3e2?version=4.2.11)
-
 ```svelte
 <script lang="ts">
 	import Grid, { GridItem, type GridController } from 'svelte-grid-extended';
@@ -559,6 +551,6 @@ Compresses all items vertically towards the top into any available space.
 </Grid>
 ```
 
-## 📜 License
+## License
 
 MIT
