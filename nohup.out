@@ -110,3 +110,163 @@ https://svelte.dev/e/state_referenced_locally
 2:18:18 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
 2:18:25 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
 2:18:25 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:40:05 PM [vite] (ssr) page reload tailwind.config.cjs
+(node:120373) Warning: Failed to load the ES module: /home/as_user/Projects/svelte-grid-extended/tailwind.config.cjs. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:120373) Warning: Failed to load the ES module: /home/as_user/Projects/svelte-grid-extended/tailwind.config.cjs. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:05 PM [vite] (ssr) page reload src/routes/examples/+layout.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ❤︎ Support daisyUI project:	https://opencollective.com/daisyui
+
+2:40:05 PM [vite] (ssr) page reload src/routes/examples/basic/+page.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ❤︎ Support daisyUI project:	https://opencollective.com/daisyui
+
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:85:27 This reference only captures the initial value of `cols`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:85:47 This reference only captures the initial value of `cols`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:86:27 This reference only captures the initial value of `rows`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:86:47 This reference only captures the initial value of `rows`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:2 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:21 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:45 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:05 PM [vite] (ssr) page reload src/lib/Grid.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:06 PM [vite-plugin-svelte] src/lib/GridItem.svelte:54:2 This reference only captures the initial value of `id`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:06 PM [vite-plugin-svelte] src/lib/GridItem.svelte:59:2 This reference only captures the initial value of `min`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:06 PM [vite-plugin-svelte] src/lib/GridItem.svelte:60:2 This reference only captures the initial value of `max`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:06 PM [vite-plugin-svelte] src/lib/GridItem.svelte:61:2 This reference only captures the initial value of `movable`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:06 PM [vite-plugin-svelte] src/lib/GridItem.svelte:62:2 This reference only captures the initial value of `resizable`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:06 PM [vite] (ssr) page reload src/lib/GridItem.svelte
+2:40:08 PM [vite] (ssr) page reload tailwind.config.cjs
+(node:120373) Warning: Failed to load the ES module: /home/as_user/Projects/svelte-grid-extended/tailwind.config.cjs. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(node:120373) Warning: Failed to load the ES module: /home/as_user/Projects/svelte-grid-extended/tailwind.config.cjs. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:08 PM [vite] (ssr) page reload src/routes/examples/+layout.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ❤︎ Support daisyUI project:	https://opencollective.com/daisyui
+
+2:40:09 PM [vite-plugin-svelte] src/routes/examples/basic/+page.svelte:20:1 No scopable elements found in template. If you're using global styles in the style tag, you should move it into an external stylesheet file and import it in JS. See https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#where-should-i-put-my-global-styles.
+2:40:09 PM [vite] (ssr) page reload src/routes/examples/basic/+page.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:85:27 This reference only captures the initial value of `cols`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:85:47 This reference only captures the initial value of `cols`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:86:27 This reference only captures the initial value of `rows`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:86:47 This reference only captures the initial value of `rows`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:2 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:21 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:45 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite] (ssr) page reload src/lib/Grid.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:09 PM [vite-plugin-svelte] src/lib/GridItem.svelte:54:2 This reference only captures the initial value of `id`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/GridItem.svelte:59:2 This reference only captures the initial value of `min`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/GridItem.svelte:60:2 This reference only captures the initial value of `max`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/GridItem.svelte:61:2 This reference only captures the initial value of `movable`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/GridItem.svelte:62:2 This reference only captures the initial value of `resizable`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite] (ssr) page reload src/lib/GridItem.svelte
+2:40:09 PM [vite] (ssr) page reload tailwind.config.cjs
+(node:120373) Warning: Failed to load the ES module: /home/as_user/Projects/svelte-grid-extended/tailwind.config.cjs. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(node:120373) Warning: Failed to load the ES module: /home/as_user/Projects/svelte-grid-extended/tailwind.config.cjs. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:09 PM [vite] (ssr) page reload src/routes/examples/+layout.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ★ Star daisyUI on GitHub	https://github.com/saadeghi/daisyui
+
+2:40:09 PM [vite-plugin-svelte] src/routes/examples/basic/+page.svelte:20:1 No scopable elements found in template. If you're using global styles in the style tag, you should move it into an external stylesheet file and import it in JS. See https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#where-should-i-put-my-global-styles.
+2:40:09 PM [vite] (ssr) page reload src/routes/examples/basic/+page.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ❤︎ Support daisyUI project:	https://opencollective.com/daisyui
+
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:85:27 This reference only captures the initial value of `cols`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:85:47 This reference only captures the initial value of `cols`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:86:27 This reference only captures the initial value of `rows`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:86:47 This reference only captures the initial value of `rows`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:2 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:21 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite-plugin-svelte] src/lib/Grid.svelte:92:45 This reference only captures the initial value of `itemSize`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:09 PM [vite] (ssr) page reload src/lib/Grid.svelte
+
+🌼   daisyUI 4.12.24
+├─ ✔︎ 1 theme added		https://daisyui.com/docs/themes
+╰─ ❤︎ Support daisyUI project:	https://opencollective.com/daisyui
+
+2:40:10 PM [vite-plugin-svelte] src/lib/GridItem.svelte:54:2 This reference only captures the initial value of `id`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:10 PM [vite-plugin-svelte] src/lib/GridItem.svelte:59:2 This reference only captures the initial value of `min`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:10 PM [vite-plugin-svelte] src/lib/GridItem.svelte:60:2 This reference only captures the initial value of `max`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:10 PM [vite-plugin-svelte] src/lib/GridItem.svelte:61:2 This reference only captures the initial value of `movable`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:10 PM [vite-plugin-svelte] src/lib/GridItem.svelte:62:2 This reference only captures the initial value of `resizable`. Did you mean to reference it inside a derived instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:10 PM [vite] (ssr) page reload src/lib/GridItem.svelte
+2:40:15 PM [vite] changed tsconfig file detected: /home/as_user/Projects/svelte-grid-extended/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+2:40:20 PM [vite] changed tsconfig file detected: /home/as_user/Projects/svelte-grid-extended/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+2:40:48 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:40:48 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
