@@ -104,3 +104,8 @@ pnpm docs:dev
 ## License
 
 MIT
+
+## Acknowledgments
+
+- Forked from https://github.com/cuire/svelte-grid-extended
+- Original project: https://github.com/valqelyan/svelte-grid
