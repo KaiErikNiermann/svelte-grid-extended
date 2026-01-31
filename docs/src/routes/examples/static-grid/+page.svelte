@@ -8,7 +8,7 @@
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
   const itemSize = { width: 80, height: 40 };
-<\/script>
+</script>
 
 <Grid {itemSize} cols={10} rows={10}>
   <GridItem x={1} y={0}>

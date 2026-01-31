@@ -13,7 +13,7 @@
     { id: '1', x: 0, y: 0, w: 2, h: 2 },
     { id: '2', x: 2, y: 0, w: 3, h: 1 }
   ]);
-<\/script>
+</script>
 
 <Grid cols={10} rows={10}>
   {#each items as item (item.id)}

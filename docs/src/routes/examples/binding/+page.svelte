@@ -24,7 +24,7 @@
     { x: 0, y: 0, w: 2, h: 2, label: 'A' },
     { x: 2, y: 0, w: 3, h: 2, label: 'B' }
   ]);
-<\/script>
+</script>
 
 <Grid cols={8}>
   {#each items as item (item.label)}

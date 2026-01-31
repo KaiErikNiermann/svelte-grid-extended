@@ -4,7 +4,7 @@
 
 	const exampleCode = String.raw`<script lang="ts">
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
-<\/script>
+</script>
 
 <Grid cols={10} rows={10}>
   <GridItem x={1} y={0}>

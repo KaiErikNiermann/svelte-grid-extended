@@ -50,7 +50,7 @@
   function removeItem(id: string) {
     items = items.filter(item => item.id !== id);
   }
-<\/script>
+</script>
 
 <button onclick={addItem}>Add</button>
 

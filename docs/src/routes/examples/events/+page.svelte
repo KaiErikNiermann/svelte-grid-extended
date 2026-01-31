@@ -31,7 +31,7 @@
     console.log('Layout changed:', detail.item);
     // Persist to database, localStorage, etc.
   }
-<\/script>
+</script>
 
 <Grid onchange={handleChange}>
   <GridItem x={0} y={0} onchange={handleChange}>

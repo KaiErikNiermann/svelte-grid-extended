@@ -8,7 +8,7 @@
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
   const itemSize = { width: 80, height: 40 };
-<\/script>
+</script>
 
 <!-- cols={0} and rows={0} means infinite in both directions -->
 <Grid {itemSize} cols={0} rows={0}>

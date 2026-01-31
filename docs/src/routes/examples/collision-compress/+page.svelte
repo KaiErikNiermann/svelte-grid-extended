@@ -16,7 +16,7 @@
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
   const itemSize = { height: 40 };
-<\/script>
+</script>
 
 <Grid {itemSize} cols={10} collision="compress">
   {#each items as item (item.id)}
