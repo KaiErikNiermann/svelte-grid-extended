@@ -8,7 +8,7 @@ const config = {
 		extend: {}
 	},
 	daisyui: {
-		themes: ['emerald']
+		themes: ['emerald', 'forest']
 	},
 	plugins: [daisyui]
 };
