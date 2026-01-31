@@ -1,10 +1,10 @@
-# @kaierikniermann/svelte-grid
+# @appulsauce/svelte-grid
 
 ##### Example
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem, type GridController } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
 	let items = $state([
 		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
@@ -52,7 +52,7 @@
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 </script>
 
 <Grid cols={10} rows={10}>
@@ -71,7 +71,7 @@ Both:
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	const itemSize = { width: 100, height: 40 };
 </script>
@@ -86,7 +86,7 @@ Only rows:
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	const itemSize = { height: 40 };
 </script>
@@ -105,7 +105,7 @@ It can be set to both dimensions or just one.
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	const itemSize = { width: 100, height: 40 };
 </script>
@@ -122,7 +122,7 @@ Grid can be styled with classes passed to various props. Check [Style related pr
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 </script>
 
 <Grid class="grid-container" cols={10} rows={10}>
@@ -176,7 +176,7 @@ Read Only grid:
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 </script>
 
 <Grid cols={10} rows={10} readOnly>
@@ -189,7 +189,7 @@ Make item non-interactive:
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 </script>
 
 <Grid cols={10} rows={10}>
@@ -208,7 +208,7 @@ Setting `collision` prop to `none` will ignore any collisions. This is the defau
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
@@ -239,7 +239,7 @@ Setting `collision` prop to `push` will cause grid items to move to the first av
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
@@ -270,7 +270,7 @@ Setting `collision` prop to `compress` will compress items vertically towards th
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
@@ -303,7 +303,7 @@ You can customize the move and resize handles using snippets:
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 </script>
 
 <Grid cols={10} rows={10}>
@@ -328,7 +328,7 @@ You can customize the move and resize handles using snippets:
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
 	let items = $state([
 		{ x: 6, y: 0, w: 2, h: 2, data: { text: 'A' } },
@@ -435,7 +435,7 @@ To understand how to use these props, look at `<Grid />` component simplified st
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem, type GridController } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
 	let items = $state([
 		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
@@ -482,7 +482,7 @@ Finds the first available position within the grid that can accommodate an item 
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem, type GridController } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
 	let items = [
 		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
@@ -524,7 +524,7 @@ Compresses all items vertically towards the top into any available space.
 
 ```svelte
 <script lang="ts">
-	import Grid, { GridItem, type GridController } from '@kaierikniermann/svelte-grid';
+	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
 	let items = [
 		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
