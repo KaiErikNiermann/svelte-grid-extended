@@ -20,7 +20,11 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"prepare": "husky"
+		"prepare": "husky",
+		"docs:dev": "pnpm --dir docs dev",
+		"docs:build": "pnpm --dir docs build",
+		"docs:preview": "pnpm --dir docs preview",
+		"docs:install": "pnpm --dir docs install"
 	},
 	"exports": {
 		".": {

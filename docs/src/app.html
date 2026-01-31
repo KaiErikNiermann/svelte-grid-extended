@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" class="">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="Documentation for @appulsauce/svelte-grid - A draggable and resizable grid layout for Svelte 5" />
+		<title>Svelte Grid</title>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+		<script>
+			// Prevent flash of wrong theme
+			const theme = localStorage.getItem('theme') ?? 'light';
+			document.documentElement.classList.toggle('dark', theme === 'dark');
+		</script>
+	</body>
+</html>
