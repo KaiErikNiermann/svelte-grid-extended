@@ -58,7 +58,7 @@ npm install @appulsauce/svelte-grid
 
 ## Documentation
 
-For full documentation and examples, visit the [docs site](https://github.com/KaiErikNiermann/svelte-grid-extended) or run the docs locally:
+For full documentation and examples, visit the [docs site](https://kaierikniermann.github.io/svelte-grid-extended/) or run the docs locally:
 
 ```bash
 # Clone the repository
