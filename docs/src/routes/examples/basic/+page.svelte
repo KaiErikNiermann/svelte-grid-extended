@@ -9,7 +9,10 @@
 
 <div class="prose mb-6">
 	<h1>Basic Grid</h1>
-	<p>The simplest grid setup with fixed columns and rows. Drag items to reposition them, or resize using the bottom-right handle.</p>
+	<p>
+		The simplest grid setup with fixed columns and rows. Drag items to reposition them, or resize
+		using the bottom-right handle.
+	</p>
 </div>
 
 <div class="border border-border rounded-lg p-4 bg-muted/30">
@@ -17,7 +20,12 @@
 		<GridItem x={1} y={0} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
 			{#snippet children()}Hey{/snippet}
 		</GridItem>
-		<GridItem x={3} y={3} w={4} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
+		<GridItem
+			x={3}
+			y={3}
+			w={4}
+			class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+		>
 			{#snippet children()}Hoy{/snippet}
 		</GridItem>
 	</Grid>

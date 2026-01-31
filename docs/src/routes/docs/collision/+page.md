@@ -20,6 +20,7 @@ Setting `collision="none"` allows items to overlap freely. This is the default b
 ```
 
 **Use cases:**
+
 - When overlap is acceptable or desired
 - For simpler use cases without dynamic rearrangement
 - When you want full control over item positioning
@@ -39,6 +40,7 @@ Setting `collision="push"` causes items to move to the first available space whe
 ```
 
 **Behavior:**
+
 - When an item is moved to a position occupied by another item, the other item moves down
 - The grid grows vertically as needed to accommodate all items
 - Items maintain their relative horizontal positions when possible
@@ -60,6 +62,7 @@ Setting `collision="compress"` compresses items vertically toward the top of the
 ```
 
 **Behavior:**
+
 - Items always move to the highest available position
 - Gaps are automatically filled when items are moved or removed
 - Creates a compact, vertically-optimized layout
@@ -68,11 +71,11 @@ Setting `collision="compress"` compresses items vertically toward the top of the
 
 ## Comparison
 
-| Mode | Overlap | Auto-arrange | Best for |
-|------|---------|--------------|----------|
-| `none` | Yes | No | Simple layouts, manual control |
-| `push` | No | Pushes down | Dashboard widgets, kanban boards |
-| `compress` | No | Fills gaps | Compact layouts, masonry-style |
+| Mode       | Overlap | Auto-arrange | Best for                         |
+| ---------- | ------- | ------------ | -------------------------------- |
+| `none`     | Yes     | No           | Simple layouts, manual control   |
+| `push`     | No      | Pushes down  | Dashboard widgets, kanban boards |
+| `compress` | No      | Fills gaps   | Compact layouts, masonry-style   |
 
 ## Example: Push Collision
 
@@ -112,7 +115,7 @@ Setting `collision="compress"` compresses items vertically toward the top of the
 	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },
 		{ id: '1', x: 2, y: 2, w: 2, h: 2 },
-		{ id: '2', x: 2, y: 0, w: 1, h: 2 },
+		{ id: '2', x: 2, y: 0, w: 1, h: 2 }
 	]);
 
 	const itemSize = { height: 40 };

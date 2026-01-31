@@ -15,35 +15,35 @@ npm install @appulsauce/svelte-grid
 
 ```svelte
 <script lang="ts">
-  import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
+	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
-  let items = $state([
-    { id: '1', x: 0, y: 0, w: 2, h: 2 },
-    { id: '2', x: 2, y: 0, w: 3, h: 1 }
-  ]);
+	let items = $state([
+		{ id: '1', x: 0, y: 0, w: 2, h: 2 },
+		{ id: '2', x: 2, y: 0, w: 3, h: 1 }
+	]);
 
-  let gridController: GridController;
+	let gridController: GridController;
 
-  function addItem() {
-    const position = gridController.getFirstAvailablePosition(2, 2);
-    if (position) {
-      items = [...items, { id: crypto.randomUUID(), ...position, w: 2, h: 2 }];
-    }
-  }
+	function addItem() {
+		const position = gridController.getFirstAvailablePosition(2, 2);
+		if (position) {
+			items = [...items, { id: crypto.randomUUID(), ...position, w: 2, h: 2 }];
+		}
+	}
 
-  const itemSize = { height: 50 };
+	const itemSize = { height: 50 };
 </script>
 
 <button onclick={addItem}>Add Item</button>
 
 <Grid {itemSize} cols={10} collision="push" bind:controller={gridController}>
-  {#each items as item (item.id)}
-    <GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
-      {#snippet children()}
-        <div class="item">{item.id}</div>
-      {/snippet}
-    </GridItem>
-  {/each}
+	{#each items as item (item.id)}
+		<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
+			{#snippet children()}
+				<div class="item">{item.id}</div>
+			{/snippet}
+		</GridItem>
+	{/each}
 </Grid>
 ```
 
@@ -77,25 +77,25 @@ pnpm docs:dev
 
 ### Grid Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `cols` | `number` | `0` | Number of columns (0 = infinite) |
-| `rows` | `number` | `0` | Number of rows (0 = infinite) |
-| `itemSize` | `{ width?, height? }` | `{}` | Fixed cell size in pixels |
-| `gap` | `number` | `10` | Gap between items |
-| `collision` | `'none' \| 'push' \| 'compress'` | `'none'` | Collision behavior |
-| `readOnly` | `boolean` | `false` | Disable all interactions |
+| Prop        | Type                             | Default  | Description                      |
+| ----------- | -------------------------------- | -------- | -------------------------------- |
+| `cols`      | `number`                         | `0`      | Number of columns (0 = infinite) |
+| `rows`      | `number`                         | `0`      | Number of rows (0 = infinite)    |
+| `itemSize`  | `{ width?, height? }`            | `{}`     | Fixed cell size in pixels        |
+| `gap`       | `number`                         | `10`     | Gap between items                |
+| `collision` | `'none' \| 'push' \| 'compress'` | `'none'` | Collision behavior               |
+| `readOnly`  | `boolean`                        | `false`  | Disable all interactions         |
 
 ### GridItem Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `x` | `number` | required | X position in grid units |
-| `y` | `number` | required | Y position in grid units |
-| `w` | `number` | `1` | Width in grid units |
-| `h` | `number` | `1` | Height in grid units |
-| `movable` | `boolean` | `true` | Can be dragged |
-| `resizable` | `boolean` | `true` | Can be resized |
+| Prop        | Type      | Default  | Description              |
+| ----------- | --------- | -------- | ------------------------ |
+| `x`         | `number`  | required | X position in grid units |
+| `y`         | `number`  | required | Y position in grid units |
+| `w`         | `number`  | `1`      | Width in grid units      |
+| `h`         | `number`  | `1`      | Height in grid units     |
+| `movable`   | `boolean` | `true`   | Can be dragged           |
+| `resizable` | `boolean` | `true`   | Can be resized           |
 
 ## Requirements
 

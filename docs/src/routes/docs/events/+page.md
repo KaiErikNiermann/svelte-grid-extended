@@ -74,8 +74,8 @@ The `onpreviewchange` callback fires during drag/resize, before the final positi
 
 ```typescript
 interface LayoutChangeDetail {
-	item: LayoutItem;        // The item that changed
-	items: LayoutItem[];     // All items in the grid
+	item: LayoutItem; // The item that changed
+	items: LayoutItem[]; // All items in the grid
 }
 
 interface LayoutItem {
@@ -96,7 +96,7 @@ interface LayoutItem {
 
 	let items = $state([
 		{ id: '1', x: 0, y: 0, w: 2, h: 2 },
-		{ id: '2', x: 2, y: 0, w: 3, h: 1 },
+		{ id: '2', x: 2, y: 0, w: 3, h: 1 }
 	]);
 
 	onMount(() => {
@@ -146,18 +146,12 @@ interface LayoutItem {
 
 {#if previewInfo}
 	<div class="fixed bottom-4 right-4 bg-black text-white p-2 rounded text-sm">
-		Position: ({previewInfo.x}, {previewInfo.y})
-		Size: {previewInfo.w}x{previewInfo.h}
+		Position: ({previewInfo.x}, {previewInfo.y}) Size: {previewInfo.w}x{previewInfo.h}
 	</div>
 {/if}
 
 <Grid {itemSize} cols={10}>
-	<GridItem
-		x={0}
-		y={0}
-		onpreviewchange={handlePreview}
-		onchange={handleChange}
-	>
+	<GridItem x={0} y={0} onpreviewchange={handlePreview} onchange={handleChange}>
 		{#snippet children()}
 			<div class="item">Drag to see position</div>
 		{/snippet}
@@ -170,16 +164,19 @@ interface LayoutItem {
 You can use either two-way binding or events to track changes:
 
 **Two-way Binding** (recommended for reactive state):
+
 ```svelte
 <GridItem bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
 ```
 
 **Events** (useful for side effects):
+
 ```svelte
 <GridItem x={item.x} y={item.y} onchange={saveToDatabase}>
 ```
 
 You can also use both together:
+
 ```svelte
 <GridItem
 	bind:x={item.x}

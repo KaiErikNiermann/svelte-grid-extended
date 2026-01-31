@@ -1,6 +1,7 @@
 <script lang="ts">
 	import NavLink from './NavLink.svelte';
 	import { cn } from '$lib/utils';
+	import { base } from '$app/paths';
 
 	interface NavSection {
 		title: string;
@@ -68,7 +69,7 @@
 			</h4>
 			<div class="space-y-1">
 				{#each section.items as item}
-					<NavLink href={item.href}>
+					<NavLink href={base + item.href}>
 						{item.label}
 					</NavLink>
 				{/each}

@@ -41,4 +41,4 @@ import type { GridController, LayoutChangeDetail, LayoutItem } from '@appulsauce
 
 ## Next Steps
 
-Once installed, head to the [Quick Start](/docs/quickstart) guide to create your first grid.
+Once installed, head to the [Quick Start](../quickstart) guide to create your first grid.

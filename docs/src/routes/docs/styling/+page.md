@@ -12,24 +12,20 @@ The Grid and GridItem components can be styled using CSS classes, inline styles,
 ### Grid Container
 
 ```svelte
-<Grid
-	class="my-grid-container"
-	style="border: 1px solid #ccc;"
-	cols={10}
->
+<Grid class="my-grid-container" style="border: 1px solid #ccc;" cols={10}>
 	<!-- items -->
 </Grid>
 ```
 
 ### GridItem
 
-| Prop | Purpose |
-|------|---------|
-| `class` | Main item container |
-| `activeClass` | Applied during drag/resize |
+| Prop           | Purpose                                      |
+| -------------- | -------------------------------------------- |
+| `class`        | Main item container                          |
+| `activeClass`  | Applied during drag/resize                   |
 | `previewClass` | The placeholder showing where item will drop |
-| `resizerClass` | The resize handle element |
-| `style` | Inline styles |
+| `resizerClass` | The resize handle element                    |
+| `style`        | Inline styles                                |
 
 ```svelte
 <GridItem
@@ -52,22 +48,20 @@ Understanding the DOM structure helps with styling:
 
 ```svelte
 <!-- Grid Container -->
-<div class="{gridClass}" style="{gridStyle}">
-
+<div class={gridClass} style={gridStyle}>
 	<!-- GridItem -->
-	<div class="{itemClass}" class:activeClass={isActive}>
+	<div class={itemClass} class:activeClass={isActive}>
 		<!-- Your content via children snippet -->
 		{@render children?.()}
 
 		<!-- Resize handle (when resizable) -->
-		<div class="{resizerClass}" />
+		<div class={resizerClass} />
 	</div>
 
 	<!-- Preview placeholder (during interaction) -->
 	{#if isActive}
-		<div class="{previewClass}" />
+		<div class={previewClass} />
 	{/if}
-
 </div>
 ```
 
@@ -95,7 +89,9 @@ Since the components use internal class bindings, you'll need `:global()` for cu
 		background-color: white;
 		border-radius: 8px;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		transition: transform 0.2s, box-shadow 0.2s;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
 	}
 
 	:global(.grid-item:hover) {
@@ -199,7 +195,7 @@ Or use a custom snippet:
 	const items = [
 		{ id: '1', x: 0, y: 0, w: 4, h: 3, title: 'Revenue', color: 'emerald' },
 		{ id: '2', x: 4, y: 0, w: 4, h: 3, title: 'Users', color: 'blue' },
-		{ id: '3', x: 0, y: 3, w: 8, h: 4, title: 'Chart', color: 'purple' },
+		{ id: '3', x: 0, y: 3, w: 8, h: 4, title: 'Chart', color: 'purple' }
 	];
 
 	const itemSize = { height: 50 };

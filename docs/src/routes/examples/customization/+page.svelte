@@ -10,13 +10,22 @@
 
 <div class="prose mb-6">
 	<h1>Custom Handles</h1>
-	<p>Use the <code>moveHandle</code> and <code>resizeHandle</code> snippets to create custom drag and resize controls. This restricts interaction to specific elements.</p>
+	<p>
+		Use the <code>moveHandle</code> and <code>resizeHandle</code> snippets to create custom drag and resize
+		controls. This restricts interaction to specific elements.
+	</p>
 </div>
 
 <div class="border border-border rounded-lg p-4 bg-muted/30">
 	<Grid cols={10} rows={10}>
 		<!-- Both custom handles -->
-		<GridItem x={0} y={0} w={3} h={4} class="flex flex-col bg-card border border-border rounded-lg overflow-hidden">
+		<GridItem
+			x={0}
+			y={0}
+			w={3}
+			h={4}
+			class="flex flex-col bg-card border border-border rounded-lg overflow-hidden"
+		>
 			{#snippet moveHandle({ moveStart })}
 				<div
 					class="flex items-center gap-2 p-2 bg-muted border-b border-border cursor-move"
@@ -48,7 +57,13 @@
 		</GridItem>
 
 		<!-- Only custom move handle -->
-		<GridItem x={3} y={0} w={3} h={4} class="flex flex-col bg-card border border-border rounded-lg overflow-hidden">
+		<GridItem
+			x={3}
+			y={0}
+			w={3}
+			h={4}
+			class="flex flex-col bg-card border border-border rounded-lg overflow-hidden"
+		>
 			{#snippet moveHandle({ moveStart })}
 				<div
 					class="flex items-center gap-2 p-2 bg-muted border-b border-border cursor-move"
@@ -69,7 +84,13 @@
 		</GridItem>
 
 		<!-- Default (whole item draggable) -->
-		<GridItem x={6} y={0} w={3} h={4} class="grid-demo-item bg-primary/20 border border-primary/40 rounded-lg">
+		<GridItem
+			x={6}
+			y={0}
+			w={3}
+			h={4}
+			class="grid-demo-item bg-primary/20 border border-primary/40 rounded-lg"
+		>
 			{#snippet children()}
 				<div class="text-center p-2">
 					<div class="font-medium">Default</div>

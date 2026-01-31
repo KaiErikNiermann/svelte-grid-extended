@@ -16,7 +16,11 @@
 
 <div class="prose mb-6">
 	<h1>Styling</h1>
-	<p>Grid items can be styled using <code>class</code>, <code>activeClass</code>, and <code>previewClass</code> props. The active class applies during drag/resize, and the preview class styles the drop target indicator.</p>
+	<p>
+		Grid items can be styled using <code>class</code>, <code>activeClass</code>, and
+		<code>previewClass</code> props. The active class applies during drag/resize, and the preview class
+		styles the drop target indicator.
+	</p>
 </div>
 
 <div class="border border-border rounded-lg p-4 bg-muted/30">

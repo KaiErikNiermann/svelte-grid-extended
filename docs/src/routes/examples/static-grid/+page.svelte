@@ -11,7 +11,10 @@
 
 <div class="prose mb-6">
 	<h1>Static Grid</h1>
-	<p>When <code>itemSize</code> is provided, the grid uses fixed pixel dimensions instead of adapting to the container. Each cell here is 80×40 pixels.</p>
+	<p>
+		When <code>itemSize</code> is provided, the grid uses fixed pixel dimensions instead of adapting to
+		the container. Each cell here is 80×40 pixels.
+	</p>
 </div>
 
 <div class="border border-border rounded-lg p-4 bg-muted/30 overflow-auto">
@@ -19,7 +22,12 @@
 		<GridItem x={1} y={0} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
 			{#snippet children()}Hey{/snippet}
 		</GridItem>
-		<GridItem x={3} y={3} w={4} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
+		<GridItem
+			x={3}
+			y={3}
+			w={4}
+			class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+		>
 			{#snippet children()}Hoy{/snippet}
 		</GridItem>
 	</Grid>

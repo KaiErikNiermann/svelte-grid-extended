@@ -30,10 +30,12 @@ Bind to the `controller` prop on the Grid component:
 Finds the first available position that can fit an item of the specified size.
 
 **Parameters:**
+
 - `w` (number): Width of the item in grid units
 - `h` (number): Height of the item in grid units
 
 **Returns:**
+
 - `{ x: number, y: number }` - The first available position
 - `null` - If no position is available (only when grid has fixed rows)
 
@@ -41,22 +43,23 @@ Finds the first available position that can fit an item of the specified size.
 <script lang="ts">
 	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
-	let items = $state([
-		{ id: '1', x: 0, y: 0, w: 2, h: 2 }
-	]);
+	let items = $state([{ id: '1', x: 0, y: 0, w: 2, h: 2 }]);
 
 	let gridController: GridController;
 
 	function addItem() {
 		const position = gridController.getFirstAvailablePosition(2, 2);
 		if (position) {
-			items = [...items, {
-				id: crypto.randomUUID(),
-				x: position.x,
-				y: position.y,
-				w: 2,
-				h: 2
-			}];
+			items = [
+				...items,
+				{
+					id: crypto.randomUUID(),
+					x: position.x,
+					y: position.y,
+					w: 2,
+					h: 2
+				}
+			];
 		}
 	}
 
@@ -86,7 +89,7 @@ Compresses all items vertically, moving them upward to fill any gaps. This is us
 
 	let items = $state([
 		{ id: '1', x: 0, y: 0, w: 2, h: 2 },
-		{ id: '2', x: 0, y: 5, w: 2, h: 2 }, // Gap at y: 2-4
+		{ id: '2', x: 0, y: 5, w: 2, h: 2 } // Gap at y: 2-4
 	]);
 
 	let gridController: GridController;
@@ -142,7 +145,7 @@ function addRandomItem() {
 
 ```typescript
 function removeItem(id: string) {
-	items = items.filter(item => item.id !== id);
+	items = items.filter((item) => item.id !== id);
 	gridController.compress();
 }
 ```

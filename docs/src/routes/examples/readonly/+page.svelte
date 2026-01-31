@@ -11,7 +11,10 @@
 
 <div class="prose mb-6">
 	<h1>Read Only</h1>
-	<p>Set <code>readOnly</code> on the Grid to disable all interactions, or use <code>movable</code> and <code>resizable</code> on individual items for fine-grained control.</p>
+	<p>
+		Set <code>readOnly</code> on the Grid to disable all interactions, or use <code>movable</code>
+		and <code>resizable</code> on individual items for fine-grained control.
+	</p>
 </div>
 
 <div class="mb-4">
@@ -23,13 +26,31 @@
 
 <div class="border border-border rounded-lg p-4 bg-muted/30">
 	<Grid cols={10} rows={10} {readOnly}>
-		<GridItem x={0} y={0} w={3} h={3} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
+		<GridItem
+			x={0}
+			y={0}
+			w={3}
+			h={3}
+			class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+		>
 			{#snippet children()}Item A{/snippet}
 		</GridItem>
-		<GridItem x={3} y={0} w={3} h={3} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
+		<GridItem
+			x={3}
+			y={0}
+			w={3}
+			h={3}
+			class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+		>
 			{#snippet children()}Item B{/snippet}
 		</GridItem>
-		<GridItem x={6} y={0} w={3} h={3} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
+		<GridItem
+			x={6}
+			y={0}
+			w={3}
+			h={3}
+			class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+		>
 			{#snippet children()}Item C{/snippet}
 		</GridItem>
 	</Grid>

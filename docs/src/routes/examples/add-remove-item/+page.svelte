@@ -12,19 +12,19 @@
 	let items = $state(initialItems.map((item) => ({ ...item })));
 	const itemsBackup = initialItems.map((item) => ({ ...item }));
 
-	let gridController: GridController;
+	let gridController: GridController | undefined = $state();
 
 	function addItem() {
 		const w = Math.floor(Math.random() * 2) + 1;
 		const h = Math.floor(Math.random() * 3) + 1;
-		const position = gridController.getFirstAvailablePosition(w, h);
+		const position = gridController?.getFirstAvailablePosition(w, h);
 		if (position) {
 			items = [...items, { id: crypto.randomUUID(), ...position, w, h }];
 		}
 	}
 
 	function removeItem(id: string) {
-		items = items.filter(item => item.id !== id);
+		items = items.filter((item) => item.id !== id);
 	}
 
 	function resetGrid() {
@@ -32,6 +32,37 @@
 	}
 
 	const itemSize = { height: 50 };
+
+	const exampleCode = String.raw`<script lang="ts">
+  import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
+
+  let items = $state([...]);
+  let gridController: GridController | undefined = $state();
+
+  function addItem() {
+    const w = 2, h = 2;
+    const position = gridController?.getFirstAvailablePosition(w, h);
+    if (position) {
+      items = [...items, { id: crypto.randomUUID(), ...position, w, h }];
+    }
+  }
+
+  function removeItem(id: string) {
+    items = items.filter(item => item.id !== id);
+  }
+<\/script>
+
+<button onclick={addItem}>Add</button>
+
+<Grid cols={8} collision="push" bind:controller={gridController}>
+  {#each items as item (item.id)}
+    <GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
+      {#snippet children()}
+        <button onclick={() => removeItem(item.id)}>X</button>
+      {/snippet}
+    </GridItem>
+  {/each}
+</Grid>`;
 </script>
 
 <svelte:head>
@@ -40,7 +71,11 @@
 
 <div class="prose mb-6">
 	<h1>Add/Remove Items</h1>
-	<p>Use the Grid Controller to find available positions when adding items. The <code>getFirstAvailablePosition(w, h)</code> method returns the first position that can fit an item of the given size.</p>
+	<p>
+		Use the Grid Controller to find available positions when adding items. The <code
+			>getFirstAvailablePosition(w, h)</code
+		> method returns the first position that can fit an item of the given size.
+	</p>
 </div>
 
 <div class="flex gap-2 mb-4">
@@ -73,7 +108,10 @@
 			>
 				{#snippet children()}
 					<button
-						onclick={(e) => { e.stopPropagation(); removeItem(item.id); }}
+						onclick={(e) => {
+							e.stopPropagation();
+							removeItem(item.id);
+						}}
 						onpointerdown={(e) => e.stopPropagation()}
 						class="absolute top-1 right-1 p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
 						aria-label="Remove item"
@@ -94,37 +132,4 @@
 <div class="mt-6 prose">
 	<h3>Code</h3>
 </div>
-<CodeBlock
-	class="mt-3"
-	lang="svelte"
-	code={`<script lang="ts">
-  import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
-
-  let items = $state([...]);
-  let gridController: GridController;
-
-  function addItem() {
-    const w = 2, h = 2;
-    const position = gridController.getFirstAvailablePosition(w, h);
-    if (position) {
-      items = [...items, { id: crypto.randomUUID(), ...position, w, h }];
-    }
-  }
-
-  function removeItem(id: string) {
-    items = items.filter(item => item.id !== id);
-  }
-</script>
-
-<button onclick={addItem}>Add</button>
-
-<Grid cols={8} collision="push" bind:controller={gridController}>
-  {#each items as item (item.id)}
-    <GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
-      {#snippet children()}
-        <button onclick={() => removeItem(item.id)}>X</button>
-      {/snippet}
-    </GridItem>
-  {/each}
-</Grid>`}
-/>
+<CodeBlock class="mt-3" lang="svelte" code={exampleCode} />

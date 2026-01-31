@@ -15,29 +15,29 @@ import { GridItem } from '@appulsauce/svelte-grid';
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `id` | `string` | `uuid.v4` | Unique identifier for the item. Used for collision detection. |
-| `x` | `number` | **required** | X position (column) in grid units. |
-| `y` | `number` | **required** | Y position (row) in grid units. |
-| `w` | `number` | `1` | Width in grid units. |
-| `h` | `number` | `1` | Height in grid units. |
-| `min` | `{ w: number, h: number }` | `{ w: 1, h: 1 }` | Minimum size constraints. |
-| `max` | `{ w: number, h: number } \| undefined` | `undefined` | Maximum size constraints. If undefined, no max limit. |
-| `movable` | `boolean` | `true` | Whether the item can be dragged. |
-| `resizable` | `boolean` | `true` | Whether the item can be resized. |
-| `onchange` | `(detail: LayoutChangeDetail) => void` | `undefined` | Callback when this item changes. |
-| `onpreviewchange` | `(detail: LayoutChangeDetail) => void` | `undefined` | Callback when the preview position changes during drag. |
+| Prop              | Type                                    | Default          | Description                                                   |
+| ----------------- | --------------------------------------- | ---------------- | ------------------------------------------------------------- |
+| `id`              | `string`                                | `uuid.v4`        | Unique identifier for the item. Used for collision detection. |
+| `x`               | `number`                                | **required**     | X position (column) in grid units.                            |
+| `y`               | `number`                                | **required**     | Y position (row) in grid units.                               |
+| `w`               | `number`                                | `1`              | Width in grid units.                                          |
+| `h`               | `number`                                | `1`              | Height in grid units.                                         |
+| `min`             | `{ w: number, h: number }`              | `{ w: 1, h: 1 }` | Minimum size constraints.                                     |
+| `max`             | `{ w: number, h: number } \| undefined` | `undefined`      | Maximum size constraints. If undefined, no max limit.         |
+| `movable`         | `boolean`                               | `true`           | Whether the item can be dragged.                              |
+| `resizable`       | `boolean`                               | `true`           | Whether the item can be resized.                              |
+| `onchange`        | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when this item changes.                              |
+| `onpreviewchange` | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when the preview position changes during drag.       |
 
 ## Style Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `class` | `string` | CSS class for the grid item container. |
-| `activeClass` | `string` | CSS class applied when item is being dragged or resized. |
-| `previewClass` | `string` | CSS class for the preview placeholder. |
-| `resizerClass` | `string` | CSS class for the resize handle. |
-| `style` | `string` | Inline styles for the grid item. |
+| Prop           | Type     | Description                                              |
+| -------------- | -------- | -------------------------------------------------------- |
+| `class`        | `string` | CSS class for the grid item container.                   |
+| `activeClass`  | `string` | CSS class applied when item is being dragged or resized. |
+| `previewClass` | `string` | CSS class for the preview placeholder.                   |
+| `resizerClass` | `string` | CSS class for the resize handle.                         |
+| `style`        | `string` | Inline styles for the grid item.                         |
 
 ## Bindable Props
 
@@ -76,9 +76,7 @@ Custom drag handle. Receives a `moveStart` function to initiate dragging:
 ```svelte
 <GridItem x={0} y={0}>
 	{#snippet moveHandle({ moveStart })}
-		<div class="drag-handle" onpointerdown={moveStart}>
-			Drag me
-		</div>
+		<div class="drag-handle" onpointerdown={moveStart}>Drag me</div>
 	{/snippet}
 
 	{#snippet children()}
@@ -94,9 +92,7 @@ Custom resize handle. Receives a `resizeStart` function to initiate resizing:
 ```svelte
 <GridItem x={0} y={0}>
 	{#snippet resizeHandle({ resizeStart })}
-		<div class="resize-handle" onpointerdown={resizeStart}>
-			⤡
-		</div>
+		<div class="resize-handle" onpointerdown={resizeStart}>⤡</div>
 	{/snippet}
 
 	{#snippet children()}
@@ -141,15 +137,11 @@ Understanding the DOM structure helps with styling:
 	previewClass="bg-blue-500/20 border-2 border-blue-500 border-dashed"
 >
 	{#snippet moveHandle({ moveStart })}
-		<div class="cursor-move p-2 bg-blue-200" onpointerdown={moveStart}>
-			⠿ Drag
-		</div>
+		<div class="cursor-move p-2 bg-blue-200" onpointerdown={moveStart}>⠿ Drag</div>
 	{/snippet}
 
 	{#snippet children()}
-		<div class="p-4">
-			Resizable content with custom drag handle
-		</div>
+		<div class="p-4">Resizable content with custom drag handle</div>
 	{/snippet}
 </GridItem>
 ```

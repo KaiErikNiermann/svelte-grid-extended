@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import { GridController } from '../../src/lib/GridController';
-import type { LayoutItem, GridParams, LayoutChangeDetail } from '../../src/lib/types';
+import type { LayoutItem, GridParams } from '../../src/lib/types';
 
 describe('GridController firstAvailablePosition', () => {
 	type TestCase = {
@@ -33,7 +33,7 @@ describe('GridController firstAvailablePosition', () => {
 		updateGrid: () => {
 			/* .. */
 		},
-		onchange: (_detail: LayoutChangeDetail) => {
+		onchange: () => {
 			/* .. */
 		}
 	};

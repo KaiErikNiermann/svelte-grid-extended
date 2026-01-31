@@ -1,16 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	import {
-		coordinate2size,
-		calcPosition,
-		snapOnMove,
-		snapOnResize,
-		type SnapGridParams
-	} from './utils/item';
+	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
 	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 
-	import type { LayoutItem, LayoutChangeDetail, Size, ItemSize, GridItemProps } from './types';
+	import type { LayoutItem, GridItemProps } from './types';
 	import { getGridContext } from './Grid.svelte';
 
 	let {
@@ -37,7 +31,7 @@
 
 	// Get grid context - this returns a reactive reference wrapper
 	const gridParamsRef = getGridContext();
-	
+
 	// Access current within reactive contexts ($effect, $derived, template)
 	const gridParams = $derived(gridParamsRef.current);
 
@@ -51,20 +45,21 @@
 	 * Item object that is used in `gridParams.items`.
 	 */
 	let item = $state<LayoutItem>({
-		id,
-		x,
-		y,
-		w,
-		h,
-		min,
-		max,
-		movable,
-		resizable,
+		id: '',
+		x: 0,
+		y: 0,
+		w: 1,
+		h: 1,
+		min: { w: 1, h: 1 },
+		max: undefined,
+		movable: true,
+		resizable: true,
 		invalidate
 	});
 
 	// Sync props to item
 	$effect(() => {
+		item.id = id;
 		item.x = x;
 		item.y = y;
 		item.w = w;
@@ -157,14 +152,11 @@
 
 	const _movable = $derived(!gridParams.readOnly && movable);
 
-	let pointerShift = { left: 0, top: 0 };
-
 	function moveStart(event: PointerEvent) {
 		if (event.button !== 0) return;
 		event.stopPropagation();
 		initInteraction(event);
 		initialPosition = { left, top };
-		pointerShift = { left: event.pageX - left, top: event.pageY - top };
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', moveEnd);
 	}
@@ -209,12 +201,7 @@
 	}
 
 	function updateCollItemPositionWithPush(collItem: LayoutItem, items: LayoutItem[]) {
-		const newPosition = getAvailablePosition(
-			collItem,
-			items,
-			gridParams.maxCols,
-			gridParams.maxRows
-		);
+		const newPosition = getAvailablePosition(collItem, items, gridParams.maxCols, gridParams.maxRows);
 		if (newPosition) {
 			const { x, y } = newPosition;
 			collItem.x = x;
@@ -224,12 +211,7 @@
 		gridParams.updateGrid();
 	}
 
-	function handleCollisionsForPreviewItemWithPush(newAttributes: {
-		x?: number;
-		y?: number;
-		w?: number;
-		h?: number;
-	}) {
+	function handleCollisionsForPreviewItemWithPush(newAttributes: { x?: number; y?: number; w?: number; h?: number }) {
 		const gridItems = Object.values(gridParams.items);
 		const itemsExceptPreview = gridItems.filter((item) => item.id != previewItem.id);
 		const collItems = getCollisions({ ...previewItem, ...newAttributes }, itemsExceptPreview);
@@ -306,7 +288,6 @@
 	function moveEnd(event: PointerEvent) {
 		if (event.button !== 0) return;
 		endInteraction(event);
-		pointerShift = { left: 0, top: 0 };
 		window.removeEventListener('pointermove', move);
 		window.removeEventListener('pointerup', moveEnd);
 	}
@@ -394,10 +375,7 @@
 			const hGap = newH - previewItem.h;
 			previewItem = { ...previewItem, w: newW, h: newH };
 			applyPreview();
-			const collItems = getCollisions(
-				{ ...previewItem, w: newW, h: 9999 },
-				Object.values(gridParams.items)
-			);
+			const collItems = getCollisions({ ...previewItem, w: newW, h: 9999 }, Object.values(gridParams.items));
 			collItems.forEach((i) => {
 				i.y += hGap;
 				i.invalidate();
@@ -432,9 +410,7 @@
 				} else if (previewItem.y < currentItem.y + currentItem.h) {
 					// compress items above previewItem
 					const maxY =
-						currentItem.y >= previewItem.y
-							? currentItem.y + previewItem.h + 1
-							: previewItem.y + currentItem.h + 1;
+						currentItem.y >= previewItem.y ? currentItem.y + previewItem.h + 1 : previewItem.y + currentItem.h + 1;
 					let newY = maxY;
 					while (newY >= 0) {
 						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {

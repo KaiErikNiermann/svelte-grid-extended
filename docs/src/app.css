@@ -50,10 +50,17 @@
 
 	body {
 		@apply bg-background text-foreground;
+		overflow: hidden;
 	}
 
 	html {
 		scroll-behavior: smooth;
+	}
+
+	html,
+	body,
+	#svelte {
+		height: 100%;
 	}
 }
 
@@ -181,7 +188,10 @@ pre.shiki code {
 	background: hsl(var(--muted));
 	color: hsl(var(--muted-foreground));
 	opacity: 0;
-	transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+	transition:
+		opacity 0.2s ease,
+		background-color 0.2s ease,
+		color 0.2s ease;
 }
 
 pre.shiki:hover .code-copy-button {

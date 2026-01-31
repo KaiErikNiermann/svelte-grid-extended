@@ -18,12 +18,7 @@ export function size2coordinate(size: number, cellSize: number, gap: number): nu
 
 export type SnapGridParams = Required<Pick<GridParams, 'itemSize' | 'gap' | 'maxCols' | 'maxRows'>>;
 
-export function snapOnMove(
-	left: number,
-	top: number,
-	item: LayoutItem,
-	gridParams: SnapGridParams
-): Position {
+export function snapOnMove(left: number, top: number, item: LayoutItem, gridParams: SnapGridParams): Position {
 	const { itemSize, gap } = gridParams;
 	const { w, h } = item;
 
@@ -36,12 +31,7 @@ export function snapOnMove(
 	return { x, y };
 }
 
-export function snapOnResize(
-	width: number,
-	height: number,
-	item: LayoutItem,
-	gridParams: SnapGridParams
-): Size {
+export function snapOnResize(width: number, height: number, item: LayoutItem, gridParams: SnapGridParams): Size {
 	const { itemSize, gap } = gridParams;
 	const { x, y } = item;
 
@@ -54,10 +44,7 @@ export function snapOnResize(
 	return { w, h };
 }
 
-export function calcPosition(
-	item: LayoutItem,
-	options: { itemSize: ItemSize; gap: number }
-): ItemPosition & ItemSize {
+export function calcPosition(item: LayoutItem, options: { itemSize: ItemSize; gap: number }): ItemPosition & ItemSize {
 	const { itemSize, gap } = options;
 	return {
 		left: coordinate2position(item.x, itemSize.width, gap),

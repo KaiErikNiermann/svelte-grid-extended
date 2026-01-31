@@ -24,7 +24,10 @@
 
 <div class="prose mb-6">
 	<h1>Two Way Binding</h1>
-	<p>Use <code>bind:</code> on item props to keep your state in sync with the grid. Move or resize items to see the values update.</p>
+	<p>
+		Use <code>bind:</code> on item props to keep your state in sync with the grid. Move or resize items
+		to see the values update.
+	</p>
 </div>
 
 <div class="flex gap-4 mb-4">
@@ -39,8 +42,14 @@
 <div class="grid gap-6 lg:grid-cols-2">
 	<div class="border border-border rounded-lg p-4 bg-muted/30">
 		<Grid {itemSize} cols={8} collision="push">
-			{#each items as item, i (item.label)}
-				<GridItem bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h} class="grid-demo-item bg-primary/20 border border-primary/40 rounded">
+			{#each items as item (item.label)}
+				<GridItem
+					bind:x={item.x}
+					bind:y={item.y}
+					bind:w={item.w}
+					bind:h={item.h}
+					class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+				>
 					{#snippet children()}{item.label}{/snippet}
 				</GridItem>
 			{/each}

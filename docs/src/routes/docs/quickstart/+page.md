@@ -86,24 +86,27 @@ For dynamic grids, use Svelte's `$state` and bind the item properties:
 ### Grid Units
 
 Items are positioned and sized in **grid units**, not pixels:
+
 - `x` and `y` define the position (column and row)
 - `w` and `h` define the size (width and height in grid cells)
 
 ### Item Size
 
 When using `itemSize`, you define the pixel dimensions of each grid cell:
+
 - `itemSize.width` - pixel width of each column
 - `itemSize.height` - pixel height of each row
 
 ### Collision Behavior
 
 The `collision` prop controls how items interact:
+
 - `none` - Items can overlap (default)
 - `push` - Items push others out of the way
 - `compress` - Items compress vertically to fill gaps
 
 ## Next Steps
 
-- Learn about [Grid props](/docs/grid)
-- Explore [GridItem options](/docs/grid-item)
-- See more [Examples](/examples)
+- Learn about [Grid props](../grid)
+- Explore [GridItem options](../grid-item)
+- See more [Examples](../examples)

@@ -19,7 +19,10 @@
 
 <div class="prose mb-6">
 	<h1>Collision: Compress</h1>
-	<p>With <code>collision="compress"</code>, items always move to the highest available position. Gaps are automatically filled, creating a compact layout.</p>
+	<p>
+		With <code>collision="compress"</code>, items always move to the highest available position.
+		Gaps are automatically filled, creating a compact layout.
+	</p>
 </div>
 
 <div class="border border-border rounded-lg p-4 bg-muted/30">
@@ -42,7 +45,8 @@
 <div class="mt-6 prose">
 	<h3>Code</h3>
 	<blockquote>
-		<strong>Tip:</strong> Use <code>autoCompress={'{'}false{'}'}</code> to disable automatic compression and call <code>controller.compress()</code> manually.
+		<strong>Tip:</strong> Use <code>autoCompress={'{'}false{'}'}</code> to disable automatic
+		compression and call <code>controller.compress()</code> manually.
 	</blockquote>
 </div>
 <CodeBlock

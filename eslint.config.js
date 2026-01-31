@@ -27,6 +27,14 @@ export default tseslint.config(
 		}
 	},
 	{
-		ignores: ['build/', '.svelte-kit/', 'dist/', 'node_modules/']
+		ignores: [
+			'build/',
+			'.svelte-kit/',
+			'dist/',
+			'node_modules/',
+			'docs/build/',
+			'docs/.svelte-kit/',
+			'docs/node_modules/'
+		]
 	}
 );

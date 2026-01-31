@@ -14,19 +14,11 @@ By default, the entire item is draggable. Use the `moveHandle` snippet to restri
 ```svelte
 <GridItem x={0} y={0}>
 	{#snippet moveHandle({ moveStart })}
-		<div
-			class="drag-handle cursor-move bg-gray-200 p-2"
-			onpointerdown={moveStart}
-		>
-			⠿ Drag here
-		</div>
+		<div class="drag-handle cursor-move bg-gray-200 p-2" onpointerdown={moveStart}>⠿ Drag here</div>
 	{/snippet}
 
 	{#snippet children()}
-		<div class="p-4">
-			This content is not draggable directly.
-			Use the handle above.
-		</div>
+		<div class="p-4">This content is not draggable directly. Use the handle above.</div>
 	{/snippet}
 </GridItem>
 ```
@@ -58,9 +50,7 @@ Replace the default resize handle with your own:
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
-	let items = $state([
-		{ id: '1', x: 0, y: 0, w: 4, h: 3 }
-	]);
+	let items = $state([{ id: '1', x: 0, y: 0, w: 4, h: 3 }]);
 
 	const itemSize = { height: 50 };
 </script>
@@ -79,12 +69,12 @@ Replace the default resize handle with your own:
 			{/snippet}
 
 			{#snippet resizeHandle({ resizeStart })}
-				<div
-					class="absolute bottom-1 right-1 w-4 h-4 cursor-se-resize"
-					onpointerdown={resizeStart}
-				>
+				<div class="absolute bottom-1 right-1 w-4 h-4 cursor-se-resize" onpointerdown={resizeStart}>
 					<svg viewBox="0 0 24 24" class="w-full h-full text-gray-400">
-						<path fill="currentColor" d="M22,22H20V20H22V22M22,18H20V16H22V18M18,22H16V20H18V22M18,18H16V16H18V18M14,22H12V20H14V22M22,14H20V12H22V14Z" />
+						<path
+							fill="currentColor"
+							d="M22,22H20V20H22V22M22,18H20V16H22V18M18,22H16V20H18V22M18,18H16V16H18V18M14,22H12V20H14V22M22,14H20V12H22V14Z"
+						/>
 					</svg>
 				</div>
 			{/snippet}
@@ -149,14 +139,7 @@ Disable move and/or resize on specific items:
 Set minimum and maximum sizes for items:
 
 ```svelte
-<GridItem
-	x={0}
-	y={0}
-	w={3}
-	h={2}
-	min={{ w: 2, h: 1 }}
-	max={{ w: 6, h: 4 }}
->
+<GridItem x={0} y={0} w={3} h={2} min={{ w: 2, h: 1 }} max={{ w: 6, h: 4 }}>
 	{#snippet children()}
 		<div>Constrained: 2-6 wide, 1-4 tall</div>
 	{/snippet}
@@ -171,7 +154,7 @@ Pass additional attributes to items using the spread operator:
 <script lang="ts">
 	const items = [
 		{ id: '1', x: 0, y: 0, w: 2, h: 2, data: { title: 'Widget A', color: 'blue' } },
-		{ id: '2', x: 2, y: 0, w: 2, h: 2, data: { title: 'Widget B', color: 'green' } },
+		{ id: '2', x: 2, y: 0, w: 2, h: 2, data: { title: 'Widget B', color: 'green' } }
 	];
 </script>
 
@@ -199,11 +182,12 @@ Use ts-pattern for complex item rendering logic:
 
 	type WidgetType = 'chart' | 'table' | 'metric';
 
-	const items: Array<{ id: string; x: number; y: number; w: number; h: number; type: WidgetType }> = [
-		{ id: '1', x: 0, y: 0, w: 4, h: 3, type: 'chart' },
-		{ id: '2', x: 4, y: 0, w: 4, h: 2, type: 'metric' },
-		{ id: '3', x: 0, y: 3, w: 8, h: 3, type: 'table' },
-	];
+	const items: Array<{ id: string; x: number; y: number; w: number; h: number; type: WidgetType }> =
+		[
+			{ id: '1', x: 0, y: 0, w: 4, h: 3, type: 'chart' },
+			{ id: '2', x: 4, y: 0, w: 4, h: 2, type: 'metric' },
+			{ id: '3', x: 0, y: 3, w: 8, h: 3, type: 'table' }
+		];
 
 	function getWidgetClass(type: WidgetType): string {
 		return match(type)
@@ -216,7 +200,13 @@ Use ts-pattern for complex item rendering logic:
 
 <Grid cols={8}>
 	{#each items as item (item.id)}
-		<GridItem x={item.x} y={item.y} w={item.w} h={item.h} class={`border ${getWidgetClass(item.type)}`}>
+		<GridItem
+			x={item.x}
+			y={item.y}
+			w={item.w}
+			h={item.h}
+			class={`border ${getWidgetClass(item.type)}`}
+		>
 			{#snippet children()}
 				{#if item.type === 'chart'}
 					<div>Chart Widget</div>

@@ -33,6 +33,7 @@ Set both width and height for a fully static grid:
 ```
 
 In this example:
+
 - Each cell is exactly 100px wide × 40px tall
 - The grid is 1000px wide × 400px tall (plus gaps)
 
@@ -57,6 +58,7 @@ Set only `height` for static row heights with fluid column widths:
 ```
 
 In this example:
+
 - Row heights are fixed at 40px
 - Column widths adapt to the container width
 - Common for dashboard layouts
@@ -131,12 +133,12 @@ When `cols` or `rows` is set to `0`, the grid grows infinitely in that dimension
 
 ## Use Cases
 
-| Configuration | Use Case |
-|--------------|----------|
+| Configuration                 | Use Case                      |
+| ----------------------------- | ----------------------------- |
 | `itemSize: { width, height }` | Fixed-size tiles, image grids |
-| `itemSize: { height }` | Dashboard widgets, cards |
-| `itemSize: { width }` | Horizontal scrolling layouts |
-| `cols: 0` or `rows: 0` | Infinite/growing layouts |
+| `itemSize: { height }`        | Dashboard widgets, cards      |
+| `itemSize: { width }`         | Horizontal scrolling layouts  |
+| `cols: 0` or `rows: 0`        | Infinite/growing layouts      |
 
 ## Example: Dashboard with Fixed Row Height
 
@@ -147,7 +149,7 @@ When `cols` or `rows` is set to `0`, the grid grows infinitely in that dimension
 	let items = $state([
 		{ id: 'stats', x: 0, y: 0, w: 4, h: 2 },
 		{ id: 'chart', x: 4, y: 0, w: 8, h: 4 },
-		{ id: 'table', x: 0, y: 2, w: 4, h: 6 },
+		{ id: 'table', x: 0, y: 2, w: 4, h: 6 }
 	]);
 
 	const itemSize = { height: 50 }; // Each row is 50px

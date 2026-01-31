@@ -16,14 +16,7 @@
 
 <Grid cols={10} rows={10}>
 	{#each items as item}
-		<GridItem
-			x={item.x}
-			y={item.y}
-			w={item.w}
-			h={item.h}
-			movable={item.movable}
-			resizable={item.resizable}
-		>
+		<GridItem x={item.x} y={item.y} w={item.w} h={item.h} movable={item.movable} resizable={item.resizable}>
 			{#snippet children()}
 				<div class="item">
 					{item.movable === false ? 'Cant move' : ''}

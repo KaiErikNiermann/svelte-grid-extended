@@ -126,12 +126,9 @@ describe('🫐 size2coordinate()', () => {
 		[40, 20, 10, 2],
 		[50, 20, 10, 2],
 		[60, 20, 10, 3]
-	])(
-		'size2coordinate(%d, %d, %d) should be %d',
-		(size: number, cellSize: number, gap: number, expected: number) => {
-			expect(size2coordinate(size, cellSize, gap)).toBe(expected);
-		}
-	);
+	])('size2coordinate(%d, %d, %d) should be %d', (size: number, cellSize: number, gap: number, expected: number) => {
+		expect(size2coordinate(size, cellSize, gap)).toBe(expected);
+	});
 });
 
 describe('🥝 clamp()', () => {
@@ -143,12 +140,9 @@ describe('🥝 clamp()', () => {
 		[10, 20, 100, 20],
 		[10, 120, 20, 120],
 		[130, 120, 20, 120]
-	])(
-		'clamp(%d, %d, %d) should be %d',
-		(num: number, min: number, max: number, expected: number) => {
-			expect(clamp(num, min, max)).toBe(expected);
-		}
-	);
+	])('clamp(%d, %d, %d) should be %d', (num: number, min: number, max: number, expected: number) => {
+		expect(clamp(num, min, max)).toBe(expected);
+	});
 });
 
 const gridParams: SnapGridParams = {
@@ -181,13 +175,7 @@ describe('🥥 snapOnMove()', () => {
 		[600, 600, item1x1, gridParams, { x: 6, y: 6 }]
 	])(
 		'should find the correct position %dx%d for item 1x1',
-		(
-			left: number,
-			top: number,
-			item: LayoutItem,
-			gridParams: SnapGridParams,
-			expected: Position
-		) => {
+		(left: number, top: number, item: LayoutItem, gridParams: SnapGridParams, expected: Position) => {
 			expect(snapOnMove(left, top, item, gridParams)).toEqual(expected);
 		}
 	);
@@ -211,21 +199,33 @@ describe('🥥 snapOnMove()', () => {
 		[600, 600, item4x4, gridParams, { x: 4, y: 4 }]
 	])(
 		'should find the correct position %dx%d for item4x4',
-		(
-			left: number,
-			top: number,
-			item: LayoutItem,
-			gridParams: SnapGridParams,
-			expected: Position
-		) => {
+		(left: number, top: number, item: LayoutItem, gridParams: SnapGridParams, expected: Position) => {
 			expect(snapOnMove(left, top, item, gridParams)).toEqual(expected);
 		}
 	);
 });
 
 describe('🍍 snapOnResize()', () => {
-	const itemX1Y1: LayoutItem = { id: '0', x: 1, y: 1, w: 1, h: 1, movable: true, resizable: true, invalidate: () => {} };
-	const itemX4Y4: LayoutItem = { id: '0', x: 4, y: 4, w: 1, h: 1, movable: true, resizable: true, invalidate: () => {} };
+	const itemX1Y1: LayoutItem = {
+		id: '0',
+		x: 1,
+		y: 1,
+		w: 1,
+		h: 1,
+		movable: true,
+		resizable: true,
+		invalidate: () => {}
+	};
+	const itemX4Y4: LayoutItem = {
+		id: '0',
+		x: 4,
+		y: 4,
+		w: 1,
+		h: 1,
+		movable: true,
+		resizable: true,
+		invalidate: () => {}
+	};
 
 	test.each([
 		[100, 100, itemX1Y1, gridParams, { w: 1, h: 1 }],
@@ -246,13 +246,7 @@ describe('🍍 snapOnResize()', () => {
 		[600, 600, itemX1Y1, gridParams, { w: 6, h: 6 }]
 	])(
 		'should find the correct size %dx%d for itemX1Y1',
-		(
-			width: number,
-			height: number,
-			item: LayoutItem,
-			gridParams: SnapGridParams,
-			expected: Size
-		) => {
+		(width: number, height: number, item: LayoutItem, gridParams: SnapGridParams, expected: Size) => {
 			expect(snapOnResize(width, height, item, gridParams)).toEqual(expected);
 		}
 	);
@@ -276,13 +270,7 @@ describe('🍍 snapOnResize()', () => {
 		[1200, 1200, itemX4Y4, gridParams, { w: 4, h: 4 }]
 	])(
 		'should find the correct size %dx%d for itemX4Y4',
-		(
-			width: number,
-			height: number,
-			item: LayoutItem,
-			gridParams: SnapGridParams,
-			expected: Size
-		) => {
+		(width: number, height: number, item: LayoutItem, gridParams: SnapGridParams, expected: Size) => {
 			expect(snapOnResize(width, height, item, gridParams)).toEqual(expected);
 		}
 	);

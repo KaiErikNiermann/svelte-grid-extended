@@ -15,9 +15,7 @@ export function assertGridOptions(options: GridOptions) {
 	}
 
 	if (collision && collision !== 'none' && itemSize?.height === undefined) {
-		throw new Error(
-			'If `collision` is not `none`, the `itemSize.height` parameter must be specified'
-		);
+		throw new Error('If `collision` is not `none`, the `itemSize.height` parameter must be specified');
 	}
 
 	if (

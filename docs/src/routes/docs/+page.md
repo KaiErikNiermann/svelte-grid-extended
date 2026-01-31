@@ -30,19 +30,19 @@ description: Get started with @appulsauce/svelte-grid
 ## Quick Links
 
 <div class="grid gap-3 sm:grid-cols-2 mt-6">
-	<a href="/docs/installation" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
+	<a href="installation" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Installation</h3>
 		<p class="text-sm text-muted-foreground">Install the package and set up your project</p>
 	</a>
-	<a href="/docs/quickstart" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
+	<a href="quickstart" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Quick Start</h3>
 		<p class="text-sm text-muted-foreground">Get up and running in minutes</p>
 	</a>
-	<a href="/docs/grid" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
+	<a href="grid" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Grid Component</h3>
 		<p class="text-sm text-muted-foreground">Learn about the main Grid component</p>
 	</a>
-	<a href="/examples" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
+	<a href="../examples" class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Examples</h3>
 		<p class="text-sm text-muted-foreground">See the grid in action</p>
 	</a>

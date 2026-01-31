@@ -21,7 +21,7 @@
 
 			button.addEventListener('click', async () => {
 				const codeEl = pre.querySelector('code');
-				const text = codeEl ? codeEl.textContent ?? '' : pre.textContent ?? '';
+				const text = codeEl ? (codeEl.textContent ?? '') : (pre.textContent ?? '');
 				try {
 					await navigator.clipboard.writeText(text.trimEnd());
 					button.dataset.copied = 'true';

@@ -90,6 +90,7 @@
 		<span class="absolute right-12 top-2 text-xs text-muted-foreground">{lang}</span>
 	{/if}
 	{#if highlighted}
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html highlighted}
 	{:else}
 		<pre class="bg-muted p-4 rounded-lg overflow-x-auto text-sm"><code>{code}</code></pre>

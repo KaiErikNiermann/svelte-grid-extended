@@ -1,9 +1,9 @@
 <script lang="ts" module>
 	import { getContext } from 'svelte';
 	import type { GridParams } from './types';
-	
+
 	const GRID_CONTEXT_NAME = Symbol('svelte-grid-extended-context');
-	
+
 	export function getGridContext(): { current: GridParams } {
 		const context = getContext<{ current: GridParams }>(GRID_CONTEXT_NAME);
 		if (context === undefined) {
@@ -82,15 +82,13 @@
 		assertGridOptions({ cols, rows, itemSize, collision });
 	});
 
-	let _cols = $state(typeof cols === 'number' ? cols : 0);
-	let _rows = $state(typeof rows === 'number' ? rows : 0);
+	let _cols = $state(0);
+	let _rows = $state(0);
 	let maxCols = $state(Infinity);
 	let maxRows = $state(Infinity);
 	let shouldExpandRows = $state(false);
 	let shouldExpandCols = $state(false);
-	let gridItemSize = $state<ItemSize | undefined>(
-		itemSize?.width && itemSize?.height ? { ...itemSize } as ItemSize : undefined
-	);
+	let gridItemSize = $state<ItemSize | undefined>(undefined);
 
 	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
 

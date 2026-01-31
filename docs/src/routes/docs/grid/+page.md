@@ -15,24 +15,24 @@ import Grid from '@appulsauce/svelte-grid';
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `cols` | `number` | `0` | Grid columns count. If set to 0, grid will grow infinitely. Must be >= 0. |
-| `rows` | `number` | `0` | Grid rows count. If set to 0, grid will grow infinitely. Must be >= 0. |
-| `itemSize` | `{ width?: number, height?: number }` | `{}` | Size of each grid cell in pixels. If not set, calculated from container size. |
-| `gap` | `number` | `10` | Gap between grid items in pixels. |
-| `bounds` | `boolean` | `false` | Whether grid items should be bounded by the container. |
-| `readOnly` | `boolean` | `false` | If true, disables all interactions with grid items. |
-| `collision` | `'none' \| 'push' \| 'compress'` | `'none'` | Collision behavior when items overlap. |
-| `autoCompress` | `boolean` | `true` | Auto compress items when programmatically changing them. Only works with 'compress' collision. |
-| `onchange` | `(detail: LayoutChangeDetail) => void` | `undefined` | Callback when any item changes position or size. |
-| `class` | `string` | `undefined` | CSS class for the grid container. |
-| `style` | `string` | `undefined` | Inline styles for the grid container. |
+| Prop           | Type                                   | Default     | Description                                                                                    |
+| -------------- | -------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| `cols`         | `number`                               | `0`         | Grid columns count. If set to 0, grid will grow infinitely. Must be >= 0.                      |
+| `rows`         | `number`                               | `0`         | Grid rows count. If set to 0, grid will grow infinitely. Must be >= 0.                         |
+| `itemSize`     | `{ width?: number, height?: number }`  | `{}`        | Size of each grid cell in pixels. If not set, calculated from container size.                  |
+| `gap`          | `number`                               | `10`        | Gap between grid items in pixels.                                                              |
+| `bounds`       | `boolean`                              | `false`     | Whether grid items should be bounded by the container.                                         |
+| `readOnly`     | `boolean`                              | `false`     | If true, disables all interactions with grid items.                                            |
+| `collision`    | `'none' \| 'push' \| 'compress'`       | `'none'`    | Collision behavior when items overlap.                                                         |
+| `autoCompress` | `boolean`                              | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision. |
+| `onchange`     | `(detail: LayoutChangeDetail) => void` | `undefined` | Callback when any item changes position or size.                                               |
+| `class`        | `string`                               | `undefined` | CSS class for the grid container.                                                              |
+| `style`        | `string`                               | `undefined` | Inline styles for the grid container.                                                          |
 
 ## Bindable Props
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop         | Type             | Description                                                             |
+| ------------ | ---------------- | ----------------------------------------------------------------------- |
 | `controller` | `GridController` | Access to grid methods like `getFirstAvailablePosition` and `compress`. |
 
 ## Grid Sizing Behavior
@@ -88,14 +88,7 @@ When `cols` or `rows` is set to 0, the grid grows infinitely in that dimension:
 	const itemSize = { height: 50 };
 </script>
 
-<Grid
-	cols={12}
-	{itemSize}
-	gap={8}
-	collision="push"
-	bind:controller
-	class="my-grid"
->
+<Grid cols={12} {itemSize} gap={8} collision="push" bind:controller class="my-grid">
 	<GridItem x={0} y={0} w={4} h={2}>
 		{#snippet children()}
 			<div>Content</div>

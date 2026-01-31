@@ -12,7 +12,10 @@
 
 	function handleChange(detail: LayoutChangeDetail) {
 		lastEvent = detail;
-		eventLog = [`Change: Item ${detail.item.id} → (${detail.item.x}, ${detail.item.y}) ${detail.item.w}×${detail.item.h}`, ...eventLog.slice(0, 9)];
+		eventLog = [
+			`Change: Item ${detail.item.id} → (${detail.item.x}, ${detail.item.y}) ${detail.item.w}×${detail.item.h}`,
+			...eventLog.slice(0, 9)
+		];
 	}
 
 	function handleItemChange(detail: LayoutChangeDetail) {
@@ -28,7 +31,10 @@
 
 <div class="prose mb-6">
 	<h1>Events</h1>
-	<p>Listen to layout changes using the <code>onchange</code> callback on Grid or individual GridItems. Useful for persisting layout or triggering side effects.</p>
+	<p>
+		Listen to layout changes using the <code>onchange</code> callback on Grid or individual GridItems.
+		Useful for persisting layout or triggering side effects.
+	</p>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-2">

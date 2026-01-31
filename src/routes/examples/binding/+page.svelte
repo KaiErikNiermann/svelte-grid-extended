@@ -6,7 +6,15 @@
 		{ id: '2', x: 6, y: 2, w: 2, h: 2, data: { text: 'B' } }
 	]);
 
-	const itemsBackup = structuredClone($state.snapshot(items));
+	let itemsBackup = $state<typeof items>([]);
+	let hasItemsBackup = $state(false);
+
+	$effect(() => {
+		if (!hasItemsBackup) {
+			itemsBackup = $state.snapshot(items);
+			hasItemsBackup = true;
+		}
+	});
 
 	const itemSize = { height: 40 };
 
@@ -20,7 +28,7 @@
 <button onclick={resetGrid}> RESET </button>
 
 <Grid cols={10} {itemSize} collision="push">
-	{#each items as item, i (item.id)}
+	{#each items as item (item.id)}
 		<GridItem bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
 			{#snippet children()}
 				<div class="item">{item.data.text}</div>

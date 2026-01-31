@@ -14,7 +14,15 @@
 		{ id: crypto.randomUUID(), x: 2, y: 4, w: 2, h: 2 }
 	]);
 
-	const itemsBackup = structuredClone($state.snapshot(items));
+	let itemsBackup = $state<typeof items>([]);
+	let hasItemsBackup = $state(false);
+
+	$effect(() => {
+		if (!hasItemsBackup) {
+			itemsBackup = $state.snapshot(items);
+			hasItemsBackup = true;
+		}
+	});
 
 	const itemSize = { height: 40 };
 
@@ -32,9 +40,7 @@
 		const w = Math.floor(Math.random() * 2) + 1;
 		const h = Math.floor(Math.random() * 5) + 1;
 		const newPosition = gridController?.getFirstAvailablePosition(w, h);
-		items = newPosition
-			? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }]
-			: items;
+		items = newPosition ? [...items, { id: crypto.randomUUID(), x: newPosition.x, y: newPosition.y, w, h }] : items;
 	}
 </script>
 
@@ -46,13 +52,7 @@
 		<div transition:fade={{ duration: 300 }}>
 			<GridItem id={item.id} bind:x={item.x} bind:y={item.y} bind:w={item.w} bind:h={item.h}>
 				{#snippet children()}
-					<button
-						onpointerdown={(e) => e.stopPropagation()}
-						onclick={() => remove(item.id)}
-						class="remove"
-					>
-						X
-					</button>
+					<button onpointerdown={(e) => e.stopPropagation()} onclick={() => remove(item.id)} class="remove"> X </button>
 					<div class="item">{item.id.slice(0, 5)}</div>
 				{/snippet}
 			</GridItem>

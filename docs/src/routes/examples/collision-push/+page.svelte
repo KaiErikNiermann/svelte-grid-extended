@@ -19,7 +19,10 @@
 
 <div class="prose mb-6">
 	<h1>Collision: Push</h1>
-	<p>With <code>collision="push"</code>, items push others out of the way when moved. The grid grows vertically to accommodate displaced items.</p>
+	<p>
+		With <code>collision="push"</code>, items push others out of the way when moved. The grid grows
+		vertically to accommodate displaced items.
+	</p>
 </div>
 
 <div class="border border-border rounded-lg p-4 bg-muted/30">
@@ -42,7 +45,8 @@
 <div class="mt-6 prose">
 	<h3>Code</h3>
 	<blockquote>
-		<strong>Note:</strong> When using <code>collision="push"</code>, <code>rows</code> is automatically set to <code>0</code> (infinite), so <code>itemSize.height</code> must be provided.
+		<strong>Note:</strong> When using <code>collision="push"</code>, <code>rows</code> is
+		automatically set to <code>0</code> (infinite), so <code>itemSize.height</code> must be provided.
 	</blockquote>
 </div>
 <CodeBlock
