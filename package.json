@@ -13,6 +13,7 @@
 		"package": "svelte-kit sync && svelte-package && publint",
 		"prepublishOnly": "pnpm package",
 		"test": "vitest",
+		"pretest:unit": "svelte-kit sync",
 		"test:unit": "vitest run",
 		"coverage": "vitest run --coverage",
 		"e2e": "playwright test",
