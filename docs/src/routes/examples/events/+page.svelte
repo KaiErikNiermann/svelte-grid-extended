@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Grid, { GridItem, type LayoutChangeDetail } from '@appulsauce/svelte-grid';
 	import { CodeBlock } from '$lib/components';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	let items = $state([
 		{ id: '1', x: 0, y: 0, w: 2, h: 2 },
@@ -31,7 +32,7 @@
     console.log('Layout changed:', detail.item);
     // Persist to database, localStorage, etc.
   }
-</script>
+${scriptClose}
 
 <Grid onchange={handleChange}>
   <GridItem x={0} y={0} onchange={handleChange}>

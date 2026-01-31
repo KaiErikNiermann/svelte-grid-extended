@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 	import { CodeBlock } from '$lib/components';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	let items = $state([
 		{ id: '0', x: 0, y: 0, w: 2, h: 3 },
@@ -16,7 +17,7 @@
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
   const itemSize = { height: 40 };
-</script>
+${scriptClose}
 
 <Grid {itemSize} cols={10} collision="compress">
   {#each items as item (item.id)}

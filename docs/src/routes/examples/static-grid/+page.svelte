@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 	import { CodeBlock } from '$lib/components';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	const itemSize = { width: 80, height: 40 };
 
@@ -8,7 +9,7 @@
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
   const itemSize = { width: 80, height: 40 };
-</script>
+${scriptClose}
 
 <Grid {itemSize} cols={10} rows={10}>
   <GridItem x={1} y={0}>

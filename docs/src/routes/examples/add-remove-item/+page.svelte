@@ -2,6 +2,7 @@
 	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 	import { Plus, RotateCcw, X } from 'lucide-svelte';
 	import { CodeBlock } from '$lib/components';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	const initialItems = [
 		{ id: crypto.randomUUID(), x: 0, y: 0, w: 2, h: 2 },
@@ -50,7 +51,7 @@
   function removeItem(id: string) {
     items = items.filter(item => item.id !== id);
   }
-</script>
+${scriptClose}
 
 <button onclick={addItem}>Add</button>
 

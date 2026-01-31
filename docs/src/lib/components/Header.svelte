@@ -37,7 +37,7 @@
 		</button>
 
 		<a href={homePath} class="flex items-center gap-2 font-semibold">
-			<span class="text-primary">Svelte-5 Grid</span>
+			<span class="text-primary">Svelte 5 Grid</span>
 		</a>
 
 		<div class="flex-1"></div>

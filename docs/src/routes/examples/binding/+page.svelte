@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 	import { CodeBlock } from '$lib/components';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	const initialItems = [
 		{ x: 0, y: 0, w: 2, h: 2, label: 'A' },
@@ -24,7 +25,7 @@
     { x: 0, y: 0, w: 2, h: 2, label: 'A' },
     { x: 2, y: 0, w: 3, h: 2, label: 'B' }
   ]);
-</script>
+${scriptClose}
 
 <Grid cols={8}>
   {#each items as item (item.label)}

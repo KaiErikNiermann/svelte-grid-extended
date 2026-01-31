@@ -2,10 +2,10 @@
 	import { ArrowRight, Grid3x3, Move, Maximize2, Zap } from 'lucide-svelte';
 	import { CodeBlock } from '$lib/components';
 	import { resolve } from '$app/paths';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	const docsPath = resolve('/docs');
 	const examplesPath = resolve('/examples');
-
 	const quickExampleCode = String.raw`<script lang="ts">
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
@@ -13,7 +13,7 @@
     { id: '1', x: 0, y: 0, w: 2, h: 2 },
     { id: '2', x: 2, y: 0, w: 3, h: 1 }
   ]);
-</script>
+${scriptClose}
 
 <Grid cols={10} rows={10}>
   {#each items as item (item.id)}

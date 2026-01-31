@@ -1,10 +1,11 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 	import { CodeBlock } from '$lib/components';
+	import { scriptClose } from '$lib/snippet-utils';
 
 	const exampleCode = String.raw`<script lang="ts">
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
-</script>
+${scriptClose}
 
 <Grid cols={10} rows={10}>
   <GridItem x={1} y={0}>
