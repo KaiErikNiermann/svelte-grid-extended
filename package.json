@@ -1,6 +1,6 @@
 {
 	"name": "@appulsauce/svelte-grid",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "A draggable and resizable grid layout, for Svelte 5",
 	"repository": {
 		"type": "git",
