@@ -39,13 +39,8 @@
 		<div class="flex-1"></div>
 
 		<nav class="hidden md:flex items-center gap-6 text-sm">
-			<a href={base + '/docs'} class="text-muted-foreground hover:text-foreground transition-colors"
-				>Docs</a
-			>
-			<a
-				href={base + '/examples'}
-				class="text-muted-foreground hover:text-foreground transition-colors">Examples</a
-			>
+			<a href={base + '/docs'} class="text-muted-foreground hover:text-foreground transition-colors">Docs</a>
+			<a href={base + '/examples'} class="text-muted-foreground hover:text-foreground transition-colors">Examples</a>
 		</nav>
 
 		<div class="flex items-center gap-2 ml-4">
@@ -66,10 +61,7 @@
 	{#if mobileMenuOpen}
 		<div class="fixed inset-0 top-14 z-40 lg:hidden" role="dialog" aria-modal="true">
 			<!-- Backdrop -->
-			<button
-				class="fixed inset-0 bg-background/80 backdrop-blur-sm"
-				onclick={closeMobileMenu}
-				aria-label="Close menu"
+			<button class="fixed inset-0 bg-background/80 backdrop-blur-sm" onclick={closeMobileMenu} aria-label="Close menu"
 			></button>
 			<!-- Sidebar -->
 			<div
