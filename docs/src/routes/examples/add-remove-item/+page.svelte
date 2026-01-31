@@ -82,21 +82,21 @@ ${scriptClose}
 <div class="flex gap-2 mb-4">
 	<button
 		onclick={addItem}
-		class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+		class="btn btn-sm btn-primary"
 	>
 		<Plus class="h-4 w-4" />
 		Add Item
 	</button>
 	<button
 		onclick={resetGrid}
-		class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md border border-border bg-background hover:bg-accent transition-colors"
+		class="btn btn-sm btn-outline"
 	>
 		<RotateCcw class="h-4 w-4" />
 		Reset
 	</button>
 </div>
 
-<div class="border border-border rounded-lg p-4 bg-muted/30">
+<div class="demo-panel">
 	<Grid {itemSize} cols={8} collision="push" bind:controller={gridController}>
 		{#each items as item (item.id)}
 			<GridItem

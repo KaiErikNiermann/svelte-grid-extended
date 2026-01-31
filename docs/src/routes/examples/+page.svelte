@@ -106,7 +106,7 @@
 	{#each examples as example}
 		<a
 			href={exampleHref(example.slug)}
-			class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent/50 transition-all group"
+			class="link-card hover:bg-accent/50 transition-all group"
 		>
 			<div class="flex items-start justify-between gap-2 mb-2">
 				<h3 class="font-semibold group-hover:text-primary transition-colors">{example.title}</h3>

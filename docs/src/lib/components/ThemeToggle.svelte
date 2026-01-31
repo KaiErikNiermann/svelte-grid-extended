@@ -17,7 +17,7 @@
 
 <button
 	onclick={toggleTheme}
-	class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+	class="icon-button"
 	aria-label="Toggle theme"
 >
 	{#if isDark}

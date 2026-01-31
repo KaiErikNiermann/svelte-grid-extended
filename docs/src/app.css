@@ -64,6 +64,40 @@
 	}
 }
 
+@layer components {
+	.btn {
+		@apply inline-flex items-center justify-center rounded-md font-medium transition-colors;
+	}
+
+	.btn-md {
+		@apply gap-2 px-4 py-2 text-sm;
+	}
+
+	.btn-sm {
+		@apply gap-1.5 px-3 py-1.5 text-sm;
+	}
+
+	.btn-primary {
+		@apply bg-primary text-primary-foreground hover:bg-primary/90;
+	}
+
+	.btn-outline {
+		@apply border border-border bg-background hover:bg-accent;
+	}
+
+	.icon-button {
+		@apply inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background transition-colors hover:bg-accent hover:text-accent-foreground;
+	}
+
+	.demo-panel {
+		@apply border border-border rounded-lg p-4 bg-muted/30;
+	}
+
+	.link-card {
+		@apply block rounded-lg border border-border p-4 hover:border-primary/50;
+	}
+}
+
 /* Prose styles for markdown content */
 .prose {
 	@apply max-w-none text-foreground;

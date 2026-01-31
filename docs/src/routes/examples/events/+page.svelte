@@ -54,7 +54,7 @@ ${scriptClose}
 </div>
 
 <div class="grid gap-6 lg:grid-cols-2">
-	<div class="border border-border rounded-lg p-4 bg-muted/30">
+	<div class="demo-panel">
 		<Grid {itemSize} cols={8} collision="push" onchange={handleChange}>
 			{#each items as item (item.id)}
 				<GridItem
@@ -64,7 +64,7 @@ ${scriptClose}
 					bind:w={item.w}
 					bind:h={item.h}
 					onchange={handleItemChange}
-					class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+					class="grid-demo-item"
 				>
 					{#snippet children()}{item.id}{/snippet}
 				</GridItem>

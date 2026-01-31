@@ -26,7 +26,7 @@
 	<div class="relative container flex h-14 items-center px-4 md:px-6">
 		<button
 			onclick={toggleMobileMenu}
-			class="mr-2 inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors lg:hidden"
+			class="mr-2 icon-button lg:hidden"
 			aria-label="Toggle menu"
 		>
 			{#if mobileMenuOpen}
@@ -56,7 +56,7 @@
 				href="https://github.com/KaiErikNiermann/svelte-grid-extended"
 				target="_blank"
 				rel="noopener noreferrer"
-				class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+				class="icon-button"
 				aria-label="GitHub"
 			>
 				<svg

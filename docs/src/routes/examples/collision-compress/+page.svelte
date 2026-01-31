@@ -45,7 +45,7 @@ ${scriptClose}
 	</p>
 </div>
 
-<div class="border border-border rounded-lg p-4 bg-muted/30">
+<div class="demo-panel">
 	<Grid {itemSize} cols={10} collision="compress">
 		{#each items as item (item.id)}
 			<GridItem
@@ -54,7 +54,7 @@ ${scriptClose}
 				bind:y={item.y}
 				bind:w={item.w}
 				bind:h={item.h}
-				class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+				class="grid-demo-item"
 			>
 				{#snippet children()}{item.id}{/snippet}
 			</GridItem>

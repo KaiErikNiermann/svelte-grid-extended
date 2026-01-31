@@ -23,7 +23,7 @@
 	</p>
 </div>
 
-<div class="border border-border rounded-lg p-4 bg-muted/30">
+<div class="demo-panel">
 	<Grid class="opacity-90" cols={10} rows={10}>
 		{#each items as item}
 			<GridItem

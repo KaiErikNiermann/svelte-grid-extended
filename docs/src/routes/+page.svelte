@@ -41,14 +41,14 @@ ${scriptClose}
 		<div class="flex flex-wrap gap-3">
 			<a
 				href={docsPath}
-				class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+				class="btn btn-md btn-primary"
 			>
 				Get Started
 				<ArrowRight class="h-4 w-4" />
 			</a>
 			<a
 				href={examplesPath}
-				class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+				class="btn btn-md btn-outline hover:text-accent-foreground"
 			>
 				View Examples
 			</a>

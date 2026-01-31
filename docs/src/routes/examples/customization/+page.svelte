@@ -16,7 +16,7 @@
 	</p>
 </div>
 
-<div class="border border-border rounded-lg p-4 bg-muted/30">
+<div class="demo-panel">
 	<Grid cols={10} rows={10}>
 		<!-- Both custom handles -->
 		<GridItem
@@ -89,7 +89,7 @@
 			y={0}
 			w={3}
 			h={4}
-			class="grid-demo-item bg-primary/20 border border-primary/40 rounded-lg"
+			class="grid-demo-item rounded-lg"
 		>
 			{#snippet children()}
 				<div class="text-center p-2">

@@ -56,14 +56,14 @@ ${scriptClose}
 <div class="flex gap-4 mb-4">
 	<button
 		onclick={resetGrid}
-		class="px-3 py-1.5 text-sm rounded-md border border-border bg-background hover:bg-accent transition-colors"
+		class="btn btn-sm btn-outline"
 	>
 		Reset Grid
 	</button>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-2">
-	<div class="border border-border rounded-lg p-4 bg-muted/30">
+	<div class="demo-panel">
 		<Grid {itemSize} cols={8} collision="push">
 			{#each items as item (item.label)}
 				<GridItem
@@ -71,7 +71,7 @@ ${scriptClose}
 					bind:y={item.y}
 					bind:w={item.w}
 					bind:h={item.h}
-					class="grid-demo-item bg-primary/20 border border-primary/40 rounded"
+					class="grid-demo-item"
 				>
 					{#snippet children()}{item.label}{/snippet}
 				</GridItem>
