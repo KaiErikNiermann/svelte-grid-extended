@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { ArrowRight, Grid3x3, Move, Maximize2, Zap } from 'lucide-svelte';
 	import { CodeBlock } from '$lib/components';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
+
+	const docsPath = resolve('/docs');
+	const examplesPath = resolve('/examples');
 
 	const quickExampleCode = String.raw`<script lang="ts">
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
@@ -37,14 +40,14 @@
 		</p>
 		<div class="flex flex-wrap gap-3">
 			<a
-				href={base + '/docs'}
+				href={docsPath}
 				class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
 			>
 				Get Started
 				<ArrowRight class="h-4 w-4" />
 			</a>
 			<a
-				href={base + '/examples'}
+				href={examplesPath}
 				class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-border bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
 			>
 				View Examples

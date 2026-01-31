@@ -11,6 +11,25 @@
 	]);
 
 	const itemSize = { height: 40 };
+
+	const exampleCode = String.raw`<script lang="ts">
+  import Grid, { GridItem } from '@appulsauce/svelte-grid';
+
+  const itemSize = { height: 40 };
+<\/script>
+
+<Grid {itemSize} cols={10} collision="push">
+  {#each items as item (item.id)}
+    <GridItem
+      bind:x={item.x}
+      bind:y={item.y}
+      bind:w={item.w}
+      bind:h={item.h}
+    >
+      ...
+    </GridItem>
+  {/each}
+</Grid>`;
 </script>
 
 <svelte:head>
@@ -49,25 +68,4 @@
 		automatically set to <code>0</code> (infinite), so <code>itemSize.height</code> must be provided.
 	</blockquote>
 </div>
-<CodeBlock
-	class="mt-3"
-	lang="svelte"
-	code={`<script lang="ts">
-  import Grid, { GridItem } from '@appulsauce/svelte-grid';
-
-  const itemSize = { height: 40 };
-</script>
-
-<Grid {itemSize} cols={10} collision="push">
-  {#each items as item (item.id)}
-    <GridItem
-      bind:x={item.x}
-      bind:y={item.y}
-      bind:w={item.w}
-      bind:h={item.h}
-    >
-      ...
-    </GridItem>
-  {/each}
-</Grid>`}
-/>
+<CodeBlock class="mt-3" lang="svelte" code={exampleCode} />

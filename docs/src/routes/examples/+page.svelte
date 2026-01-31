@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { match } from 'ts-pattern';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
+	import type { RouteId } from '$app/types';
 
 	const examples = [
 		{ slug: 'basic', title: 'Basic', description: 'Simple grid layout setup', category: 'basics' },
@@ -86,6 +87,10 @@
 			.with('advanced', () => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300')
 			.exhaustive();
 	}
+
+	type ExampleSlug = (typeof examples)[number]['slug'];
+
+	const exampleHref = (slug: ExampleSlug) => resolve(`/examples/${slug}` as RouteId);
 </script>
 
 <svelte:head>
@@ -100,7 +105,7 @@
 <div class="grid gap-4 sm:grid-cols-2 mt-8">
 	{#each examples as example}
 		<a
-			href={`${base}/examples/${example.slug}`}
+			href={exampleHref(example.slug)}
 			class="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent/50 transition-all group"
 		>
 			<div class="flex items-start justify-between gap-2 mb-2">

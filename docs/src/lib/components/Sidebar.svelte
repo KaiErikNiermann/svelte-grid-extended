@@ -1,11 +1,12 @@
 <script lang="ts">
 	import NavLink from './NavLink.svelte';
 	import { cn } from '$lib/utils';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
+	import type { RouteId } from '$app/types';
 
 	interface NavSection {
 		title: string;
-		items: { href: string; label: string }[];
+		items: { href: RouteId; label: string }[];
 	}
 
 	const sections: NavSection[] = [
@@ -69,7 +70,7 @@
 			</h4>
 			<div class="space-y-1">
 				{#each section.items as item}
-					<NavLink href={base + item.href}>
+					<NavLink href={resolve(item.href)}>
 						{item.label}
 					</NavLink>
 				{/each}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { cn } from '$lib/utils';
 
 	interface Props {
@@ -11,7 +11,7 @@
 
 	const normalizePath = (path: string) => (path !== '/' ? path.replace(/\/+$/, '') : path);
 
-	const isActive = $derived(normalizePath($page.url.pathname) === normalizePath(href));
+	const isActive = $derived(normalizePath(page.url.pathname) === normalizePath(href));
 </script>
 
 <a

@@ -23,6 +23,21 @@
 	}
 
 	const itemSize = { height: 50 };
+
+	const exampleCode = String.raw`<script lang="ts">
+  import Grid, { GridItem, type LayoutChangeDetail } from '@appulsauce/svelte-grid';
+
+  function handleChange(detail: LayoutChangeDetail) {
+    console.log('Layout changed:', detail.item);
+    // Persist to database, localStorage, etc.
+  }
+<\/script>
+
+<Grid onchange={handleChange}>
+  <GridItem x={0} y={0} onchange={handleChange}>
+    ...
+  </GridItem>
+</Grid>`;
 </script>
 
 <svelte:head>
@@ -84,21 +99,4 @@
 <div class="mt-6 prose">
 	<h3>Code</h3>
 </div>
-<CodeBlock
-	class="mt-3"
-	lang="svelte"
-	code={`<script lang="ts">
-  import Grid, { GridItem, type LayoutChangeDetail } from '@appulsauce/svelte-grid';
-
-  function handleChange(detail: LayoutChangeDetail) {
-    console.log('Layout changed:', detail.item);
-    // Persist to database, localStorage, etc.
-  }
-</script>
-
-<Grid onchange={handleChange}>
-  <GridItem x={0} y={0} onchange={handleChange}>
-    ...
-  </GridItem>
-</Grid>`}
-/>
+<CodeBlock class="mt-3" lang="svelte" code={exampleCode} />

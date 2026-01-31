@@ -16,6 +16,28 @@
 	}
 
 	const itemSize = { height: 50 };
+
+	const exampleCode = String.raw`<script lang="ts">
+  import Grid, { GridItem } from '@appulsauce/svelte-grid';
+
+  let items = $state([
+    { x: 0, y: 0, w: 2, h: 2, label: 'A' },
+    { x: 2, y: 0, w: 3, h: 2, label: 'B' }
+  ]);
+<\/script>
+
+<Grid cols={8}>
+  {#each items as item (item.label)}
+    <GridItem
+      bind:x={item.x}
+      bind:y={item.y}
+      bind:w={item.w}
+      bind:h={item.h}
+    >
+      {#snippet children()}{item.label}{/snippet}
+    </GridItem>
+  {/each}
+</Grid>`;
 </script>
 
 <svelte:head>
@@ -70,28 +92,4 @@
 <div class="mt-6 prose">
 	<h3>Code</h3>
 </div>
-<CodeBlock
-	class="mt-3"
-	lang="svelte"
-	code={`<script lang="ts">
-  import Grid, { GridItem } from '@appulsauce/svelte-grid';
-
-  let items = $state([
-    { x: 0, y: 0, w: 2, h: 2, label: 'A' },
-    { x: 2, y: 0, w: 3, h: 2, label: 'B' }
-  ]);
-</script>
-
-<Grid cols={8}>
-  {#each items as item (item.label)}
-    <GridItem
-      bind:x={item.x}
-      bind:y={item.y}
-      bind:w={item.w}
-      bind:h={item.h}
-    >
-      {#snippet children()}{item.label}{/snippet}
-    </GridItem>
-  {/each}
-</Grid>`}
-/>
+<CodeBlock class="mt-3" lang="svelte" code={exampleCode} />

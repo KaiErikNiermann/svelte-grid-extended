@@ -1,6 +1,19 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 	import { CodeBlock } from '$lib/components';
+
+	const exampleCode = String.raw`<script lang="ts">
+  import Grid, { GridItem } from '@appulsauce/svelte-grid';
+<\/script>
+
+<Grid cols={10} rows={10}>
+  <GridItem x={1} y={0}>
+    {#snippet children()}Hey{/snippet}
+  </GridItem>
+  <GridItem x={3} y={3} w={4}>
+    {#snippet children()}Hoy{/snippet}
+  </GridItem>
+</Grid>`;
 </script>
 
 <svelte:head>
@@ -34,19 +47,4 @@
 <div class="mt-6 prose">
 	<h3>Code</h3>
 </div>
-<CodeBlock
-	class="mt-3"
-	lang="svelte"
-	code={`<script lang="ts">
-  import Grid, { GridItem } from '@appulsauce/svelte-grid';
-</script>
-
-<Grid cols={10} rows={10}>
-  <GridItem x={1} y={0}>
-    {#snippet children()}Hey{/snippet}
-  </GridItem>
-  <GridItem x={3} y={3} w={4}>
-    {#snippet children()}Hoy{/snippet}
-  </GridItem>
-</Grid>`}
-/>
+<CodeBlock class="mt-3" lang="svelte" code={exampleCode} />

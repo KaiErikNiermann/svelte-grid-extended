@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { ArrowLeft } from 'lucide-svelte';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		children: import('svelte').Snippet;
@@ -9,8 +9,8 @@
 
 	let { children }: Props = $props();
 
-	const examplesPath = base + '/examples';
-	const isExamplePage = $derived($page.url.pathname !== examplesPath);
+	const examplesPath = resolve('/examples');
+	const isExamplePage = $derived(page.url.pathname !== examplesPath);
 </script>
 
 <div class="examples-page">
