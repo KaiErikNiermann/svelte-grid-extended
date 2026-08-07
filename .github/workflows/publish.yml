@@ -16,10 +16,10 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
+      # No `version:` input — pnpm/action-setup reads the `packageManager` field so
+      # the release build uses exactly the pnpm the repo is pinned to.
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -30,6 +30,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Releases are cut from tags, which may not have gone through a PR, so the
+      # full gate runs again here rather than trusting an earlier CI run.
+      - name: Verify (lint, types, tests)
+        run: pnpm verify
 
       - name: Build package
         run: pnpm package

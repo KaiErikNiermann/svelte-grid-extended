@@ -26,22 +26,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Workflow context reaches the script through env rather than `${{ }}`
+      # interpolation, so nothing from the event payload is ever spliced into the
+      # shell source itself.
       - name: Detect docs changes
         id: detect
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             echo "docs_changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          BEFORE="${{ github.event.before }}"
           if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
             echo "docs_changed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          CHANGED=$(git diff --name-only "$BEFORE" "${{ github.sha }}" -- docs/)
+          # The library itself is bundled into the docs site, so a change to src/
+          # must republish too.
+          CHANGED=$(git diff --name-only "$BEFORE" "$CURRENT_SHA" -- docs/ src/)
           if [ -n "$CHANGED" ]; then
             echo "docs_changed=true" >> "$GITHUB_OUTPUT"
           else
