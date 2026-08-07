@@ -8,9 +8,9 @@
 	function enhanceCodeBlocks() {
 		const pres = document.querySelectorAll<HTMLPreElement>('pre.shiki');
 
-		pres.forEach((pre) => {
-			if (pre.closest('[data-codeblock]')) return;
-			if (pre.querySelector('.code-copy-button')) return;
+		for (const pre of pres) {
+			if (pre.closest('[data-codeblock]')) continue;
+			if (pre.querySelector('.code-copy-button')) continue;
 
 			const button = document.createElement('button');
 			button.type = 'button';
@@ -36,7 +36,7 @@
 			});
 
 			pre.prepend(button);
-		});
+		}
 	}
 
 	async function runEnhancer() {

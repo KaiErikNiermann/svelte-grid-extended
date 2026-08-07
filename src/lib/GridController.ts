@@ -6,12 +6,7 @@ export class GridController implements GridControllerType {
 
 	constructor(gridParamsOrRef: GridParams | { current: GridParams }) {
 		// Support both direct gridParams (for tests/external use) and reference object (for internal use)
-		if ('current' in gridParamsOrRef) {
-			this._gridParamsRef = gridParamsOrRef;
-		} else {
-			// Wrap direct gridParams in a reference object
-			this._gridParamsRef = { current: gridParamsOrRef };
-		}
+		this._gridParamsRef = 'current' in gridParamsOrRef ? gridParamsOrRef : { current: gridParamsOrRef };
 	}
 
 	get gridParams(): GridParams {

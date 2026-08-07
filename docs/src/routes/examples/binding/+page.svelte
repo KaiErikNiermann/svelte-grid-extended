@@ -54,12 +54,7 @@ ${scriptClose}
 </div>
 
 <div class="flex gap-4 mb-4">
-	<button
-		onclick={resetGrid}
-		class="btn btn-sm btn-outline"
-	>
-		Reset Grid
-	</button>
+	<button onclick={resetGrid} class="btn btn-sm btn-outline"> Reset Grid </button>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-2">

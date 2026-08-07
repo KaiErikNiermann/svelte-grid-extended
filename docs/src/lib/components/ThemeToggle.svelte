@@ -15,11 +15,7 @@
 	}
 </script>
 
-<button
-	onclick={toggleTheme}
-	class="icon-button"
-	aria-label="Toggle theme"
->
+<button onclick={toggleTheme} class="icon-button" aria-label="Toggle theme">
 	{#if isDark}
 		<Sun class="h-4 w-4" />
 	{:else}

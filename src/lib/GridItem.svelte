@@ -191,12 +191,12 @@
 		const snapParams = gridParams as SnapGridParams;
 		const { x: newX, y: newY } = snapOnMove(left, top, previewItem, snapParams);
 
-		if (gridParams.collision !== 'none') {
-			movePreviewWithCollisions(newX, newY);
-		} else {
+		if (gridParams.collision === 'none') {
 			if (!hasCollisions({ ...previewItem, x: newX, y: newY }, Object.values(gridParams.items))) {
 				previewItem = { ...previewItem, x: newX, y: newY };
 			}
+		} else {
+			movePreviewWithCollisions(newX, newY);
 		}
 	}
 
@@ -216,14 +216,14 @@
 		const itemsExceptPreview = gridItems.filter((item) => item.id != previewItem.id);
 		const collItems = getCollisions({ ...previewItem, ...newAttributes }, itemsExceptPreview);
 
-		collItems.forEach((collItem: LayoutItem) => {
+		for (const collItem of collItems) {
 			const itemsExceptCollItem = gridItems.filter((item) => item.id != collItem.id);
 			const items = [
 				...itemsExceptCollItem.filter((item) => item.id != previewItem.id),
 				{ ...previewItem, ...newAttributes }
 			];
 			updateCollItemPositionWithPush(collItem, items);
-		});
+		}
 
 		previewItem = { ...previewItem, ...newAttributes };
 		gridParams.updateGrid();
@@ -234,6 +234,10 @@
 		handleCollisionsForPreviewItemWithPush({ x, y });
 	}
 
+	// Vertical-compression search: the nested scan over colliding items is inherently
+	// branchy and has no component-level test coverage, so it is left intact rather
+	// than split up for the metric's sake.
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	function movePreviewWithCollisionsWithCompress(newX: number, newY: number) {
 		const gridItems = Object.values(gridParams.items);
 		let computedY = newY;
@@ -243,11 +247,11 @@
 			if (collItems.length > 0) {
 				const sortedItems = collItems.sort((a, b) => b.y - a.y);
 				let moved = false;
-				sortedItems.forEach((sortItem) => {
+				for (const sortItem of sortedItems) {
 					if (newY + previewItem.h / 2 >= sortItem.y + sortItem.h / 2) {
 						moved = true;
 						computedY = sortItem.y + sortItem.h;
-						sortedItems.forEach((itm) => {
+						for (const itm of sortedItems) {
 							if (
 								!hasCollisions({ ...itm, y: itm.y - previewItem.h }, itemsExceptPreview) &&
 								itm.y - previewItem.h >= 0
@@ -255,10 +259,9 @@
 								itm.y -= previewItem.h;
 								itm.invalidate();
 							}
-						});
-						return false;
+						}
 					}
-				});
+				}
 				if (!moved) {
 					computedY = previewItem.y;
 				}
@@ -303,7 +306,6 @@
 				height: coordinate2size(min.h, gridParams.itemSize.height, gridParams.gap)
 			};
 		}
-		return undefined;
 	});
 
 	const maxSize = $derived.by(() => {
@@ -313,7 +315,6 @@
 				height: coordinate2size(max.h, gridParams.itemSize.height, gridParams.gap)
 			};
 		}
-		return undefined;
 	});
 
 	const _resizable = $derived(!gridParams.readOnly && item.resizable);
@@ -356,12 +357,12 @@
 
 		const snapParams = gridParams as SnapGridParams;
 		const { w: newW, h: newH } = snapOnResize(width, height, previewItem, snapParams);
-		if (gridParams.collision !== 'none') {
-			resizePreviewWithCollisions(newW, newH);
-		} else {
+		if (gridParams.collision === 'none') {
 			if (!hasCollisions({ ...previewItem, w: newW, h: newH }, Object.values(gridParams.items))) {
 				previewItem = { ...previewItem, w: newW, h: newH };
 			}
+		} else {
+			resizePreviewWithCollisions(newW, newH);
 		}
 	}
 
@@ -376,11 +377,11 @@
 			previewItem = { ...previewItem, w: newW, h: newH };
 			applyPreview();
 			const collItems = getCollisions({ ...previewItem, w: newW, h: 9999 }, Object.values(gridParams.items));
-			collItems.forEach((i) => {
+			for (const i of collItems) {
 				i.y += hGap;
 				i.invalidate();
 				gridParams.updateGrid();
-			});
+			}
 			compressItems();
 		}
 	}
@@ -404,6 +405,9 @@
 		const gridItems = Object.values(gridParams.items);
 		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 		sortedItems.reduce(
+			// Same story as movePreviewWithCollisionsWithCompress: branchy layout math
+			// with no component-level tests behind it.
+			// eslint-disable-next-line sonarjs/cognitive-complexity
 			(accItem, currentItem) => {
 				if (currentItem.id === previewItem.id) {
 					// if previewItem do nothing

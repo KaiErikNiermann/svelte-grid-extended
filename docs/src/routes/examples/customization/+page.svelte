@@ -84,13 +84,7 @@
 		</GridItem>
 
 		<!-- Default (whole item draggable) -->
-		<GridItem
-			x={6}
-			y={0}
-			w={3}
-			h={4}
-			class="grid-demo-item rounded-lg"
-		>
+		<GridItem x={6} y={0} w={3} h={4} class="grid-demo-item rounded-lg">
 			{#snippet children()}
 				<div class="text-center p-2">
 					<div class="font-medium">Default</div>

@@ -22,10 +22,10 @@ export function getGridDimensions(items: LayoutItem[]): GridDimensions {
 	let cols = 0;
 	let rows = 0;
 
-	items.forEach((item) => {
+	for (const item of items) {
 		cols = Math.max(cols, item.x + item.w);
 		rows = Math.max(rows, item.y + item.h);
-	});
+	}
 
 	return { cols, rows };
 }

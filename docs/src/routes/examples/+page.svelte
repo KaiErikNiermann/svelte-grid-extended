@@ -104,10 +104,7 @@
 
 <div class="grid gap-4 sm:grid-cols-2 mt-8">
 	{#each examples as example}
-		<a
-			href={exampleHref(example.slug)}
-			class="link-card hover:bg-accent/50 transition-all group"
-		>
+		<a href={exampleHref(example.slug)} class="link-card hover:bg-accent/50 transition-all group">
 			<div class="flex items-start justify-between gap-2 mb-2">
 				<h3 class="font-semibold group-hover:text-primary transition-colors">{example.title}</h3>
 				<span class={`text-xs px-2 py-0.5 rounded-full ${getCategoryColor(example.category)}`}>

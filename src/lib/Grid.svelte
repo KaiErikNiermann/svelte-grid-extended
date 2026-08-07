@@ -88,7 +88,7 @@
 	let maxRows = $state(Infinity);
 	let shouldExpandRows = $state(false);
 	let shouldExpandCols = $state(false);
-	let gridItemSize = $state<ItemSize | undefined>(undefined);
+	let gridItemSize = $state<ItemSize | undefined>();
 
 	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
 
@@ -223,14 +223,15 @@
 	controller = _controller as GridControllerType;
 
 	setContext(GRID_CONTEXT_NAME, contextRef);
+
+	const containerCss = $derived.by(() => {
+		const width = containerWidth ? `${containerWidth}px` : '100%';
+		const height = containerHeight ? `${containerHeight}px` : '100%';
+		return `width: ${width}; height: ${height}; ${style}`;
+	});
 </script>
 
-<div
-	class={`svelte-grid-extended ${classes}`}
-	bind:this={gridContainer}
-	style={`width: ${containerWidth ? `${containerWidth}px` : '100%'}; 
-	height: ${containerHeight ? `${containerHeight}px` : '100%'}; ${style}`}
->
+<div class={`svelte-grid-extended ${classes}`} bind:this={gridContainer} style={containerCss}>
 	{#if gridItemSize}
 		{@render children?.()}
 	{/if}

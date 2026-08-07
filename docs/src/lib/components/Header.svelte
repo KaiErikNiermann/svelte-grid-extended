@@ -24,11 +24,7 @@
 		class="absolute inset-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pointer-events-none"
 	></div>
 	<div class="relative container flex h-14 items-center px-4 md:px-6">
-		<button
-			onclick={toggleMobileMenu}
-			class="mr-2 icon-button lg:hidden"
-			aria-label="Toggle menu"
-		>
+		<button onclick={toggleMobileMenu} class="mr-2 icon-button lg:hidden" aria-label="Toggle menu">
 			{#if mobileMenuOpen}
 				<X class="h-4 w-4" />
 			{:else}

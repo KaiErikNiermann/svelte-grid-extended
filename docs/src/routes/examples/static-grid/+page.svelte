@@ -38,12 +38,7 @@ ${scriptClose}
 		<GridItem x={1} y={0} class="grid-demo-item">
 			{#snippet children()}Hey{/snippet}
 		</GridItem>
-		<GridItem
-			x={3}
-			y={3}
-			w={4}
-			class="grid-demo-item"
-		>
+		<GridItem x={3} y={3} w={4} class="grid-demo-item">
 			{#snippet children()}Hoy{/snippet}
 		</GridItem>
 	</Grid>

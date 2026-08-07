@@ -112,7 +112,7 @@ describe('getCollisions()', () => {
 		[createTestItem({ id: '8', x: 0, y: 0, w: 3, h: 3, movable: true, resizable: true }), 6],
 		[createTestItem({ id: '8', x: 0, y: 0, w: 4, h: 4, movable: true, resizable: true }), 8]
 	])('should have collisions', (item, expected) => {
-		expect(getCollisions(item, items).length).toBe(expected);
+		expect(getCollisions(item, items)).toHaveLength(expected);
 	});
 });
 

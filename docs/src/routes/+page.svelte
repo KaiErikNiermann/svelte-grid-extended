@@ -39,17 +39,11 @@ ${scriptClose}
 			dashboards and layouts with ease.
 		</p>
 		<div class="flex flex-wrap gap-3">
-			<a
-				href={docsPath}
-				class="btn btn-md btn-primary"
-			>
+			<a href={docsPath} class="btn btn-md btn-primary">
 				Get Started
 				<ArrowRight class="h-4 w-4" />
 			</a>
-			<a
-				href={examplesPath}
-				class="btn btn-md btn-outline hover:text-accent-foreground"
-			>
+			<a href={examplesPath} class="btn btn-md btn-outline hover:text-accent-foreground">
 				View Examples
 			</a>
 		</div>

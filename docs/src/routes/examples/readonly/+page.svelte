@@ -26,31 +26,13 @@
 
 <div class="demo-panel">
 	<Grid cols={10} rows={10} {readOnly}>
-		<GridItem
-			x={0}
-			y={0}
-			w={3}
-			h={3}
-			class="grid-demo-item"
-		>
+		<GridItem x={0} y={0} w={3} h={3} class="grid-demo-item">
 			{#snippet children()}Item A{/snippet}
 		</GridItem>
-		<GridItem
-			x={3}
-			y={0}
-			w={3}
-			h={3}
-			class="grid-demo-item"
-		>
+		<GridItem x={3} y={0} w={3} h={3} class="grid-demo-item">
 			{#snippet children()}Item B{/snippet}
 		</GridItem>
-		<GridItem
-			x={6}
-			y={0}
-			w={3}
-			h={3}
-			class="grid-demo-item"
-		>
+		<GridItem x={6} y={0} w={3} h={3} class="grid-demo-item">
 			{#snippet children()}Item C{/snippet}
 		</GridItem>
 	</Grid>

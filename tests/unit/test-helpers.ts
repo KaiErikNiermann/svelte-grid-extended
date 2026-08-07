@@ -16,5 +16,5 @@ export function createTestItem(item: Omit<LayoutItem, 'invalidate'> & { invalida
 export function createTestItems(
 	items: Array<Omit<LayoutItem, 'invalidate'> & { invalidate?: () => void }>
 ): LayoutItem[] {
-	return items.map(createTestItem);
+	return items.map((item) => createTestItem(item));
 }

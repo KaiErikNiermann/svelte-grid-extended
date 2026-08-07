@@ -9,7 +9,14 @@
 
 	let { href, children }: Props = $props();
 
-	const normalizePath = (path: string) => (path !== '/' ? path.replace(/\/+$/, '') : path);
+	// Trailing slashes are trimmed without a regex: `/\/+$/` backtracks super-linearly
+	// on a run of slashes, and sonarjs rejects it.
+	const normalizePath = (path: string) => {
+		if (path === '/') return path;
+		let normalized = path;
+		while (normalized.endsWith('/')) normalized = normalized.slice(0, -1);
+		return normalized;
+	};
 
 	const isActive = $derived(normalizePath(page.url.pathname) === normalizePath(href));
 </script>

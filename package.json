@@ -20,8 +20,11 @@
 		"e2e": "playwright test",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --check . && eslint .",
+		"check:docs": "pnpm package:build && pnpm --dir docs check",
+		"lint": "prettier --check . && eslint . --max-warnings=0",
+		"lint:fix": "prettier --write . && eslint . --fix",
 		"format": "prettier --write .",
+		"verify": "pnpm lint && pnpm check && pnpm test:unit",
 		"prepare": "husky",
 		"docs:dev": "pnpm --dir docs dev",
 		"docs:build": "pnpm --dir docs build",
@@ -62,6 +65,7 @@
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.39.2",
 		"@playwright/test": "^1.49.0",
 		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/kit": "^2.15.0",
@@ -73,10 +77,14 @@
 		"daisyui": "^4.12.0",
 		"eslint": "^9.17.0",
 		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-security": "^4.0.1",
+		"eslint-plugin-sonarjs": "^4.2.0",
 		"eslint-plugin-svelte": "^2.46.0",
+		"eslint-plugin-unicorn": "^62.0.0",
 		"globals": "^15.14.0",
 		"husky": "^9.1.0",
 		"jsdom": "^25.0.1",
+		"lint-staged": "^17.3.0",
 		"postcss": "^8.4.49",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.2",
@@ -96,5 +104,9 @@
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
-	"packageManager": "pnpm@9.15.0"
+	"packageManager": "pnpm@9.15.0",
+	"lint-staged": {
+		"*.{js,ts,svelte,md,svx,json,css,yaml,yml}": "prettier --write",
+		"*.{js,ts,svelte}": "eslint --fix --max-warnings=0"
+	}
 }

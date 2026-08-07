@@ -80,17 +80,11 @@ ${scriptClose}
 </div>
 
 <div class="flex gap-2 mb-4">
-	<button
-		onclick={addItem}
-		class="btn btn-sm btn-primary"
-	>
+	<button onclick={addItem} class="btn btn-sm btn-primary">
 		<Plus class="h-4 w-4" />
 		Add Item
 	</button>
-	<button
-		onclick={resetGrid}
-		class="btn btn-sm btn-outline"
-	>
+	<button onclick={resetGrid} class="btn btn-sm btn-outline">
 		<RotateCcw class="h-4 w-4" />
 		Reset
 	</button>
