@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+# Gate every push on the same checks CI runs: formatting, lint, types, unit tests.
+# Skip with `git push --no-verify` only when you know CI will cover it.
+set -e
+
+echo "› prettier"
+pnpm exec prettier --check .
+
+echo "› eslint"
+pnpm exec eslint . --max-warnings=0
+
+echo "› svelte-check"
+pnpm run check
+
+echo "› vitest"
+pnpm run test:unit

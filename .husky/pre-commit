@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Fast gate: format + lint only. The heavier type-check and test run live in pre-push.
+set -e
+
+pnpm exec lint-staged
