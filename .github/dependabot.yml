@@ -23,10 +23,47 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+    # Majors held back deliberately. Each needs a coordinated migration that
+    # cannot land as a single dependency bump, so an auto-opened PR would sit
+    # red forever. Drop the entry here when the migration is done.
     ignore:
-      # Svelte is a peer dependency; the supported range is a deliberate API
-      # decision, not something to bump automatically.
+      # Peer dependency — the supported range is an API decision, not a bump.
       - dependency-name: 'svelte'
+        update-types: ['version-update:semver-major']
+
+      # eslint 10 cluster. Peer ranges all accept it, but unicorn 73 and
+      # eslint-plugin-svelte 3 introduce ~110 new findings, including
+      # unicorn/no-top-level-assignment-in-function, which fires on every
+      # `$state` reassignment — i.e. on Svelte 5 reactivity itself. Needs a
+      # config pass and real code changes, not a version bump.
+      - dependency-name: 'eslint'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'eslint-config-prettier'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'eslint-plugin-svelte'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'eslint-plugin-unicorn'
+        update-types: ['version-update:semver-major']
+
+      # @sveltejs/vite-plugin-svelte 7 requires vite ^8; the repo is on vite 6.
+      # The two have to move together, along with @sveltejs/kit.
+      - dependency-name: 'vite'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@sveltejs/vite-plugin-svelte'
+        update-types: ['version-update:semver-major']
+
+      # daisyui 5 requires tailwind 4, and tailwind 4 replaces the JS config
+      # with CSS-first configuration — app.css and tailwind.config.mjs both
+      # have to be rewritten.
+      - dependency-name: 'tailwindcss'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'daisyui'
+        update-types: ['version-update:semver-major']
+
+      # TypeScript 7 is the native port; too early for a published library.
+      - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'npm'
@@ -42,6 +79,19 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+    # Same coordinated-migration blocks as the root manifest; the docs site
+    # shares the vite/tailwind toolchain.
+    ignore:
+      - dependency-name: 'svelte'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'vite'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@sveltejs/vite-plugin-svelte'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'tailwindcss'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'github-actions'
     directory: '/'
