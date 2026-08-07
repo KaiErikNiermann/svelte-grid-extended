@@ -4,7 +4,14 @@ description: Get started with @appulsauce/svelte-grid
 ---
 
 <script>
-	import { ArrowRight } from 'lucide-svelte';
+	import { resolve } from '$app/paths';
+
+	// mdsvex smartypants rewrites straight quotes inside inline HTML, so resolve() is
+	// called here rather than inline in the markup below.
+	const installationPath = resolve('/docs/installation');
+	const quickstartPath = resolve('/docs/quickstart');
+	const gridPath = resolve('/docs/grid');
+	const examplesPath = resolve('/examples');
 </script>
 
 # Introduction
@@ -30,19 +37,19 @@ description: Get started with @appulsauce/svelte-grid
 ## Quick Links
 
 <div class="grid gap-3 sm:grid-cols-2 mt-6">
-	<a href="installation" class="link-card hover:bg-accent transition-colors">
+	<a href={installationPath} class="link-card hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Installation</h3>
 		<p class="text-sm text-muted-foreground">Install the package and set up your project</p>
 	</a>
-	<a href="quickstart" class="link-card hover:bg-accent transition-colors">
+	<a href={quickstartPath} class="link-card hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Quick Start</h3>
 		<p class="text-sm text-muted-foreground">Get up and running in minutes</p>
 	</a>
-	<a href="grid" class="link-card hover:bg-accent transition-colors">
+	<a href={gridPath} class="link-card hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Grid Component</h3>
 		<p class="text-sm text-muted-foreground">Learn about the main Grid component</p>
 	</a>
-	<a href="../examples" class="link-card hover:bg-accent transition-colors">
+	<a href={examplesPath} class="link-card hover:bg-accent transition-colors">
 		<h3 class="font-semibold mb-1">Examples</h3>
 		<p class="text-sm text-muted-foreground">See the grid in action</p>
 	</a>

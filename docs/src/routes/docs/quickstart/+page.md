@@ -3,6 +3,16 @@ title: Quick Start
 description: Create your first grid layout
 ---
 
+<script>
+	import { resolve } from '$app/paths';
+
+	// mdsvex smartypants rewrites straight quotes inside inline HTML, so resolve() is
+	// called here rather than inline in the prose below.
+	const gridPath = resolve('/docs/grid');
+	const gridItemPath = resolve('/docs/grid-item');
+	const examplesPath = resolve('/examples');
+</script>
+
 # Quick Start
 
 This guide will help you create your first grid layout in just a few steps.
@@ -107,6 +117,6 @@ The `collision` prop controls how items interact:
 
 ## Next Steps
 
-- Learn about [Grid props](../grid)
-- Explore [GridItem options](../grid-item)
-- See more [Examples](../examples)
+- Learn about <a href={gridPath}>Grid props</a>
+- Explore <a href={gridItemPath}>GridItem options</a>
+- See more <a href={examplesPath}>Examples</a>

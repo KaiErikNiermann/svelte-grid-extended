@@ -3,6 +3,14 @@ title: Installation
 description: How to install @appulsauce/svelte-grid
 ---
 
+<script>
+	import { resolve } from '$app/paths';
+
+	// mdsvex smartypants rewrites straight quotes inside inline HTML, so resolve() is
+	// called here rather than inline in the prose below.
+	const quickstartPath = resolve('/docs/quickstart');
+</script>
+
 # Installation
 
 Install the package using your preferred package manager:
@@ -41,4 +49,4 @@ import type { GridController, LayoutChangeDetail, LayoutItem } from '@appulsauce
 
 ## Next Steps
 
-Once installed, head to the [Quick Start](../quickstart) guide to create your first grid.
+Once installed, head to the <a href={quickstartPath}>Quick Start</a> guide to create your first grid.
