@@ -10,7 +10,10 @@ export default defineConfig({
 		environment: 'jsdom',
 		coverage: {
 			reporter: ['text', 'json', 'html'],
-			provider: 'v8'
+			provider: 'v8',
+			// The demo routes under src/routes are not part of the published package;
+			// including them buried the library's own numbers under 0% noise.
+			include: ['src/lib/**']
 		}
 	}
 });
