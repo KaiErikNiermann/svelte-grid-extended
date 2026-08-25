@@ -38,5 +38,6 @@
 	"dependencies": {
 		"@appulsauce/svelte-grid": "link:.."
 	},
-	"type": "module"
+	"type": "module",
+	"packageManager": "pnpm@9.15.0"
 }
