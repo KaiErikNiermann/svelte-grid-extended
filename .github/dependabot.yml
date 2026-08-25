@@ -14,15 +14,23 @@ updates:
     # breaking upgrade can be reviewed (or held back) on its own.
     groups:
       dev-dependencies:
+        applies-to: version-updates
         dependency-type: 'development'
         update-types:
           - 'minor'
           - 'patch'
       production-dependencies:
+        applies-to: version-updates
         dependency-type: 'production'
         update-types:
           - 'minor'
           - 'patch'
+      # Advisories are almost always transitive lockfile bumps. Batched, they
+      # are one reviewable PR; ungrouped, each advisory opens its own.
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - '*'
     # Majors held back deliberately. Each needs a coordinated migration that
     # cannot land as a single dependency bump, so an auto-opened PR would sit
     # red forever. Drop the entry here when the migration is done.
@@ -76,9 +84,14 @@ updates:
       prefix: 'chore(docs)'
     groups:
       docs-dependencies:
+        applies-to: version-updates
         update-types:
           - 'minor'
           - 'patch'
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - '*'
     # Same coordinated-migration blocks as the root manifest; the docs site
     # shares the vite/tailwind toolchain.
     ignore:
