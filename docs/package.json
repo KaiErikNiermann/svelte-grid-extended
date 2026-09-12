@@ -39,5 +39,10 @@
 		"@appulsauce/svelte-grid": "link:.."
 	},
 	"type": "module",
-	"packageManager": "pnpm@9.15.0"
+	"packageManager": "pnpm@9.15.0",
+	"pnpm": {
+		"overrides": {
+			"cookie": "^0.7.2"
+		}
+	}
 }
