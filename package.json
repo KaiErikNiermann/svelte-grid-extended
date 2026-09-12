@@ -107,5 +107,10 @@
 	"lint-staged": {
 		"*.{js,ts,svelte,md,svx,json,css,yaml,yml}": "prettier --write",
 		"*.{js,ts,svelte}": "eslint --fix --max-warnings=0"
+	},
+	"pnpm": {
+		"overrides": {
+			"cookie": "^0.7.2"
+		}
 	}
 }
