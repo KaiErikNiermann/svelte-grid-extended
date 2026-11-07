@@ -1,4 +1,4 @@
-import type { RequireAtLeastOne } from '$lib/utils/types';
+import type { RequireAtLeastOne } from './utils/types';
 import type { Snippet } from 'svelte';
 
 export type LayoutItem = Size &

@@ -9,7 +9,7 @@
 
 	let { children }: Props = $props();
 
-	const examplesPath = resolve('/examples');
+	const examplesPath = resolve('examples');
 	const isExamplePage = $derived(page.url.pathname !== examplesPath);
 </script>
 

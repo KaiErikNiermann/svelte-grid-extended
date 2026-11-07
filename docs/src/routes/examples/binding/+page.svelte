@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
-	import { CodeBlock } from '$lib/components';
-	import { scriptClose } from '$lib/snippet-utils';
+	import { CodeBlock } from '#lib/components/index.ts';
+	import { scriptClose } from '#lib/snippet-utils.ts';
 
 	const initialItems = [
 		{ x: 0, y: 0, w: 2, h: 2, label: 'A' },

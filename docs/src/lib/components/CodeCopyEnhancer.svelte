@@ -55,7 +55,10 @@
 		});
 
 		runEnhancer();
-		afterNavigate(() => {
+
+		afterNavigate(({ shallow, type }) => {
+			if (shallow && type === 'goto') return;
+
 			runEnhancer();
 		});
 

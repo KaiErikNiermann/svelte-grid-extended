@@ -20,6 +20,7 @@ export default tseslint.config(
 			'coverage/',
 			'.remember/',
 			'.serena/',
+			'.scratch/',
 			'.svelte-kit/',
 			'docs/build/',
 			'docs/.svelte-kit/',

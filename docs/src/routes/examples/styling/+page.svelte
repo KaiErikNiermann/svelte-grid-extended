@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
-	import { CodeBlock } from '$lib/components';
+	import { CodeBlock } from '#lib/components/index.ts';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 2, h: 3 },

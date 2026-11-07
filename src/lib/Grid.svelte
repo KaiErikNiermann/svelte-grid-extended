@@ -21,7 +21,7 @@
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
-	import { GridController } from '$lib/GridController';
+	import { GridController } from './GridController';
 
 	import type {
 		Breakpoints,

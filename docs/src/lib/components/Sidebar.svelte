@@ -1,6 +1,6 @@
 <script lang="ts">
 	import NavLink from './NavLink.svelte';
-	import { cn } from '$lib/utils';
+	import { cn } from '#lib/utils/index.ts';
 	import { resolve } from '$app/paths';
 	import type { RouteId } from '$app/types';
 

@@ -1,4 +1,4 @@
-import type { BreakpointKey, Breakpoints, GridSize } from '$lib/types';
+import type { BreakpointKey, Breakpoints, GridSize } from '../types';
 
 export function findGridSize(cols: GridSize, width: number, breakpoints: Breakpoints) {
 	if (typeof cols == 'number') {

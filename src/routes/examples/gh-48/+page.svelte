@@ -1,5 +1,5 @@
 <script>
-	import Grid, { GridItem } from '$lib';
+	import Grid, { GridItem } from '#lib';
 </script>
 
 <section>CONTENT</section>

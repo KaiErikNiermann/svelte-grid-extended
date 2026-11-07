@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Copy, Check } from 'lucide-svelte';
 	import { codeToHtml } from 'shiki/bundle/web';
-	import { cn } from '$lib/utils';
+	import { cn } from '#lib/utils/index.ts';
 
 	interface Props {
 		code: string;

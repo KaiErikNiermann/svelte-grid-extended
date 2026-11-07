@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid, { GridItem, type GridController } from '$lib';
+	import Grid, { GridItem, type GridController } from '#lib';
 
 	let items = $state([
 		{ id: '1', x: 0, y: 0, w: 2, h: 5 },
