@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
-	import { CodeBlock } from '$lib/components';
+	import { CodeBlock } from '#lib/components/index.ts';
 
 	let readOnly = $state(true);
 </script>

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { ArrowRight, Grid3x3, Move, Maximize2, Zap } from 'lucide-svelte';
-	import { CodeBlock } from '$lib/components';
+	import { CodeBlock } from '#lib/components/index.ts';
 	import { resolve } from '$app/paths';
-	import { scriptClose } from '$lib/snippet-utils';
+	import { scriptClose } from '#lib/snippet-utils.ts';
 
-	const docsPath = resolve('/docs');
-	const examplesPath = resolve('/examples');
+	const docsPath = resolve('docs');
+	const examplesPath = resolve('examples');
 	const quickExampleCode = String.raw`<script lang="ts">
   import Grid, { GridItem } from '@appulsauce/svelte-grid';
 

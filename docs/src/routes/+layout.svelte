@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import { Header, Sidebar, CodeCopyEnhancer } from '$lib/components';
+	import { Header, Sidebar, CodeCopyEnhancer } from '#lib/components/index.ts';
 	import { afterNavigate } from '$app/navigation';
 
 	interface Props {
@@ -10,7 +10,9 @@
 	let { children }: Props = $props();
 	let mainEl: HTMLElement | null = null;
 
-	afterNavigate(() => {
+	afterNavigate(({ shallow, type }) => {
+		if (shallow && type === 'goto') return;
+
 		mainEl?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 	});
 </script>

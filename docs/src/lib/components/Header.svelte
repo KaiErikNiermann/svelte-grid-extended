@@ -15,8 +15,8 @@
 	}
 
 	const homePath = resolve('/');
-	const docsPath = resolve('/docs');
-	const examplesPath = resolve('/examples');
+	const docsPath = resolve('docs');
+	const examplesPath = resolve('examples');
 </script>
 
 <header class="sticky top-0 z-50 w-full border-b border-border bg-background/95">
