@@ -19,3 +19,6 @@ vite.config.ts.timestamp-*
 
 # Scratch output (smoke scripts, comparison builds)
 .scratch
+
+# Local working log, kept out of the repo
+LOG.md
