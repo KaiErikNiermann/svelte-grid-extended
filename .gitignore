@@ -16,3 +16,6 @@ vite.config.ts.timestamp-*
 .serena
 .remember
 .playwright-mcp
+
+# Scratch output (smoke scripts, comparison builds)
+.scratch
