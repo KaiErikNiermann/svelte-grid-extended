@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Grid from '$lib';
-	import GridItem from '$lib/GridItem.svelte';
+	import Grid from '#lib';
+	import GridItem from '#lib/GridItem.svelte';
 </script>
 
 <Grid cols={10} rows={10}>

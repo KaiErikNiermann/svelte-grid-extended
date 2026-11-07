@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Grid, { GridItem, type GridController } from '$lib';
-	import type { Collision } from '$lib/types';
+	import Grid, { GridItem, type GridController } from '#lib';
+	import type { Collision } from '#lib/types.js';
 
 	let items = $state([
 		{ id: crypto.randomUUID(), x: 0, y: 0, w: 2, h: 5 },

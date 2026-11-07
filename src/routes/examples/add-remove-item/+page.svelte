@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import Grid, { GridItem, type GridController } from '$lib';
+	import Grid, { GridItem, type GridController } from '#lib';
 
 	let items = $state([
 		{ id: crypto.randomUUID(), x: 0, y: 0, w: 2, h: 5 },

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Grid, { type LayoutChangeDetail } from '$lib';
-	import GridItem from '$lib/GridItem.svelte';
+	import Grid, { type LayoutChangeDetail } from '#lib';
+	import GridItem from '#lib/GridItem.svelte';
 
 	function logItem(detail: LayoutChangeDetail) {
 		console.log(detail.item);

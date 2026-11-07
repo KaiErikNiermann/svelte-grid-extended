@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid, { GridItem } from '$lib';
+	import Grid, { GridItem } from '#lib';
 
 	const items = [
 		{ id: '0', x: 0, y: 0, w: 2, h: 5 },

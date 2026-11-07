@@ -1,4 +1,4 @@
-import type { Collision, GridSize, ItemSize } from '$lib/types';
+import type { Collision, GridSize, ItemSize } from '../types';
 
 export type GridOptions = {
 	cols: GridSize;

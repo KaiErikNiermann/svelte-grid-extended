@@ -1,4 +1,4 @@
-import type { GridDimensions, LayoutItem } from '$lib/types';
+import type { GridDimensions, LayoutItem } from '../types';
 
 export function isItemColliding(item: LayoutItem, otherItem: LayoutItem): boolean {
 	return (

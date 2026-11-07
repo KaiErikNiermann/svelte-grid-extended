@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Grid, { GridItem } from '$lib';
+	import Grid, { GridItem } from '#lib';
 </script>
 
 <Grid cols={10} rows={10}>
