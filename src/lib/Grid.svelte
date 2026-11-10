@@ -20,6 +20,7 @@
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
+	import { offscreenCss, watchOffscreen, type OffscreenState } from './utils/offscreen';
 	import { getGridDimensions, hasCollisions } from './utils/grid';
 	import {
 		assignBox,
@@ -181,10 +182,12 @@
 		});
 
 		sizeObserver.observe(gridContainer);
+		const stopWatching = watchOffscreen(gridContainer, (state) => (offscreen = state));
 
 		return () => {
 			destroyed = true;
 			sizeObserver.disconnect();
+			stopWatching();
 		};
 	});
 
@@ -331,10 +334,13 @@
 
 	setContext(GRID_CONTEXT_NAME, contextRef);
 
+	// Rendering is skipped while the grid is far off screen; see offscreenCss.
+	let offscreen = $state<OffscreenState>();
+
 	const containerCss = $derived.by(() => {
 		const width = containerWidth ? `${containerWidth}px` : '100%';
 		const height = containerHeight ? `${containerHeight}px` : '100%';
-		return `width: ${width}; height: ${height}; ${style}`;
+		return `width: ${width}; height: ${height}; ${offscreenCss(offscreen)} ${style}`;
 	});
 </script>
 
