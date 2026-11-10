@@ -116,6 +116,15 @@
 		onpreviewchange?.({ item: previewItem });
 	});
 
+	$effect(() => {
+		if (!active || gridParams.collision !== 'none') return;
+
+		const occupied = Object.values(gridParams.items);
+		if (hasCollisions(previewItem, occupied) && !hasCollisions(item, occupied)) {
+			previewItem = { ...item };
+		}
+	});
+
 	function applyPreview() {
 		item.x = previewItem.x;
 		item.y = previewItem.y;
@@ -138,7 +147,11 @@
 	}
 
 	function endInteraction(event: PointerEvent) {
-		applyPreview();
+		if (hasCollisions(previewItem, Object.values(gridParams.items))) {
+			previewItem = { ...item };
+		} else {
+			applyPreview();
+		}
 		active = false;
 		initialPointerPosition.left = 0;
 		initialPointerPosition.top = 0;
