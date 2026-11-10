@@ -84,10 +84,10 @@
 
 	let _cols = $state(0);
 	let _rows = $state(0);
-	let maxCols = $state(Infinity);
-	let maxRows = $state(Infinity);
 	let shouldExpandRows = $state(false);
 	let shouldExpandCols = $state(false);
+	let maxCols = $derived(shouldExpandCols ? Infinity : _cols);
+	let maxRows = $derived(shouldExpandRows ? Infinity : _rows);
 	let gridItemSize = $state<ItemSize | undefined>();
 
 	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
@@ -108,12 +108,10 @@
 
 	$effect(() => {
 		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
-		maxCols = shouldExpandCols ? Infinity : _cols;
 	});
 
 	$effect(() => {
 		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
-		maxRows = shouldExpandRows ? Infinity : _rows;
 	});
 
 	$effect(() => {
