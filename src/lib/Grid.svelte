@@ -139,9 +139,25 @@
 		items = { ...items };
 		retryUnplaced();
 
-		if (autoCompress && collision === 'compress') {
-			_controller._internalCompress(items);
-		}
+		if (autoCompress && collision === 'compress') scheduleCompress();
+	}
+
+	let compressQueued = false;
+	let destroyed = false;
+
+	/**
+	 * Compresses once per microtask, however many changes asked for it. Compressing on every
+	 * change made a burst of N registrations or removals cost N passes of $O(n^2)$ each, and
+	 * destroying a compress grid ran one pass per item for a grid about to disappear: 150
+	 * items took over 10 s to unmount in jsdom.
+	 */
+	function scheduleCompress(): void {
+		if (compressQueued) return;
+		compressQueued = true;
+		queueMicrotask(() => {
+			compressQueued = false;
+			if (!destroyed && autoCompress && collision === 'compress') _controller._internalCompress(items);
+		});
 	}
 
 	onMount(() => {
@@ -167,7 +183,10 @@
 
 		sizeObserver.observe(gridContainer);
 
-		return () => sizeObserver.disconnect();
+		return () => {
+			destroyed = true;
+			sizeObserver.disconnect();
+		};
 	});
 
 	const limits = (): Limits => ({ maxCols, maxRows });
