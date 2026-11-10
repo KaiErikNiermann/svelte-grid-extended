@@ -136,7 +136,6 @@
 	let gridContainer: HTMLDivElement;
 
 	function updateGrid() {
-		items = { ...items };
 		retryUnplaced();
 
 		if (autoCompress && collision === 'compress') scheduleCompress();
