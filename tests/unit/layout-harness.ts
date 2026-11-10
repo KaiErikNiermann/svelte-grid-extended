@@ -72,6 +72,7 @@ export type LayoutComponent = {
 	remove: (id: string) => void;
 	patch: (id: string, change: Partial<LayoutSpec>) => void;
 	setGrid: (change: Record<string, unknown>) => void;
+	setVisible: (show: boolean) => void;
 	snapshot: () => LayoutSpec[];
 	getController: () => import('../../src/lib/types').GridController | undefined;
 };
