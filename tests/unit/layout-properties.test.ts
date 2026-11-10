@@ -21,7 +21,10 @@ const configs: ScenarioConfig[] = [
 	{ collision: 'none', rows: 0, withPatches: false },
 	{ collision: 'none', rows: 6, withPatches: true },
 	{ collision: 'push', rows: 0, withPatches: true },
-	{ collision: 'compress', rows: 0, withPatches: true }
+	{ collision: 'compress', rows: 0, withPatches: true },
+	{ collision: 'push', rows: 0, withPatches: true, gap: 10 },
+	{ collision: 'none', rows: 6, withPatches: false, breakpointCols: { xs: 2, md: 4, lg: 6 } },
+	{ collision: 'push', rows: 0, withPatches: true, breakpointCols: { xs: 2, md: 4, lg: 6 } }
 ];
 
 describe.each(configs)('random operations ($collision, rows=$rows, patches=$withPatches)', (config) => {
@@ -29,7 +32,7 @@ describe.each(configs)('random operations ($collision, rows=$rows, patches=$with
 		// fc.assert throws on a counterexample; the assertion makes that explicit.
 		await expect(
 			fc.assert(
-				fc.asyncProperty(fc.array(opArb(config.withPatches), { minLength: 1, maxLength: MAX_OPS }), (ops) =>
+				fc.asyncProperty(fc.array(opArb(config), { minLength: 1, maxLength: MAX_OPS }), (ops) =>
 					runScenario(config, ops, resizeTo)
 				),
 				{ numRuns: RUNS }

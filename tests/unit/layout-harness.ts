@@ -71,7 +71,11 @@ export type MountedLayout = {
 	container: HTMLElement;
 	unmount: () => void;
 	settle: () => Promise<void>;
+	/** Distance in pixels from one cell's origin to the next: `CELL + gap`. */
+	pitch: number;
 	drag: (id: string, dx: number, dy: number, during?: () => Promise<void>) => Promise<void>;
+	/** A drag through several pointer moves, each in cells from the start; push reacts to each. */
+	dragPath: (id: string, path: readonly (readonly [number, number])[]) => Promise<void>;
 	resize: (id: string, dw: number, dh: number, during?: () => Promise<void>) => Promise<void>;
 	drawn: () => Record<string, { x: number; y: number; w: number; h: number }>;
 	gridElement: () => HTMLElement;
@@ -95,15 +99,27 @@ export function mountLayout(options: {
 		props: { grid: { gap: 0, ...options.grid }, initial: options.items, onchange: options.onchange }
 	});
 	const layout = component as unknown as LayoutComponent;
+	const gap = typeof options.grid.gap === 'number' ? options.grid.gap : 0;
+	const pitch = CELL + gap;
+	// Inverse of calcPosition: $\text{left} = x \cdot pitch + gap$, $\text{width} = w \cdot pitch - gap$.
+	const toCells = (left: string, top: string, width: string, height: string) => ({
+		x: (Number.parseFloat(left) - gap) / pitch,
+		y: (Number.parseFloat(top) - gap) / pitch,
+		w: (Number.parseFloat(width) + gap) / pitch,
+		h: (Number.parseFloat(height) + gap) / pitch
+	});
 
-	async function gesture(selector: string, dx: number, dy: number, during?: () => Promise<void>) {
+	async function gesture(selector: string, path: readonly (readonly [number, number])[], during?: () => Promise<void>) {
 		const handle = container.querySelector(selector);
 		if (!handle) throw new Error(`nothing matches ${selector}`);
 		pointer(handle, 'pointerdown', 0, 0);
-		pointer(window, 'pointermove', dx * CELL, dy * CELL);
-		await settle();
+		for (const [dx, dy] of path) {
+			pointer(window, 'pointermove', dx * pitch, dy * pitch);
+			await settle();
+		}
 		if (during) await during();
-		pointer(window, 'pointerup', dx * CELL, dy * CELL);
+		const [endX, endY] = path.at(-1) ?? [0, 0];
+		pointer(window, 'pointerup', endX * pitch, endY * pitch);
 		await settle();
 	}
 
@@ -112,22 +128,16 @@ export function mountLayout(options: {
 		container,
 		unmount,
 		settle,
-		drag: (id, dx, dy, during) => gesture(`.it-${id}`, dx, dy, during),
-		resize: (id, dw, dh, during) => gesture(`.it-${id} .resizer-default`, dw, dh, during),
+		pitch,
+		drag: (id, dx, dy, during) => gesture(`.it-${id}`, [[dx, dy]], during),
+		dragPath: (id, path) => gesture(`.it-${id}`, path),
+		resize: (id, dw, dh, during) => gesture(`.it-${id} .resizer-default`, [[dw, dh]], during),
 		drawn: () =>
 			Object.fromEntries(
 				[...container.querySelectorAll<HTMLElement>('.it')].map((el) => {
 					const id = [...el.classList].find((c) => c.startsWith('it-'))!.slice(3);
 					const { left, top, width, height } = el.style;
-					return [
-						id,
-						{
-							x: Number.parseFloat(left) / CELL,
-							y: Number.parseFloat(top) / CELL,
-							w: Number.parseFloat(width) / CELL,
-							h: Number.parseFloat(height) / CELL
-						}
-					];
+					return [id, toCells(left, top, width, height)];
 				})
 			),
 		gridElement: () => container.querySelector<HTMLElement>('.svelte-grid-extended')!
@@ -170,6 +180,15 @@ function itemProblems(it: LayoutSpec, drawn: Drawn, cols: number, rows: number):
 	return problems;
 }
 
+/** A grid that grows downwards must be at least as tall as its lowest item reaches. */
+function heightProblems(mounted: MountedLayout, items: LayoutSpec[]): string[] {
+	if (items.length === 0) return [];
+	const bottom = Math.max(...items.map((i) => i.y! + i.h)) * mounted.pitch;
+	const height = mounted.gridElement().style.height;
+	if (!height.endsWith('px')) return [`grid height is ${height} while items reach ${bottom}px`];
+	return Number.parseFloat(height) < bottom ? [`grid is ${height} tall but items reach ${bottom}px`] : [];
+}
+
 /** Every way a settled layout can be wrong, as readable strings (empty when it is valid). */
 export function layoutProblems(mounted: MountedLayout, options: InvariantOptions): string[] {
 	const items = mounted.component.snapshot();
@@ -177,6 +196,7 @@ export function layoutProblems(mounted: MountedLayout, options: InvariantOptions
 	const rows = options.collision === 'none' ? options.rows : Infinity;
 	return [
 		...(options.allowOverlap ? [] : overlapProblems(items)),
-		...items.flatMap((it) => itemProblems(it, drawn, options.cols, rows))
+		...items.flatMap((it) => itemProblems(it, drawn, options.cols, rows)),
+		...(rows === Infinity ? heightProblems(mounted, items) : [])
 	];
 }

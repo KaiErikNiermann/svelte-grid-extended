@@ -8,42 +8,70 @@ import { expect } from 'vitest';
 import fc from 'fast-check';
 
 import { FIXED_SIZE, layoutProblems, mountLayout, type LayoutSpec, type MountedLayout } from './layout-harness';
-import type { Collision } from '../../src/lib/types';
+import { findGridSize } from '../../src/lib/utils/breakpoints';
+import type { Breakpoints, Collision, GridSize } from '../../src/lib/types';
 
-export type Op =
+type SimpleOp =
 	| { kind: 'addFree'; w: number; h: number }
 	| { kind: 'addUnplaced'; w: number; h: number }
 	| { kind: 'remove'; pick: number }
 	| { kind: 'patch'; pick: number; x: number; y: number; w: number; h: number }
+	| { kind: 'cols'; cols: number };
+
+export type Op =
+	| SimpleOp
 	| { kind: 'drag'; pick: number; dx: number; dy: number }
+	| { kind: 'dragPath'; pick: number; path: [number, number][] }
 	| { kind: 'resize'; pick: number; dw: number; dh: number }
-	| { kind: 'cols'; cols: number }
-	| { kind: 'containerResize' };
+	| { kind: 'containerResize' }
+	| { kind: 'width'; width: number }
+	/** Several changes in the same tick, before any effect runs. */
+	| { kind: 'batch'; ops: SimpleOp[] };
+
+export type ScenarioConfig = {
+	collision: Collision;
+	rows: number;
+	withPatches: boolean;
+	gap?: number;
+	/** Breakpoint-based cols; the container width then decides the column count. */
+	breakpointCols?: Exclude<GridSize, number>;
+};
+
+// The Grid's default breakpoints, which breakpoint-based cols are resolved against.
+const BREAKPOINTS: Breakpoints = { xxl: 1536, xl: 1280, lg: 1024, md: 768, sm: 640, xs: 320 };
 
 const size = fc.integer({ min: 1, max: 3 });
 const pick = fc.nat();
-export const opArb = (withPatches: boolean): fc.Arbitrary<Op> =>
-	fc.oneof(
+const cell = fc.integer({ min: -3, max: 4 });
+
+function simpleOpArb(config: ScenarioConfig): fc.Arbitrary<SimpleOp> {
+	const patch = fc.record({
+		kind: fc.constant('patch' as const),
+		pick,
+		x: fc.integer({ min: -2, max: 9 }),
+		y: fc.integer({ min: -2, max: 9 }),
+		w: fc.integer({ min: 1, max: 7 }),
+		h: fc.integer({ min: 1, max: 4 })
+	});
+	const cols = fc.record({ kind: fc.constant('cols' as const), cols: fc.integer({ min: 2, max: 6 }) });
+	return fc.oneof(
 		fc.record({ kind: fc.constant('addFree' as const), w: size, h: size }),
 		fc.record({ kind: fc.constant('addUnplaced' as const), w: size, h: size }),
 		fc.record({ kind: fc.constant('remove' as const), pick }),
-		...(withPatches
-			? [
-					fc.record({
-						kind: fc.constant('patch' as const),
-						pick,
-						x: fc.integer({ min: -2, max: 9 }),
-						y: fc.integer({ min: -2, max: 9 }),
-						w: fc.integer({ min: 1, max: 7 }),
-						h: fc.integer({ min: 1, max: 4 })
-					})
-				]
-			: []),
+		...(config.withPatches ? [patch] : []),
+		...(config.breakpointCols ? [] : [cols])
+	);
+}
+
+export function opArb(config: ScenarioConfig): fc.Arbitrary<Op> {
+	const simple = simpleOpArb(config);
+	return fc.oneof(
+		simple,
+		fc.record({ kind: fc.constant('drag' as const), pick, dx: cell, dy: cell }),
 		fc.record({
-			kind: fc.constant('drag' as const),
+			kind: fc.constant('dragPath' as const),
 			pick,
-			dx: fc.integer({ min: -3, max: 4 }),
-			dy: fc.integer({ min: -3, max: 4 })
+			path: fc.array(fc.tuple(cell, cell), { minLength: 2, maxLength: 4 })
 		}),
 		fc.record({
 			kind: fc.constant('resize' as const),
@@ -51,9 +79,13 @@ export const opArb = (withPatches: boolean): fc.Arbitrary<Op> =>
 			dw: fc.integer({ min: -2, max: 3 }),
 			dh: fc.integer({ min: -2, max: 3 })
 		}),
-		fc.record({ kind: fc.constant('cols' as const), cols: fc.integer({ min: 2, max: 6 }) }),
-		fc.constant({ kind: 'containerResize' as const })
+		fc.constant({ kind: 'containerResize' as const }),
+		...(config.breakpointCols
+			? [fc.record({ kind: fc.constant('width' as const), width: fc.constantFrom(320, 700, 1024, 1600) })]
+			: []),
+		fc.record({ kind: fc.constant('batch' as const), ops: fc.array(simple, { minLength: 2, maxLength: 3 }) })
 	);
+}
 
 function occupied(items: LayoutSpec[], x: number, y: number, w: number, h: number): boolean {
 	return items.some((i) => x < i.x! + i.w && i.x! < x + w && y < i.y! + i.h && i.y! < y + h);
@@ -69,20 +101,44 @@ function freeCell(items: LayoutSpec[], cols: number, rows: number, w: number, h:
 	return null;
 }
 
-type Run = { mounted: MountedLayout; cols: number; rows: number; nextId: number };
+type Run = {
+	mounted: MountedLayout;
+	config: ScenarioConfig;
+	cols: number;
+	rows: number;
+	nextId: number;
+	resizeTo: (width: number, height: number) => void;
+	/** Set while a batch has changed the layout and no effect has run yet. */
+	unsettled: boolean;
+	/** During a batch, the items that had registered before it; only they can be targeted. */
+	registered?: Set<string>;
+};
 
 function chosen(run: Run, index: number): LayoutSpec | undefined {
-	const items = run.mounted.component.snapshot();
+	const items = run.mounted.component.snapshot().filter((i) => !run.registered || run.registered.has(i.id));
 	return items.length > 0 ? items[index % items.length] : undefined;
 }
 
-async function apply(run: Run, op: Op, resizeTo: (width: number, height: number) => void): Promise<void> {
+/**
+ * Adds an item at a cell that is free right now. Skipped after another change in the same
+ * tick: the layout has not settled, so the free cell is stale, and two items registered on
+ * one cell is PR #9's case (registration does not relocate them).
+ */
+function addFree(run: Run, id: string, op: { w: number; h: number }): void {
+	if (run.unsettled) return;
+	const items = run.mounted.component.snapshot();
+	const w = Math.min(op.w, run.cols);
+	const free = freeCell(items, run.cols, run.rows, w, op.h);
+	if (free) run.mounted.component.add({ id, ...free, w, h: op.h });
+}
+
+function applySimple(run: Run, op: SimpleOp): void {
 	const { component } = run.mounted;
 	const id = `n${run.nextId++}`;
+	const target = 'pick' in op ? chosen(run, op.pick) : undefined;
 	switch (op.kind) {
 		case 'addFree': {
-			const free = freeCell(component.snapshot(), run.cols, run.rows, Math.min(op.w, run.cols), op.h);
-			if (free) component.add({ id, ...free, w: Math.min(op.w, run.cols), h: op.h });
+			addFree(run, id, op);
 			break;
 		}
 		case 'addUnplaced': {
@@ -90,23 +146,11 @@ async function apply(run: Run, op: Op, resizeTo: (width: number, height: number)
 			break;
 		}
 		case 'remove': {
-			const target = chosen(run, op.pick);
 			if (target) component.remove(target.id);
 			break;
 		}
 		case 'patch': {
-			const target = chosen(run, op.pick);
 			if (target) component.patch(target.id, { x: op.x, y: op.y, w: op.w, h: op.h });
-			break;
-		}
-		case 'drag': {
-			const target = chosen(run, op.pick);
-			if (target) await run.mounted.drag(target.id, op.dx, op.dy);
-			break;
-		}
-		case 'resize': {
-			const target = chosen(run, op.pick);
-			if (target) await run.mounted.resize(target.id, op.dw, op.dh);
 			break;
 		}
 		case 'cols': {
@@ -114,9 +158,49 @@ async function apply(run: Run, op: Op, resizeTo: (width: number, height: number)
 			component.setGrid({ cols: op.cols });
 			break;
 		}
-		case 'containerResize': {
-			resizeTo(run.cols * 100, run.rows === Infinity ? 1000 : run.rows * 100);
+	}
+}
+
+function resizeContainer(run: Run, width: number): void {
+	if (run.config.breakpointCols) run.cols = findGridSize(run.config.breakpointCols, width, BREAKPOINTS);
+	run.resizeTo(width, run.rows === Infinity ? 1000 : run.rows * run.mounted.pitch);
+}
+
+async function apply(run: Run, op: Op): Promise<void> {
+	const target = 'pick' in op ? chosen(run, op.pick) : undefined;
+	switch (op.kind) {
+		case 'drag': {
+			if (target) await run.mounted.drag(target.id, op.dx, op.dy);
 			break;
+		}
+		case 'dragPath': {
+			if (target) await run.mounted.dragPath(target.id, op.path);
+			break;
+		}
+		case 'resize': {
+			if (target) await run.mounted.resize(target.id, op.dw, op.dh);
+			break;
+		}
+		case 'containerResize': {
+			resizeContainer(run, run.cols * run.mounted.pitch);
+			break;
+		}
+		case 'width': {
+			resizeContainer(run, op.width);
+			break;
+		}
+		case 'batch': {
+			run.registered = new Set(run.mounted.component.snapshot().map((i) => i.id));
+			for (const inner of op.ops) {
+				applySimple(run, inner);
+				run.unsettled = true;
+			}
+			run.unsettled = false;
+			run.registered = undefined;
+			break;
+		}
+		default: {
+			applySimple(run, op);
 		}
 	}
 	await run.mounted.settle();
@@ -161,24 +245,28 @@ function compressProblems(items: LayoutSpec[]): string[] {
 		.map((i) => `${i.id}(${i.x},${i.y}) could move up`);
 }
 
-export type ScenarioConfig = { collision: Collision; rows: number; withPatches: boolean };
-
 /**
  * Mounts an empty 4-column grid, applies `ops` in order and asserts after every step that
  * the layout has no avoidable problem. Fails with the step and operation that broke it.
  */
 export async function runScenario(
-	{ collision, rows, withPatches }: ScenarioConfig,
+	config: ScenarioConfig,
 	ops: Op[],
 	resizeTo: (width: number, height: number) => void
 ): Promise<void> {
+	const { collision, rows, withPatches } = config;
 	const fixedRows = rows || Infinity;
-	const mounted = mountLayout({ grid: { cols: 4, rows, collision, ...FIXED_SIZE }, items: [] });
-	const run: Run = { mounted, cols: 4, rows: fixedRows, nextId: 0 };
+	const cols = config.breakpointCols ?? 4;
+	const mounted = mountLayout({ grid: { cols, rows, collision, gap: config.gap ?? 0, ...FIXED_SIZE }, items: [] });
+	const run: Run = { mounted, config, cols: 4, rows: fixedRows, nextId: 0, resizeTo, unsettled: false };
 	await mounted.settle();
+	if (config.breakpointCols) {
+		resizeContainer(run, 1024);
+		await mounted.settle();
+	}
 	try {
 		for (const [step, op] of ops.entries()) {
-			await apply(run, op, resizeTo);
+			await apply(run, op);
 			const items = mounted.component.snapshot();
 			const problems = [
 				...layoutProblems(mounted, {
