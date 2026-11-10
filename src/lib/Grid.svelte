@@ -16,11 +16,19 @@
 </script>
 
 <script lang="ts">
-	import { setContext, onMount, type Snippet } from 'svelte';
+	import { setContext, onMount, untrack, type Snippet } from 'svelte';
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
 	import { getGridDimensions } from './utils/grid';
+	import {
+		assignBox,
+		clampToLimits,
+		hasPosition,
+		pushAside,
+		relocateIfColliding,
+		type Limits
+	} from './utils/placement';
 	import { GridController } from './GridController';
 
 	import type {
@@ -161,13 +169,71 @@
 		return () => sizeObserver.disconnect();
 	});
 
+	const limits = (): Limits => ({ maxCols, maxRows });
+
+	/**
+	 * Fits a new item into the grid before it joins: an item past the fixed limits is clamped
+	 * inside, and one without `x`/`y` gets the first free cell. Either move avoids landing on
+	 * another item. An item registered where it fits is left exactly as given.
+	 * Returns whether the item changed, so its bindings can be updated.
+	 */
+	function placeNewItem(item: LayoutItem): boolean {
+		const positioned = hasPosition(item);
+		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
+		const moved = !positioned || box.x !== item.x || box.y !== item.y;
+		return assignBox(item, moved ? relocateIfColliding(item, box, Object.values(items), limits()) : box);
+	}
+
 	function registerItem(item: LayoutItem): void {
 		if (item.id in items) {
 			throw new Error(`Item with id ${item.id} already exists`);
 		}
+		const changed = placeNewItem(item);
 		items[item.id] = item;
-		updateGrid();
+		if (changed) {
+			item.invalidate();
+		} else {
+			updateGrid();
+		}
 	}
+
+	/**
+	 * Re-validates an item whose x/y/w/h changed from outside a drag, or at the end of one:
+	 * it is clamped into the limits, and in push and compress mode the items it now covers
+	 * are pushed aside, the same rule a drag follows. `none` mode applies the props as given.
+	 */
+	function settleItem(item: LayoutItem): void {
+		const changed = assignBox(item, clampToLimits(item, limits()));
+		if (collision !== 'none') {
+			for (const other of pushAside(item, Object.values(items), limits())) other.invalidate();
+		}
+		if (changed) {
+			item.invalidate();
+		} else {
+			updateGrid();
+		}
+	}
+
+	/** Moves items that a smaller grid (fewer columns, a new breakpoint) left outside it. */
+	function reflow(bounds: Limits): void {
+		const ordered = Object.values(items).sort((a, b) => a.y - b.y || a.x - b.x);
+		for (const it of ordered) {
+			const box = clampToLimits(it, bounds);
+			if (box.x === it.x && box.y === it.y && box.w === it.w && box.h === it.h) continue;
+			if (collision === 'none') {
+				assignBox(it, relocateIfColliding(it, box, Object.values(items), bounds));
+			} else {
+				assignBox(it, box);
+				for (const other of pushAside(it, Object.values(items), bounds)) other.invalidate();
+			}
+			it.invalidate();
+		}
+	}
+
+	$effect(() => {
+		const bounds = { maxCols, maxRows };
+		untrack(() => reflow(bounds));
+	});
 
 	function unregisterItem(item: LayoutItem): void {
 		delete items[item.id];
@@ -194,6 +260,7 @@
 		collision,
 		registerItem,
 		unregisterItem,
+		settleItem,
 		updateGrid,
 		onchange: handleChange
 	});

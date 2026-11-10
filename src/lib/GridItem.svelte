@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
 	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
+	import { assignBox } from './utils/placement';
 
 	import type { LayoutItem, GridItemProps } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -60,15 +61,38 @@
 	// Sync props to item
 	$effect(() => {
 		item.id = id;
-		item.x = x;
-		item.y = y;
-		item.w = w;
-		item.h = h;
 		item.min = min;
 		item.max = max;
 		item.movable = movable;
 		item.resizable = resizable;
+		const next = { x, y, w, h };
+		untrack(() => syncBox(next));
 	});
+
+	let registered = false;
+
+	const keep = (value: number, current: number) => (Number.isFinite(value) ? value : current);
+
+	/**
+	 * Copies the x/y/w/h props into the item. Before registration they are copied as given, so
+	 * the grid can place an item that has no x/y. Afterwards a real change is handed to the grid
+	 * to re-validate, and a prop cleared to `undefined` keeps the item where it is. Changes made
+	 * by the grid itself arrive here equal to the item, through `invalidate`, and do nothing.
+	 */
+	function syncBox(next: { x: number; y: number; w: number; h: number }) {
+		if (!registered) {
+			Object.assign(item, next);
+			return;
+		}
+		const box = { x: keep(next.x, item.x), y: keep(next.y, item.y), w: keep(next.w, item.w), h: keep(next.h, item.h) };
+		const cleared = box.x !== next.x || box.y !== next.y || box.w !== next.w || box.h !== next.h;
+		if (!assignBox(item, box)) {
+			if (cleared) item.invalidate();
+			return;
+		}
+		// A drag or resize in progress settles the item when it ends.
+		if (!active) gridParams.settleItem(item);
+	}
 
 	/**
 	 * Updates svelte-components props behind that item.
@@ -85,7 +109,9 @@
 
 	onMount(() => {
 		gridParams.registerItem(item);
+		registered = true;
 		return () => {
+			registered = false;
 			gridParams.unregisterItem(item);
 		};
 	});
@@ -140,6 +166,8 @@
 	function endInteraction(event: PointerEvent) {
 		applyPreview();
 		active = false;
+		// Props may have moved another item onto this one during the gesture.
+		gridParams.settleItem(item);
 		initialPointerPosition.left = 0;
 		initialPointerPosition.top = 0;
 		itemRef.releasePointerCapture(event.pointerId);
