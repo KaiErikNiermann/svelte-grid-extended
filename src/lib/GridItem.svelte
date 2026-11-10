@@ -2,7 +2,7 @@
 	import { onMount, untrack } from 'svelte';
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
-	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
+	import { blockingRow, hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 	import { assignBox } from './utils/placement';
 
 	import type { LayoutItem, GridItemProps } from './types';
@@ -440,9 +440,6 @@
 		const gridItems = Object.values(gridParams.items);
 		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 		sortedItems.reduce(
-			// Same story as movePreviewWithCollisionsWithCompress: branchy layout math
-			// with no component-level tests behind it.
-			// eslint-disable-next-line sonarjs/cognitive-complexity
 			(accItem, currentItem) => {
 				if (currentItem.id === previewItem.id) {
 					// if previewItem do nothing
@@ -450,26 +447,14 @@
 					// compress items above previewItem
 					const maxY =
 						currentItem.y >= previewItem.y ? currentItem.y + previewItem.h + 1 : previewItem.y + currentItem.h + 1;
-					let newY = maxY;
-					while (newY >= 0) {
-						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
-							break;
-						}
-						newY--;
-					}
+					const newY = blockingRow(currentItem, accItem, maxY);
 					currentItem.y = newY + 1;
 					currentItem.invalidate();
 					gridParams.updateGrid();
 					accItem.push(currentItem);
 				} else {
 					// compress items below previewItem
-					let newY = currentItem.y;
-					while (newY >= 0) {
-						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
-							break;
-						}
-						newY--;
-					}
+					const newY = blockingRow(currentItem, accItem, currentItem.y);
 					if (newY < currentItem.y && newY > 0) {
 						currentItem.y = newY + 1;
 					}

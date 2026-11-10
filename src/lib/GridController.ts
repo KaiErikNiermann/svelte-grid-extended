@@ -1,4 +1,4 @@
-import { getAvailablePosition, hasCollisions } from './utils/grid';
+import { blockingRow, getAvailablePosition } from './utils/grid';
 import type { GridParams, GridController as GridControllerType, LayoutItem } from './types';
 
 export class GridController implements GridControllerType {
@@ -57,13 +57,7 @@ export class GridController implements GridControllerType {
 		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 
 		sortedItems.reduce((accItem, currentItem) => {
-			let newY = currentItem.y;
-			while (newY >= 0) {
-				if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
-					break;
-				}
-				newY--;
-			}
+			const newY = blockingRow(currentItem, accItem, currentItem.y);
 			if (newY !== currentItem.y - 1) {
 				currentItem.y = newY + 1;
 				currentItem.invalidate();
