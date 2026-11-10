@@ -43,8 +43,13 @@ export class GridController implements GridControllerType {
 		this._compress(this.gridParams.items);
 	}
 
-	_internalCompress(): void {
-		this._compress(this.gridParams.items, true);
+	/**
+	 * Compresses `items`, which the grid passes as its live state: reading them through the
+	 * context instead returned a stale snapshot during an item's teardown, so removing several
+	 * items in one tick compressed against items that were already gone.
+	 */
+	_internalCompress(items: Record<string, LayoutItem>): void {
+		this._compress(items, true);
 	}
 
 	private _compress(items: Record<string, LayoutItem>, skipUpdate = false): void {

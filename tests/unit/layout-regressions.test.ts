@@ -44,6 +44,65 @@ const cases: { name: string; config: ScenarioConfig; ops: Op[] }[] = [
 			{ kind: 'addUnplaced', w: 1, h: 1 },
 			{ kind: 'remove', pick: 65_685_185 }
 		]
+	},
+	{
+		name: 'removing several items in one tick leaves the rest compressed',
+		config: { collision: 'compress', rows: 0, withPatches: true },
+		ops: [
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addUnplaced', w: 1, h: 1 },
+					{ kind: 'addUnplaced', w: 1, h: 1 }
+				]
+			},
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addFree', w: 3, h: 1 },
+					{ kind: 'addUnplaced', w: 2, h: 2 }
+				]
+			},
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'remove', pick: 0 },
+					{ kind: 'remove', pick: 0 },
+					{ kind: 'remove', pick: 0 }
+				]
+			},
+			{ kind: 'patch', pick: 0, x: 0, y: 0, w: 1, h: 1 }
+		]
+	},
+	{
+		name: 'removing items and patching another in one tick leaves the rest compressed',
+		config: { collision: 'compress', rows: 0, withPatches: true },
+		ops: [
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addFree', w: 1, h: 1 },
+					{ kind: 'addUnplaced', w: 1, h: 1 },
+					{ kind: 'addFree', w: 1, h: 1 }
+				]
+			},
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addUnplaced', w: 1, h: 2 },
+					{ kind: 'patch', pick: 99_434_095, x: 0, y: 3, w: 1, h: 1 }
+				]
+			},
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'remove', pick: 0 },
+					{ kind: 'remove', pick: 336_429_855 },
+					{ kind: 'patch', pick: 0, x: 0, y: 0, w: 1, h: 1 }
+				]
+			},
+			{ kind: 'drag', pick: 0, dx: 0, dy: 0 }
+		]
 	}
 ];
 

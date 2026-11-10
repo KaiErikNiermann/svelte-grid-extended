@@ -140,7 +140,7 @@
 		retryUnplaced();
 
 		if (autoCompress && collision === 'compress') {
-			_controller._internalCompress();
+			_controller._internalCompress(items);
 		}
 	}
 
