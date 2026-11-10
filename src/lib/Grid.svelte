@@ -20,7 +20,7 @@
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
-	import { getGridDimensions } from './utils/grid';
+	import { getGridDimensions, hasCollisions, getAvailablePosition } from './utils/grid';
 	import { GridController } from './GridController';
 
 	import type {
@@ -175,8 +175,28 @@
 		if (item.id in items) {
 			throw new Error(`Item with id ${item.id} already exists`);
 		}
+
+		const occupied = Object.values(items);
+		const relocated = hasCollisions(item, occupied);
+
+		if (relocated) {
+			const position = getAvailablePosition(item, occupied, maxCols, maxRows);
+
+			if (!position) {
+				throw new Error(`No available position for item ${item.id}`);
+			}
+
+			item.x = position.x;
+			item.y = position.y;
+		}
+
 		items[item.id] = item;
-		updateGrid();
+
+		if (relocated) {
+			item.invalidate();
+		} else {
+			updateGrid();
+		}
 	}
 
 	function unregisterItem(item: LayoutItem): void {
