@@ -51,6 +51,10 @@
 			bind:y={it.y as number}
 			bind:w={it.w}
 			bind:h={it.h}
+			min={it.min}
+			max={it.max}
+			movable={it.movable}
+			resizable={it.resizable}
 			class={`it it-${it.id}`}
 			previewClass={`pv pv-${it.id}`}
 			onchange={() => onchange?.(it.id)}
