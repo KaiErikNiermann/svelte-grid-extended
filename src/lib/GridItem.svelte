@@ -112,6 +112,13 @@
 		registered = true;
 		return () => {
 			registered = false;
+			// A drag or resize only removes its window listeners on pointerup. Destroyed
+			// mid-gesture (the item removed, or its grid), they stayed attached, kept the
+			// destroyed item alive and threw on the next pointerup.
+			window.removeEventListener('pointermove', move);
+			window.removeEventListener('pointerup', moveEnd);
+			window.removeEventListener('pointermove', resize);
+			window.removeEventListener('pointerup', resizeEnd);
 			gridParams.unregisterItem(item);
 		};
 	});

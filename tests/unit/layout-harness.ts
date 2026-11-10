@@ -26,7 +26,11 @@ export const item = (id: string, x: number, y: number, w = 1, h = 1): LayoutSpec
  * browser fires it after layout), pointer capture is stubbed (jsdom lacks it), and every
  * mounted grid is cleaned up afterwards.
  */
-export function useLayoutHarness(): { resizeTo: (width: number, height: number) => void } {
+export function useLayoutHarness(): {
+	resizeTo: (width: number, height: number) => void;
+	/** ResizeObservers created and not yet disconnected: one per mounted grid. */
+	liveObservers: () => number;
+} {
 	let callbacks: ResizeObserverCallback[] = [];
 	beforeEach(() => {
 		callbacks = [];
@@ -54,6 +58,7 @@ export function useLayoutHarness(): { resizeTo: (width: number, height: number) 
 		vi.unstubAllGlobals();
 	});
 	return {
+		liveObservers: () => callbacks.length,
 		resizeTo: (width, height) => {
 			for (const callback of callbacks) {
 				callback([{ contentRect: { width, height } } as ResizeObserverEntry], {} as ResizeObserver);
