@@ -20,7 +20,7 @@
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
-	import { getGridDimensions } from './utils/grid';
+	import { getGridDimensions, hasCollisions } from './utils/grid';
 	import {
 		assignBox,
 		clampToLimits,
@@ -137,6 +137,7 @@
 
 	function updateGrid() {
 		items = { ...items };
+		retryUnplaced();
 
 		if (autoCompress && collision === 'compress') {
 			_controller._internalCompress();
@@ -171,6 +172,33 @@
 
 	const limits = (): Limits => ({ maxCols, maxRows });
 
+	// Items the grid had to leave overlapping because a fixed-size grid had no free cell.
+	// Overlaps set by props are not tracked: `none` mode allows them.
+	const unplaced = new Set<string>();
+
+	/** Records `item` as unplaced when the position the grid chose for it still overlaps. */
+	function trackPlacement(item: LayoutItem): void {
+		if (hasCollisions(item, Object.values(items))) unplaced.add(item.id);
+		else unplaced.delete(item.id);
+	}
+
+	/** Moves unplaced items into a cell that has freed up since (removal, resize, more columns). */
+	function retryUnplaced(): void {
+		// A snapshot: the loop re-adds items that still do not fit, which a live Set would revisit.
+		for (const id of new Set(unplaced)) {
+			unplaced.delete(id);
+			const it = items[id];
+			if (!it) continue;
+			const others = Object.values(items);
+			const box = relocateIfColliding(it, it, others, limits());
+			if (hasCollisions({ ...it, ...box }, others)) {
+				unplaced.add(id);
+			} else if (assignBox(it, box)) {
+				it.invalidate();
+			}
+		}
+	}
+
 	/**
 	 * Fits a new item into the grid before it joins: an item past the fixed limits is clamped
 	 * inside, and one without `x`/`y` gets the first free cell. Either move avoids landing on
@@ -181,7 +209,10 @@
 		const positioned = hasPosition(item);
 		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
 		const moved = !positioned || box.x !== item.x || box.y !== item.y;
-		return assignBox(item, moved ? relocateIfColliding(item, box, Object.values(items), limits()) : box);
+		if (!moved) return assignBox(item, box);
+		const changed = assignBox(item, relocateIfColliding(item, box, Object.values(items), limits()));
+		trackPlacement(item);
+		return changed;
 	}
 
 	function registerItem(item: LayoutItem): void {
@@ -222,12 +253,14 @@
 			if (box.x === it.x && box.y === it.y && box.w === it.w && box.h === it.h) continue;
 			if (collision === 'none') {
 				assignBox(it, relocateIfColliding(it, box, Object.values(items), bounds));
+				trackPlacement(it);
 			} else {
 				assignBox(it, box);
 				for (const other of pushAside(it, Object.values(items), bounds)) other.invalidate();
 			}
 			it.invalidate();
 		}
+		retryUnplaced();
 	}
 
 	$effect(() => {
@@ -237,6 +270,7 @@
 
 	function unregisterItem(item: LayoutItem): void {
 		delete items[item.id];
+		unplaced.delete(item.id);
 		updateGrid();
 	}
 

@@ -69,6 +69,7 @@ export type LayoutComponent = {
 export type MountedLayout = {
 	component: LayoutComponent;
 	container: HTMLElement;
+	unmount: () => void;
 	settle: () => Promise<void>;
 	drag: (id: string, dx: number, dy: number, during?: () => Promise<void>) => Promise<void>;
 	resize: (id: string, dw: number, dh: number, during?: () => Promise<void>) => Promise<void>;
@@ -90,7 +91,7 @@ export function mountLayout(options: {
 	items: LayoutSpec[];
 	onchange?: (id: string) => void;
 }): MountedLayout {
-	const { component, container } = render(Layout, {
+	const { component, container, unmount } = render(Layout, {
 		props: { grid: { gap: 0, ...options.grid }, initial: options.items, onchange: options.onchange }
 	});
 	const layout = component as unknown as LayoutComponent;
@@ -109,6 +110,7 @@ export function mountLayout(options: {
 	return {
 		component: layout,
 		container,
+		unmount,
 		settle,
 		drag: (id, dx, dy, during) => gesture(`.it-${id}`, dx, dy, during),
 		resize: (id, dw, dh, during) => gesture(`.it-${id} .resizer-default`, dw, dh, during),
