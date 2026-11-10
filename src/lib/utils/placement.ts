@@ -11,9 +11,29 @@ type Box = Pick<LayoutItem, 'x' | 'y' | 'w' | 'h'>;
  * axes (`Infinity`) are left alone apart from the lower bound.
  */
 export function clampToLimits(box: Box, { maxCols, maxRows }: Limits): Box {
-	const w = Math.max(1, Math.min(box.w, maxCols));
-	const h = Math.max(1, Math.min(box.h, maxRows));
-	return { x: clamp(box.x, 0, maxCols - w), y: clamp(box.y, 0, maxRows - h), w, h };
+	const w = Math.min(parseSize(box.w) ?? 1, Math.max(1, maxCols));
+	const h = Math.min(parseSize(box.h) ?? 1, Math.max(1, maxRows));
+	return {
+		x: clamp(parseCoordinate(box.x) ?? 0, 0, maxCols - w),
+		y: clamp(parseCoordinate(box.y) ?? 0, 0, maxRows - h),
+		w,
+		h
+	};
+}
+
+/**
+ * A prop as a grid coordinate: a finite number rounded to a whole cell, anything else
+ * (`undefined`, `NaN`, an infinity) missing. Positions are parsed here, at the boundary,
+ * so the layout code only ever sees whole cells: `NaN !== NaN` made every comparison report
+ * a change, and a `NaN` size looped the item and the grid against each other forever.
+ */
+export function parseCoordinate(value: unknown): number | undefined {
+	return typeof value === 'number' && Number.isFinite(value) ? Math.round(value) : undefined;
+}
+
+/** A prop as a size in cells: a finite number rounded, at least 1; anything else missing. */
+export function parseSize(value: unknown): number | undefined {
+	return typeof value === 'number' && Number.isFinite(value) ? Math.max(1, Math.round(value)) : undefined;
 }
 
 /** Whether `x` and `y` are both usable coordinates (a missing prop arrives as `undefined`). */

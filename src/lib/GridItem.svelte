@@ -3,7 +3,7 @@
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
 	import { blockingRow, hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
-	import { assignBox } from './utils/placement';
+	import { assignBox, parseCoordinate, parseSize } from './utils/placement';
 
 	import type { LayoutItem, GridItemProps } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -71,27 +71,34 @@
 
 	let registered = false;
 
-	const keep = (value: number, current: number) => (Number.isFinite(value) ? value : current);
-
 	/**
-	 * Copies the x/y/w/h props into the item. Before registration they are copied as given, so
-	 * the grid can place an item that has no x/y. Afterwards a real change is handed to the grid
-	 * to re-validate, and a prop cleared to `undefined` keeps the item where it is. Changes made
-	 * by the grid itself arrive here equal to the item, through `invalidate`, and do nothing.
+	 * Copies the x/y/w/h props into the item, parsed into whole cells. Before registration a
+	 * missing or unusable x/y stays missing, so the grid places the item, and an unusable size
+	 * becomes 1. Afterwards a real change is handed to the grid to re-validate, and an unusable
+	 * value keeps the item's current one. Changes made by the grid itself arrive here equal to
+	 * the item, through `invalidate`, and do nothing.
 	 */
 	function syncBox(next: { x: number; y: number; w: number; h: number }) {
+		const parsed = {
+			x: parseCoordinate(next.x),
+			y: parseCoordinate(next.y),
+			w: parseSize(next.w),
+			h: parseSize(next.h)
+		};
 		if (!registered) {
-			Object.assign(item, next);
+			// x/y may stay undefined here: registration places such an item and writes x/y back.
+			Object.assign(item, { x: parsed.x as number, y: parsed.y as number, w: parsed.w ?? 1, h: parsed.h ?? 1 });
 			return;
 		}
-		const box = { x: keep(next.x, item.x), y: keep(next.y, item.y), w: keep(next.w, item.w), h: keep(next.h, item.h) };
-		const cleared = box.x !== next.x || box.y !== next.y || box.w !== next.w || box.h !== next.h;
-		if (!assignBox(item, box)) {
-			if (cleared) item.invalidate();
-			return;
-		}
+		const box = { x: parsed.x ?? item.x, y: parsed.y ?? item.y, w: parsed.w ?? item.w, h: parsed.h ?? item.h };
 		// A drag or resize in progress settles the item when it ends.
-		if (!active) gridParams.settleItem(item);
+		if (assignBox(item, box) && !active) gridParams.settleItem(item);
+		writeBackIfNormalized();
+	}
+
+	/** Writes the item's values to the bound props when they differ (rounded, clamped, placed). */
+	function writeBackIfNormalized() {
+		if (x !== item.x || y !== item.y || w !== item.w || h !== item.h) item.invalidate();
 	}
 
 	/**
@@ -110,6 +117,7 @@
 	onMount(() => {
 		gridParams.registerItem(item);
 		registered = true;
+		writeBackIfNormalized();
 		return () => {
 			registered = false;
 			// A drag or resize only removes its window listeners on pointerup. Destroyed
