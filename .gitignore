@@ -22,3 +22,6 @@ vite.config.ts.timestamp-*
 
 # Local working log, kept out of the repo
 LOG.md
+
+# Notes on bugs in dependencies (local, see LOCAL-PATCHES.md)
+.upstream-issues/
