@@ -82,23 +82,28 @@
 		assertGridOptions({ cols, rows, itemSize, collision });
 	});
 
-	let _cols = $state(0);
-	let _rows = $state(0);
-	let maxCols = $state(Infinity);
-	let maxRows = $state(Infinity);
-	let shouldExpandRows = $state(false);
-	let shouldExpandCols = $state(false);
+	// What the ResizeObserver resolved breakpoint-based sizes to; unused when the prop is a number.
+	let observedCols = $state<number | undefined>();
+	let observedRows = $state<number | undefined>();
 	let gridItemSize = $state<ItemSize | undefined>();
+
+	// Every limit below is derived rather than written by effects: an effect that wrote `_rows`
+	// was clobbered by the resize its own growth caused, so a growing grid fell back to `100%`
+	// and items overflowed it until the next interaction recomputed the size.
+	// `0` means "grow with the content"; `undefined` means breakpoints are not measured yet.
+	const resolvedCols = $derived(typeof cols === 'number' ? cols : observedCols);
+	// Push and compress always grow downwards: `rows` is documented as ignored there.
+	const resolvedRows = $derived.by(() => {
+		if (collision !== 'none') return 0;
+		return typeof rows === 'number' ? rows : observedRows;
+	});
 
 	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
 
-	$effect(() => {
-		if (typeof cols === 'number') _cols = cols;
-	});
-
-	$effect(() => {
-		if (typeof rows === 'number') _rows = rows;
-	});
+	const maxCols = $derived(resolvedCols || Infinity);
+	const maxRows = $derived(resolvedRows || Infinity);
+	const _cols = $derived(resolvedCols || calculatedGridSize.cols);
+	const _rows = $derived(resolvedRows || calculatedGridSize.rows);
 
 	$effect(() => {
 		if (itemSize?.width && itemSize?.height) {
@@ -106,31 +111,15 @@
 		}
 	});
 
-	$effect(() => {
-		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
-		maxCols = shouldExpandCols ? Infinity : _cols;
-	});
-
-	$effect(() => {
-		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
-		maxRows = shouldExpandRows ? Infinity : _rows;
-	});
-
-	$effect(() => {
-		if (collision !== 'none') {
-			_rows = 0;
-		}
-	});
-
 	const containerWidth = $derived.by(() => {
-		if (gridItemSize && cols === 0) {
+		if (gridItemSize && resolvedCols === 0) {
 			return _cols * (gridItemSize.width + gap + 1);
 		}
 		return null;
 	});
 
 	const containerHeight = $derived.by(() => {
-		if (gridItemSize && rows === 0) {
+		if (gridItemSize && resolvedRows === 0) {
 			return _rows * (gridItemSize.height + gap + 1);
 		}
 		return null;
@@ -156,15 +145,14 @@
 			const width = entry.contentRect.width;
 			const height = entry.contentRect.height;
 
-			_cols = findGridSize(cols, width, breakpoints);
-			_rows = findGridSize(rows, height, breakpoints);
+			observedCols = findGridSize(cols, width, breakpoints);
+			observedRows = findGridSize(rows, height, breakpoints);
 
-			shouldExpandCols = _cols === 0;
-			shouldExpandRows = _rows === 0;
-
+			const fitCols = resolvedCols ?? 0;
+			const fitRows = resolvedRows ?? 0;
 			gridItemSize = {
-				width: itemSize.width ?? (width - (_cols + 1) * gap) / _cols,
-				height: itemSize.height ?? (height - (_rows + 1) * gap) / _rows
+				width: itemSize.width ?? (width - (fitCols + 1) * gap) / fitCols,
+				height: itemSize.height ?? (height - (fitRows + 1) * gap) / fitRows
 			};
 		});
 
