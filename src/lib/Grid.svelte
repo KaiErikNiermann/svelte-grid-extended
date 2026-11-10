@@ -20,7 +20,7 @@
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
-	import { getGridDimensions } from './utils/grid';
+	import { getGridDimensions, hasCollisions, getAvailablePosition } from './utils/grid';
 	import { GridController } from './GridController';
 
 	import type {
@@ -84,10 +84,10 @@
 
 	let _cols = $state(0);
 	let _rows = $state(0);
-	let maxCols = $state(Infinity);
-	let maxRows = $state(Infinity);
 	let shouldExpandRows = $state(false);
 	let shouldExpandCols = $state(false);
+	let maxCols = $derived(shouldExpandCols ? Infinity : _cols);
+	let maxRows = $derived(shouldExpandRows ? Infinity : _rows);
 	let gridItemSize = $state<ItemSize | undefined>();
 
 	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
@@ -108,12 +108,10 @@
 
 	$effect(() => {
 		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
-		maxCols = shouldExpandCols ? Infinity : _cols;
 	});
 
 	$effect(() => {
 		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
-		maxRows = shouldExpandRows ? Infinity : _rows;
 	});
 
 	$effect(() => {
@@ -177,8 +175,28 @@
 		if (item.id in items) {
 			throw new Error(`Item with id ${item.id} already exists`);
 		}
+
+		const occupied = Object.values(items);
+		const relocated = hasCollisions(item, occupied);
+
+		if (relocated) {
+			const position = getAvailablePosition(item, occupied, maxCols, maxRows);
+
+			if (!position) {
+				throw new Error(`No available position for item ${item.id}`);
+			}
+
+			item.x = position.x;
+			item.y = position.y;
+		}
+
 		items[item.id] = item;
-		updateGrid();
+
+		if (relocated) {
+			item.invalidate();
+		} else {
+			updateGrid();
+		}
 	}
 
 	function unregisterItem(item: LayoutItem): void {
