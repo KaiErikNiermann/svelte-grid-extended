@@ -17,6 +17,8 @@
 		"test:unit": "svelte-kit sync && vitest run",
 		"coverage": "svelte-kit sync && vitest run --coverage",
 		"e2e": "playwright test",
+		"bench": "node bench/run.mjs",
+		"bench:remote": "bench/remote.sh",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"check:docs": "pnpm package:build && pnpm --dir docs check",

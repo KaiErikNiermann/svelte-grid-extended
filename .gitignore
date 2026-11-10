@@ -25,3 +25,6 @@ LOG.md
 
 # Notes on bugs in dependencies (local, see LOCAL-PATCHES.md)
 .upstream-issues/
+
+# Benchmark run outputs (the baseline in bench/baseline.json is committed)
+/bench/results/
