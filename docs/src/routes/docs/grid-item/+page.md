@@ -29,6 +29,8 @@ import { GridItem } from '@appulsauce/svelte-grid';
 | `onchange`        | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when this item changes.                              |
 | `onpreviewchange` | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when the preview position changes during drag.       |
 
+Positions and sizes are whole grid cells. A fractional value is rounded, a size is at least 1, and a value that is not a finite number (`NaN`, `Infinity`) is ignored: before the item joins the grid it gets the first free cell (or a size of 1), and afterwards it keeps its current value. An item placed outside a grid with fixed `cols` or `rows` is moved inside it. When the grid changes a value this way, the bound prop is updated to match.
+
 ## Style Props
 
 | Prop           | Type     | Description                                              |

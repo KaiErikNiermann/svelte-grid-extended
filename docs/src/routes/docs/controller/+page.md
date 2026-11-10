@@ -117,7 +117,7 @@ Compresses all items vertically, moving them upward to fill any gaps. This is us
 
 ## Auto Compress
 
-When using `collision="compress"`, the grid automatically compresses items after programmatic changes by default. You can disable this with `autoCompress={false}`:
+When using `collision="compress"`, the grid automatically compresses items after programmatic changes by default. It compresses once per microtask, after all the changes made in the same tick, so positions read synchronously right after a change are not compressed yet; read them after `await tick()` or in `onchange`. `controller.compress()` still compresses immediately. You can disable automatic compression with `autoCompress={false}`:
 
 ```svelte
 <Grid collision="compress" autoCompress={false}>
