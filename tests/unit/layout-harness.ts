@@ -33,12 +33,17 @@ export function useLayoutHarness(): { resizeTo: (width: number, height: number) 
 		vi.stubGlobal(
 			'ResizeObserver',
 			class {
+				private readonly callback: ResizeObserverCallback;
 				constructor(callback: ResizeObserverCallback) {
+					this.callback = callback;
 					callbacks.push(callback);
 				}
 				observe() {}
 				unobserve() {}
-				disconnect() {}
+				// An unmounted grid disconnects; keeping its callback would fire resizes into it.
+				disconnect() {
+					callbacks = callbacks.filter((c) => c !== this.callback);
+				}
 			}
 		);
 		HTMLElement.prototype.setPointerCapture = () => {};
@@ -126,7 +131,10 @@ export function mountLayout(options: {
 	return {
 		component: layout,
 		container,
-		unmount,
+		unmount: () => {
+			unmount();
+			container.remove();
+		},
 		settle,
 		pitch,
 		drag: (id, dx, dy, during) => gesture(`.it-${id}`, [[dx, dy]], during),
