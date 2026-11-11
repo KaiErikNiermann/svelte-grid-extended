@@ -5,6 +5,6 @@
 		"strict": true,
 		"types": ["$app/types", "node"]
 	},
-	"include": ["src", "vite.config.ts"],
+	"include": ["src", "vite.config.ts", "tooling"],
 	"exclude": ["src/lib/vendor/**/*.js"]
 }
