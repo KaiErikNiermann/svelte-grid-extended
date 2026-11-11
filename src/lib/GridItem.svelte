@@ -177,7 +177,18 @@
 
 	let itemRef: HTMLElement;
 
+	/**
+	 * Where the pointer went down, in the grid's own coordinates. Gestures are measured from the
+	 * grid's current place on screen at every event, so a grid that moves during a drag (content
+	 * above it grows, a scroll container scrolls) does not carry the item away from the pointer.
+	 */
 	const initialPointerPosition = { left: 0, top: 0 };
+
+	/** The pointer's position relative to the grid's top-left corner, as the grid is now. */
+	function pointerInGrid(event: PointerEvent): { left: number; top: number } {
+		const origin = gridParams.boundsTo?.getBoundingClientRect() ?? { left: 0, top: 0 };
+		return { left: event.clientX - origin.left, top: event.clientY - origin.top };
+	}
 
 	/** The preview's box when the gesture began, to tell a drop from a press that moved nothing. */
 	let gestureStart = { x: 0, y: 0, w: 0, h: 0 };
@@ -185,8 +196,9 @@
 	function initInteraction(event: PointerEvent) {
 		active = true;
 		gestureStart = { x: previewItem.x, y: previewItem.y, w: previewItem.w, h: previewItem.h };
-		initialPointerPosition.left = event.pageX;
-		initialPointerPosition.top = event.pageY;
+		const at = pointerInGrid(event);
+		initialPointerPosition.left = at.left;
+		initialPointerPosition.top = at.top;
 		itemRef.setPointerCapture(event.pointerId);
 	}
 
@@ -236,23 +248,15 @@
 		if (!gridParams.itemSize) {
 			throw new Error('Grid is not mounted yet');
 		}
-		let _left = event.pageX - initialPointerPosition.left + initialPosition.left;
-		let _top = event.pageY - initialPointerPosition.top + initialPosition.top;
+		const at = pointerInGrid(event);
+		let _left = at.left - initialPointerPosition.left + initialPosition.left;
+		let _top = at.top - initialPointerPosition.top + initialPosition.top;
 
+		// Within the grid's box, in the grid's coordinates like the item's own position.
 		if (gridParams.bounds && gridParams.boundsTo) {
-			const parentRect = gridParams.boundsTo.getBoundingClientRect();
-			if (_left < parentRect.left) {
-				_left = parentRect.left;
-			}
-			if (_top < parentRect.top) {
-				_top = parentRect.top;
-			}
-			if (_left + width > parentRect.right) {
-				_left = parentRect.right - width;
-			}
-			if (_top + height > parentRect.bottom) {
-				_top = parentRect.bottom - height;
-			}
+			const { width: gridWidth, height: gridHeight } = gridParams.boundsTo.getBoundingClientRect();
+			_left = Math.max(0, Math.min(_left, gridWidth - width));
+			_top = Math.max(0, Math.min(_top, gridHeight - height));
 		}
 
 		left = _left;
@@ -596,8 +600,9 @@
 			throw new Error('Grid is not mounted yet');
 		}
 
-		width = event.pageX + initialSize.width - initialPointerPosition.left;
-		height = event.pageY + initialSize.height - initialPointerPosition.top;
+		const at = pointerInGrid(event);
+		width = at.left - initialPointerPosition.left + initialSize.width;
+		height = at.top - initialPointerPosition.top + initialSize.height;
 
 		if (gridParams.bounds && gridParams.boundsTo) {
 			const parentRect = gridParams.boundsTo.getBoundingClientRect();
