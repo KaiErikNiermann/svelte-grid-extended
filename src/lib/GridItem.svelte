@@ -784,6 +784,14 @@
 		bottom: 0;
 		cursor: se-resize;
 	}
+	/* A fingertip covers about 44px; the corner mark stays where it is. At most half the item on
+	   each side, so a small item can still be dragged and scrolled from, and never below 20px. */
+	@media (pointer: coarse) {
+		.resizer-default {
+			width: max(20px, min(44px, 50%));
+			height: max(20px, min(44px, 50%));
+		}
+	}
 	.resizer-default::after {
 		content: '';
 		position: absolute;
