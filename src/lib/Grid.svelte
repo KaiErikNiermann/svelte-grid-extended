@@ -326,6 +326,24 @@
 		untrack(() => reflow(bounds));
 	});
 
+	/**
+	 * Brings the layout in line with a newly chosen mode: overlaps that `none` allowed are
+	 * pushed apart in reading order, and compress mode compresses.
+	 */
+	function adoptMode(mode: Collision): void {
+		if (mode === 'none') return;
+		const ordered = Object.values(items).sort((a, b) => a.y - b.y || a.x - b.x);
+		for (const it of ordered) {
+			for (const other of pushAside(it, Object.values(items), limits())) other.invalidate();
+		}
+		updateGrid();
+	}
+
+	$effect(() => {
+		const mode = collision;
+		untrack(() => adoptMode(mode));
+	});
+
 	function unregisterItem(item: LayoutItem): void {
 		delete items[item.id];
 		unplaced.delete(item.id);

@@ -103,6 +103,54 @@ const cases: { name: string; config: ScenarioConfig; ops: Op[] }[] = [
 			},
 			{ kind: 'drag', pick: 0, dx: 0, dy: 0 }
 		]
+	},
+	{
+		name: 'switching from none back to compress mid-drag compresses what none left',
+		config: { collision: 'compress', rows: 0, withPatches: true },
+		ops: [
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addUnplaced', w: 1, h: 1 },
+					{ kind: 'addUnplaced', w: 1, h: 1 }
+				]
+			},
+			{
+				kind: 'dragWild',
+				pick: 0,
+				fast: false,
+				steps: [
+					{ kind: 'op', op: { kind: 'patch', pick: 0, x: 0, y: 0, w: 4, h: 2 } },
+					{ kind: 'flip', to: 'none' },
+					{ kind: 'op', op: { kind: 'addFree', w: 1, h: 1 } }
+				]
+			},
+			{ kind: 'containerResize' }
+		]
+	},
+	{
+		name: 'switching from none back to shift mid-drag separates items none let overlap',
+		config: { collision: 'shift', rows: 0, withPatches: true },
+		ops: [
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addFree', w: 1, h: 1 },
+					{ kind: 'addUnplaced', w: 1, h: 1 }
+				]
+			},
+			{
+				kind: 'dragWild',
+				pick: 0,
+				fast: false,
+				steps: [
+					{ kind: 'flip', to: 'none' },
+					{ kind: 'op', op: { kind: 'patch', pick: 1_342_207_575, x: 0, y: 0, w: 1, h: 1 } },
+					{ kind: 'move', dx: 0, dy: 0 }
+				]
+			},
+			{ kind: 'cols', cols: 2 }
+		]
 	}
 ];
 
