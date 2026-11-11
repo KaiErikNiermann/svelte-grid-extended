@@ -54,6 +54,7 @@ export const navSections: readonly NavSection[] = [
 			{ href: '/examples/collision-compress', label: 'Collision Compress' },
 			{ href: '/examples/collision-shift', label: 'Collision Shift' },
 			{ href: '/examples/placement', label: 'Placement Scenarios' },
+			{ href: '/examples/text-alignment', label: 'Text Alignment' },
 			{ href: '/examples/add-remove-item', label: 'Add/Remove Items' }
 		]
 	}

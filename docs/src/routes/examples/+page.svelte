@@ -72,6 +72,12 @@
 			category: 'collision'
 		},
 		{
+			slug: 'text-alignment',
+			title: 'Text Alignment',
+			description: 'Labels that line up within and across items',
+			category: 'styling'
+		},
+		{
 			slug: 'add-remove-item',
 			title: 'Add/Remove Items',
 			description: 'Dynamic item management',
