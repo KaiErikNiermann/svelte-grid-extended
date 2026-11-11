@@ -61,6 +61,12 @@
 		}
 	}
 
+	/* Until the component is defined its slotted footer is plain content in the page's flow, and
+	   it would push everything down by its height when the palette loads. */
+	ninja-keys:not(:defined) {
+		display: none;
+	}
+
 	/* The palette reads these from the host, so it follows the site's light and dark tokens. */
 	ninja-keys {
 		--ninja-width: min(40rem, calc(100vw - 2rem));
