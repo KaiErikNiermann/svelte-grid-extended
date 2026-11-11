@@ -243,22 +243,50 @@
 				<h2>{section.title}</h2>
 				<p>{section.intro}</p>
 			</div>
-			{#each section.cases as s (s.id)}
-				<article id={s.id} class="flex flex-col gap-3 scroll-mt-20">
-					<h3 class="text-lg font-semibold">
-						<a href={`#${s.id}`} class="hover:underline">{s.id}</a> · {s.title}
-					</h3>
-					<p class="text-sm">{s.steps}</p>
-					{#if typeof s.expect === 'string' && s.modes.length > 1}
-						<p class="text-sm text-muted-foreground">Expect: {s.expect}</p>
-					{/if}
-					<div class="grid gap-6 sm:grid-cols-2">
-						{#each s.modes as mode (mode)}
-							<ModeGrid scenario={s} {mode} expect={expectFor(s, mode)} />
-						{/each}
-					</div>
-				</article>
-			{/each}
+			<div class="cases">
+				{#each section.cases as s (s.id)}
+					<article
+						id={s.id}
+						class="case flex flex-col gap-3 scroll-mt-20 rounded-lg border border-border p-4"
+						data-modes={s.modes.length > 1 ? 'many' : 'one'}
+					>
+						<h3 class="text-lg font-semibold">
+							<a href={`#${s.id}`} class="hover:underline">{s.id}</a> · {s.title}
+						</h3>
+						<p class="text-sm">{s.steps}</p>
+						{#if typeof s.expect === 'string' && s.modes.length > 1}
+							<p class="text-sm text-muted-foreground">Expect: {s.expect}</p>
+						{/if}
+						<div class="modes">
+							{#each s.modes as mode (mode)}
+								<ModeGrid scenario={s} {mode} expect={expectFor(s, mode)} />
+							{/each}
+						</div>
+					</article>
+				{/each}
+			</div>
 		</section>
 	{/each}
 </div>
+
+<style>
+	/* As many cards per row as fit at 16rem each: one on a phone, two or three on wider screens. */
+	.cases {
+		display: grid;
+		gap: 1.5rem;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+	}
+
+	/* A case that compares several modes takes the whole row and lays its grids out the same way. */
+	.case[data-modes='many'] {
+		grid-column: 1 / -1;
+	}
+
+	/* Fills the card, so each grid can sit at the bottom and grids in one row line up. */
+	.modes {
+		flex: 1;
+		display: grid;
+		gap: 1.5rem;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+	}
+</style>

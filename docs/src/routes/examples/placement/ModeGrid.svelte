@@ -9,7 +9,8 @@
 	}: { scenario: ScenarioSpec; mode: Collision; expect: string | undefined } = $props();
 
 	const DELAY_MS = 1000;
-	const itemSize = { width: 48, height: 40 };
+	// No width: cells take the panel width divided by cols, so the whole panel is the grid.
+	const itemSize = { height: 40 };
 
 	const fresh = () => scenario.items.map((it) => ({ ...it }));
 	let items = $state<Spec[]>(fresh());
@@ -89,17 +90,15 @@
 	}
 </script>
 
-<div class="flex flex-col gap-2 min-w-0">
-	<div class="flex items-center justify-between gap-2">
-		<code class="text-sm font-semibold">{mode}</code>
-		<div class="flex flex-wrap gap-2">
-			{#each scenario.actions ?? [] as action (action.label)}
-				<button class="btn btn-sm btn-primary" onclick={() => (items = action.apply(items))}>
-					{action.label}
-				</button>
-			{/each}
-			<button class="btn btn-sm btn-outline" onclick={reset}>Reset</button>
-		</div>
+<div class="flex flex-col gap-2 min-w-0 h-full">
+	<code class="text-sm font-semibold">{mode}</code>
+	<div class="flex flex-wrap gap-2">
+		{#each scenario.actions ?? [] as action (action.label)}
+			<button class="btn btn-sm btn-primary" onclick={() => (items = action.apply(items))}>
+				{action.label}
+			</button>
+		{/each}
+		<button class="btn btn-sm btn-outline" onclick={reset}>Reset</button>
 	</div>
 	{#if expect}<p class="text-sm text-muted-foreground">Expect: {expect}</p>{/if}
 	<p class="font-mono text-xs">
@@ -107,7 +106,7 @@
 		{#if overlapping}<span class="text-red-600 dark:text-red-400"> · overlapping</span>{/if}
 	</p>
 	<p class="font-mono text-xs min-h-4">{note}</p>
-	<div class="demo-panel" onpointerdowncapture={onPress}>
+	<div class="demo-panel mt-auto" onpointerdowncapture={onPress}>
 		{#key key}
 			<Grid
 				class="grid-compact"
