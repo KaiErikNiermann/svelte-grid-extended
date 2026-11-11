@@ -3,6 +3,12 @@ title: Styling
 description: How to style grid components
 ---
 
+<script>
+	import { resolve } from '$app/paths';
+
+	const textAlignmentPath = resolve('/examples/text-alignment');
+</script>
+
 # Styling
 
 The Grid and GridItem components can be styled using CSS classes, inline styles, or CSS-in-JS frameworks like Tailwind CSS.
@@ -132,6 +138,44 @@ Tailwind classes work directly on the props:
 	{/snippet}
 </GridItem>
 ```
+
+## Aligning Text in Items
+
+Centring a grid item's content, or padding it, does not centre or align the letters. A line of text is as tall as its line box, and the line box includes room above the capitals and below the baseline that the letters do not fill. That room differs from font to font, and browsers round it to whole pixels in their own way, so labels in items of the same height sit at slightly different heights, and the first lines of top-aligned labels do not line up across items. This is not specific to the grid: it applies to any text in any box.
+
+Measured on the <a href={textAlignmentPath}>text alignment example</a>, as the offset of the letters from where they should sit, in device pixels:
+
+| Font, 14px             | Chromium, 1x | Chromium, 1.5x | Firefox, 1x | Firefox, 1.5x |
+| ---------------------- | ------------ | -------------- | ----------- | ------------- |
+| Inter, centred         | +0.12        | +0.18          | +0.41       | +0.61         |
+| Monospace, centred     | -1.41        | -3.61          | -1.11       | -1.66         |
+| Inter, top-aligned     | +4.83        | +7.24          | +5.12       | +7.68         |
+| Monospace, top-aligned | +3.78        | +4.17          | +4.08       | +6.13         |
+
+The fix is `text-box: trim-both cap alphabetic`. It trims a block's first and last line box to the capital height and the alphabetic baseline, so centring or padding the box places the letters themselves. With it, Chromium puts every label in the example within 0.02 device pixels of its target, in every font, and the labels line up across items.
+
+```svelte
+<GridItem x={0} y={0} w={2} h={1} class="card">
+	<span class="label">Revenue</span>
+</GridItem>
+
+<style>
+	/* text-box applies to block containers; a flex item is one already. */
+	.label {
+		display: block;
+	}
+
+	@supports (text-box: trim-both cap alphabetic) {
+		.label {
+			text-box: trim-both cap alphabetic;
+		}
+	}
+</style>
+```
+
+- Put the trim on an element around the text, not on the item itself: the item's box would lose its own padding to the trim.
+- Padding then measures from the letters, so a top padding of `0.75rem` puts the top of the capitals `0.75rem` below the item's edge, whatever the font.
+- `text-box` is supported in Chromium-based browsers and Safari, but not in Firefox (as of Firefox 153). Keep it inside `@supports`: Firefox then shows the untrimmed layout above, which is how the text looked before.
 
 ## Transitions
 
