@@ -109,7 +109,15 @@
 		return typeof rows === 'number' ? rows : observedRows;
 	});
 
-	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
+	// The box a drag or resize in progress is heading for. The grid grows to show it, so the
+	// preview never hangs outside the container before the drop. In shift mode it also counts
+	// as taken: an item added or moved there mid-drag goes to the nearest free cell instead of
+	// ending up under the drop.
+	let dragTarget = $state<Placed | null>(null);
+
+	const calculatedGridSize = $derived(
+		getGridDimensions(dragTarget ? [...Object.values(items), dragTarget] : Object.values(items))
+	);
 
 	const maxCols = $derived(resolvedCols || Infinity);
 	const maxRows = $derived(resolvedRows || Infinity);
@@ -247,10 +255,6 @@
 		trackPlacement(item);
 		return changed;
 	}
-
-	// Shift mode: the cell a drag is heading for counts as taken, so an item added or moved
-	// there mid-drag goes to the nearest free cell instead of ending up under the drop.
-	let dragTarget: Placed | null = null;
 
 	function setDragTarget(target: Placed | null): void {
 		dragTarget = target;

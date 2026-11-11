@@ -127,6 +127,7 @@
 			removeGestureListeners();
 			// Destroyed mid-drag: the drag never drops, so items that made way go back.
 			abortShift();
+			if (active) gridParams.setDragTarget(null);
 			gridParams.unregisterItem(item);
 		};
 	});
@@ -155,6 +156,11 @@
 
 	$effect(() => {
 		onpreviewchange?.({ item: previewItem });
+	});
+
+	// Every drag and resize reports its preview, so the grid grows to show it before the drop.
+	$effect(() => {
+		if (active) gridParams.setDragTarget(placed(previewItem));
 	});
 
 	function applyPreview() {
@@ -461,6 +467,7 @@
 		if (!active) return;
 		previewItem = { ...item };
 		abortShift();
+		gridParams.setDragTarget(null);
 		active = false;
 		gridParams.updateGrid();
 	}

@@ -18,7 +18,7 @@ export function hasCollisions(currentItem: LayoutItem, items: LayoutItem[]): boo
 	return items.some((item) => isItemColliding(currentItem, item));
 }
 
-export function getGridDimensions(items: LayoutItem[]): GridDimensions {
+export function getGridDimensions(items: Pick<LayoutItem, 'x' | 'y' | 'w' | 'h'>[]): GridDimensions {
 	let cols = 0;
 	let rows = 0;
 

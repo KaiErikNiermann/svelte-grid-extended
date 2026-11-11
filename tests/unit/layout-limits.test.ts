@@ -47,3 +47,36 @@ describe('grid limits', () => {
 		expect(layoutProblems(grid, { collision, cols: 2, rows: Infinity })).toEqual([]);
 	});
 });
+
+describe('a drag preview below the last row', () => {
+	test.each(['none', 'shift'] as const)('grows the grid before the drop (%s)', async (collision) => {
+		const grid = mountLayout({ grid: { cols: 4, collision, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+		await grid.settle();
+		const oneRow = grid.gridElement().style.height;
+		let during = '';
+		await grid.dragSteps('a', [
+			[0, 3],
+			() => {
+				during = grid.gridElement().style.height;
+			}
+		]);
+
+		// containerHeight is $rows \cdot (height + gap + 1)$: 4 rows of 100px cells, gap 0.
+		expect(oneRow).toBe('101px');
+		expect(during).toBe('404px');
+		expect(grid.gridElement().style.height).toBe('404px');
+	});
+
+	test('shrinks back when the drag is cancelled', async () => {
+		const grid = mountLayout({ grid: { cols: 4, collision: 'shift', ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+		await grid.settle();
+		await grid.dragSteps('a', [
+			[0, 3],
+			() => {
+				window.dispatchEvent(new MouseEvent('pointercancel', { bubbles: true }));
+			}
+		]);
+
+		expect(grid.gridElement().style.height).toBe('101px');
+	});
+});
