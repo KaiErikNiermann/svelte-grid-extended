@@ -3,7 +3,7 @@ import { playwright } from '@vitest/browser-playwright';
 import { svelteTesting } from '@testing-library/svelte/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 
-import { mouse } from './tests/browser/commands';
+import { mouse, touch } from './tests/browser/commands';
 
 const UNIT_TESTS = ['tests/unit/**/*.test.ts'];
 const STRESS_TESTS = ['tests/stress/**/*.test.ts'];
@@ -46,7 +46,7 @@ function browserProject(browser: 'chromium' | 'firefox', deviceScaleFactor = 1) 
 				// Large enough that the harness grids (100px cells) and their drags stay on screen.
 				viewport: { width: 1600, height: 1200 },
 				instances: [{ browser }],
-				commands: { mouse },
+				commands: { mouse, touch },
 				// Failures are reported as text; screenshots would land next to the test files.
 				screenshotFailures: false
 			}

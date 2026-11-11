@@ -6,6 +6,7 @@
  */
 // Re-exported so this module pulls in the provider's types for the command context (page, frame).
 export type { PlaywrightProviderOptions } from '@vitest/browser-playwright';
+import type { CDPSession } from '@playwright/test';
 import type { BrowserCommand } from 'vitest/node';
 
 /** One step of real mouse input, in the test iframe's client coordinates. */
@@ -35,8 +36,65 @@ export const mouse: BrowserCommand<[steps: MouseStep[]]> = async (ctx, steps) =>
 	}
 };
 
+/**
+ * One step of real touch input: a finger goes down, moves or lifts, in the test iframe's client
+ * coordinates; `wait` holds every finger still for `ms`. `finger` tells several fingers apart.
+ */
+export type TouchStep =
+	{ type: 'down' | 'move' | 'up'; x: number; y: number; finger?: number } | { type: 'wait'; ms: number };
+
+const TOUCH_EVENT = { down: 'touchStart', move: 'touchMove', up: 'touchEnd' } as const;
+
+/**
+ * One protocol session per page, kept across calls with the fingers still down, so a test can
+ * press in one call, wait in the page for the drag to start, and move in the next.
+ */
+const touchSessions = new WeakMap<
+	object,
+	{ session: CDPSession; down: Map<number, { x: number; y: number; id: number }> }
+>();
+
+/**
+ * Plays `steps` as touch input through the DevTools protocol (Chromium only: Playwright has no
+ * touch moves, and Firefox no protocol for them). The input goes through Chromium's own gesture
+ * handling, so a swipe really scrolls, touch-action applies and pointercancel fires as it would
+ * under a finger. Each event lists every finger still down, as the protocol expects.
+ */
+export const touch: BrowserCommand<[steps: TouchStep[]]> = async (ctx, steps) => {
+	if (ctx.page.context().browser()?.browserType().name() !== 'chromium') {
+		throw new Error('touch input needs Chromium');
+	}
+	const frame = await ctx.frame();
+	const element = await frame.frameElement();
+	const box = await element.boundingBox();
+	if (!box) throw new Error('the test iframe has no layout box');
+	const innerWidth = await frame.evaluate(() => window.innerWidth);
+	const scale = box.width / innerWidth;
+	let state = touchSessions.get(ctx.page);
+	if (!state) {
+		state = { session: await ctx.page.context().newCDPSession(ctx.page), down: new Map() };
+		touchSessions.set(ctx.page, state);
+	}
+	const { session, down } = state;
+	for (const step of steps) {
+		if (step.type === 'wait') {
+			await new Promise((resolve) => setTimeout(resolve, step.ms));
+			continue;
+		}
+		const id = step.finger ?? 0;
+		const point = { x: box.x + step.x * scale, y: box.y + step.y * scale, id };
+		if (step.type === 'up') down.delete(id);
+		else down.set(id, point);
+		await session.send('Input.dispatchTouchEvent', {
+			type: TOUCH_EVENT[step.type],
+			touchPoints: [...down.values()]
+		});
+	}
+};
+
 declare module 'vitest/browser' {
 	interface BrowserCommands {
 		mouse: (steps: MouseStep[]) => Promise<void>;
+		touch: (steps: TouchStep[]) => Promise<void>;
 	}
 }
