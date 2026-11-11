@@ -21,7 +21,12 @@ With `push` and `compress`, this covers every way an item can end up on another 
 
 Setting `collision="none"` allows items to overlap freely. This is the default behavior.
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <Grid cols={10} rows={10} collision="none">
 	<!-- Items can overlap each other -->
 </Grid>
@@ -37,8 +42,9 @@ Setting `collision="none"` allows items to overlap freely. This is the default b
 
 Setting `collision="push"` causes items to move to the first available space when they would overlap.
 
-```svelte
-<script>
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
 	const itemSize = { height: 40 };
 </script>
 
@@ -59,8 +65,9 @@ Setting `collision="push"` causes items to move to the first available space whe
 
 Setting `collision="compress"` compresses items vertically toward the top of the grid.
 
-```svelte
-<script>
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
 	const itemSize = { height: 40 };
 </script>
 
@@ -81,8 +88,9 @@ Setting `collision="compress"` compresses items vertically toward the top of the
 
 Setting `collision="shift"` makes items step aside for a drag, the way icons do on a phone home screen.
 
-```svelte
-<script>
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
 	const itemSize = { height: 40 };
 </script>
 
@@ -116,7 +124,7 @@ The <a href={placementPath}>placement scenarios</a> show each of these rules, an
 
 ## Example: Push Collision
 
-```svelte
+```svelte twoslash
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
@@ -145,7 +153,7 @@ The <a href={placementPath}>placement scenarios</a> show each of these rules, an
 
 ## Example: Compress Collision
 
-```svelte
+```svelte twoslash
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
 
@@ -173,7 +181,12 @@ The <a href={placementPath}>placement scenarios</a> show each of these rules, an
 
 When using `collision="compress"`, the `autoCompress` prop controls whether items automatically compress after programmatic changes:
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <!-- Auto compress enabled (default) -->
 <Grid collision="compress" autoCompress={true}>
 	<!-- Items auto-compress after state changes -->

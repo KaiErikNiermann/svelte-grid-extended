@@ -9,7 +9,7 @@ The `GridItem` component represents an individual item within the grid. Each ite
 
 ## Import
 
-```typescript
+```typescript twoslash
 import { GridItem } from '@appulsauce/svelte-grid';
 ```
 
@@ -45,8 +45,9 @@ Positions and sizes are whole grid cells. A fractional value is rounded, a size 
 
 All position and size props (`x`, `y`, `w`, `h`) support two-way binding:
 
-```svelte
-<script>
+```svelte twoslash
+<script lang="ts">
+	import { GridItem } from '@appulsauce/svelte-grid';
 	let item = $state({ x: 0, y: 0, w: 2, h: 2 });
 </script>
 
@@ -63,7 +64,12 @@ All position and size props (`x`, `y`, `w`, `h`) support two-way binding:
 
 The main content of the grid item:
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import { GridItem } from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <GridItem x={0} y={0}>
 	{#snippet children()}
 		<div class="my-content">Hello World</div>
@@ -75,7 +81,12 @@ The main content of the grid item:
 
 Custom drag handle. Receives a `moveStart` function to initiate dragging:
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import { GridItem } from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <GridItem x={0} y={0}>
 	{#snippet moveHandle({ moveStart })}
 		<div class="drag-handle" onpointerdown={moveStart}>Drag me</div>
@@ -91,7 +102,12 @@ Custom drag handle. Receives a `moveStart` function to initiate dragging:
 
 Custom resize handle. Receives a `resizeStart` function to initiate resizing:
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import { GridItem } from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <GridItem x={0} y={0}>
 	{#snippet resizeHandle({ resizeStart })}
 		<div class="resize-handle" onpointerdown={resizeStart}>⤡</div>
@@ -125,7 +141,12 @@ Understanding the DOM structure helps with styling:
 
 ## Example
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import { GridItem } from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <GridItem
 	id="item-1"
 	x={0}

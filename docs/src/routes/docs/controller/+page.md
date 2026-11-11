@@ -11,7 +11,7 @@ The Grid Controller provides methods to programmatically interact with the grid 
 
 Bind to the `controller` prop on the Grid component:
 
-```svelte
+```svelte twoslash
 <script lang="ts">
 	import Grid, { type GridController } from '@appulsauce/svelte-grid';
 
@@ -39,7 +39,7 @@ Finds the first available position that can fit an item of the specified size.
 - `{ x: number, y: number }` - The first available position
 - `null` - If no position is available (only when grid has fixed rows)
 
-```svelte
+```svelte twoslash
 <script lang="ts">
 	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
@@ -83,7 +83,7 @@ Finds the first available position that can fit an item of the specified size.
 
 Compresses all items vertically, moving them upward to fill any gaps. This is useful after removing items or when you want to optimize the layout.
 
-```svelte
+```svelte twoslash
 <script lang="ts">
 	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
@@ -119,7 +119,12 @@ Compresses all items vertically, moving them upward to fill any gaps. This is us
 
 When using `collision="compress"`, the grid automatically compresses items after programmatic changes by default. It compresses once per microtask, after all the changes made in the same tick, so positions read synchronously right after a change are not compressed yet; read them after `await tick()` or in `onchange`. `controller.compress()` still compresses immediately. You can disable automatic compression with `autoCompress={false}`:
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <Grid collision="compress" autoCompress={false}>
 	<!-- Items won't auto-compress -->
 </Grid>
@@ -129,7 +134,13 @@ When using `collision="compress"`, the grid automatically compresses items after
 
 ### Dynamic Item Addition
 
-```typescript
+```typescript twoslash
+import type { GridController } from '@appulsauce/svelte-grid';
+
+let gridController!: GridController;
+let items: { id: string; x: number; y: number; w: number; h: number }[] = [];
+
+// ---cut---
 function addRandomItem() {
 	const w = Math.floor(Math.random() * 3) + 1;
 	const h = Math.floor(Math.random() * 3) + 1;
@@ -143,7 +154,13 @@ function addRandomItem() {
 
 ### Item Removal with Compression
 
-```typescript
+```typescript twoslash
+import type { GridController } from '@appulsauce/svelte-grid';
+
+let gridController!: GridController;
+let items: { id: string; x: number; y: number; w: number; h: number }[] = [];
+
+// ---cut---
 function removeItem(id: string) {
 	items = items.filter((item) => item.id !== id);
 	gridController.compress();

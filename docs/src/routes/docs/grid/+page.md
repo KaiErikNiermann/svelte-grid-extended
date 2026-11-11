@@ -9,7 +9,7 @@ The `Grid` component is the main container for your grid layout. It manages the 
 
 ## Import
 
-```typescript
+```typescript twoslash
 import Grid from '@appulsauce/svelte-grid';
 ```
 
@@ -41,7 +41,12 @@ import Grid from '@appulsauce/svelte-grid';
 
 When both `cols` and `rows` are set to positive numbers, the grid has a fixed size:
 
-```svelte
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
+</script>
+
+<!-- ---cut--- -->
 <Grid cols={10} rows={10}>
 	<!-- Grid has exactly 10x10 cells -->
 </Grid>
@@ -51,8 +56,10 @@ When both `cols` and `rows` are set to positive numbers, the grid has a fixed si
 
 When `itemSize` is provided along with `cols`/`rows`, the grid uses fixed pixel dimensions:
 
-```svelte
-<script>
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
+
 	const itemSize = { width: 100, height: 40 };
 </script>
 
@@ -65,8 +72,10 @@ When `itemSize` is provided along with `cols`/`rows`, the grid uses fixed pixel 
 
 When `cols` or `rows` is set to 0, the grid grows infinitely in that dimension:
 
-```svelte
-<script>
+```svelte twoslash
+<script lang="ts">
+	import Grid from '@appulsauce/svelte-grid';
+
 	const itemSize = { width: 100, height: 40 };
 </script>
 
@@ -83,7 +92,7 @@ A grid that is more than one viewport height away from the screen is drawn with 
 
 ## Example
 
-```svelte
+```svelte twoslash
 <script lang="ts">
 	import Grid, { GridItem, type GridController } from '@appulsauce/svelte-grid';
 
