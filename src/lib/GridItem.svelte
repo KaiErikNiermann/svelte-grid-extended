@@ -452,7 +452,7 @@
 	/** The pointer that owns the current gesture or press. */
 	let gesturePointer: number | undefined;
 	/** A touch held down on the item, not yet long enough to start its gesture. */
-	let press: { x: number; y: number; timer: ReturnType<typeof setTimeout> } | undefined;
+	let press = $state.raw<{ x: number; y: number; timer: ReturnType<typeof setTimeout> } | undefined>();
 
 	/**
 	 * Starts a drag or resize for a primary-button press. A finger or pen on a part of the item
@@ -710,6 +710,7 @@
 	class:non-active-default={!active}
 	onpointerdown={_movable && !hasMoveHandle ? moveStart : undefined}
 	oncontextmenu={holdMenu}
+	data-holding={press ? '' : undefined}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
 			${_movable && !hasMoveHandle ? 'cursor: move;' : ''} ${touchAction} user-select: none;
 			-webkit-user-select: none; -webkit-touch-callout: none;

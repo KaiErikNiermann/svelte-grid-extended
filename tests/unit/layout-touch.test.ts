@@ -101,13 +101,18 @@ describe.skipIf(!IN_JSDOM && !IN_CHROMIUM)('touch input', () => {
 	test.skipIf(!IN_JSDOM)('the drag does not start before the delay has passed', async () => {
 		const grid = mountLayout({ grid: { cols: 4, touchDelay: DELAY, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
 		await grid.settle();
+		const holding = () => grid.container.querySelector<HTMLElement>('.it-a')!.dataset.holding !== undefined;
+		expect(holding()).toBe(false);
 		const finger = await fingerOn(grid, '.it-a');
 		vi.advanceTimersByTime(DELAY - 1);
 		await grid.settle();
 		expect(active(grid, 'a')).toBe(false);
+		// Marked while the finger is held, so a page can show the press being counted.
+		expect(holding()).toBe(true);
 		vi.advanceTimersByTime(1);
 		await grid.settle();
 		expect(active(grid, 'a')).toBe(true);
+		expect(holding()).toBe(false);
 		await finger.up();
 	});
 
@@ -155,6 +160,7 @@ describe.skipIf(!IN_JSDOM && !IN_CHROMIUM)('touch input', () => {
 		else await new Promise((resolve) => setTimeout(resolve, DELAY + 100));
 		await grid.settle();
 		expect(active(grid, 'a')).toBe(false);
+		expect(grid.container.querySelector<HTMLElement>('.it-a')!.dataset.holding).toBeUndefined();
 
 		const next = await fingerOn(grid, '.it-b');
 		await next.hold();
