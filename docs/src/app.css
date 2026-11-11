@@ -122,6 +122,54 @@
 		@apply ms-auto hidden rounded border border-border bg-background px-1.5 font-mono text-xs sm:inline-block;
 	}
 
+	/* A docs page and, once the pane is wide enough for it, its table of contents beside it. */
+	.docs-frame {
+		container-type: inline-size;
+	}
+
+	.docs-layout {
+		@apply grid gap-10;
+	}
+
+	.docs-layout > * {
+		@apply min-w-0;
+	}
+
+	.toc {
+		@apply hidden;
+	}
+
+	@container (min-width: 60rem) {
+		.docs-layout[data-toc='true'] {
+			grid-template-columns: minmax(0, 1fr) 14rem;
+		}
+
+		.docs-layout[data-toc='true'] > .toc {
+			@apply sticky top-0 flex flex-col gap-2 self-start overflow-y-auto;
+			max-block-size: calc(100dvh - 8rem);
+		}
+	}
+
+	.toc-title {
+		@apply px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground;
+	}
+
+	.toc ul {
+		@apply flex flex-col gap-0.5;
+	}
+
+	.toc li[data-level='3'] {
+		@apply ps-3;
+	}
+
+	.toc a {
+		@apply block rounded-md px-3 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground;
+	}
+
+	.toc a[aria-current='location'] {
+		@apply bg-primary/10 font-medium text-primary;
+	}
+
 	.link-card {
 		@apply block rounded-lg border border-border p-4 hover:border-primary/50;
 	}
@@ -138,6 +186,10 @@
 
 .prose h2 {
 	@apply text-2xl font-semibold tracking-tight mt-10 mb-4 border-b border-border pb-2;
+}
+
+.prose :is(h2, h3, h4) {
+	@apply scroll-mt-4;
 }
 
 .prose h3 {
