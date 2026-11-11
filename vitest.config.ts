@@ -6,6 +6,7 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { mouse } from './tests/browser/commands';
 
 const UNIT_TESTS = ['tests/unit/**/*.test.ts'];
+const STRESS_TESTS = ['tests/stress/**/*.test.ts'];
 
 // Property-test effort, provided to every environment (see layout-properties.test.ts; the
 // types are in tests/provided-context.d.ts).
@@ -26,7 +27,7 @@ function browserProject(browser: 'chromium' | 'firefox', deviceScaleFactor = 1) 
 		resolve: { conditions: ['browser'] },
 		test: {
 			name: deviceScaleFactor === 1 ? browser : `${browser}-${deviceScaleFactor}x`,
-			include: UNIT_TESTS,
+			include: [...UNIT_TESTS, ...STRESS_TESTS],
 			// Real mouse input goes to page coordinates; with files in parallel their iframes
 			// share the page and a press can land in another file's iframe.
 			fileParallelism: false,
@@ -35,7 +36,12 @@ function browserProject(browser: 'chromium' | 'firefox', deviceScaleFactor = 1) 
 				// The outer window is bigger than the test viewport, so the test iframe is not
 				// scaled down to fit it: real mouse input then lands 1:1 in every engine.
 				// A device scale above 1 rounds layout to device pixels differently per engine.
-				provider: playwright({ contextOptions: { viewport: { width: 1700, height: 1300 }, deviceScaleFactor } }),
+				provider: playwright({
+					contextOptions: { viewport: { width: 1700, height: 1300 }, deviceScaleFactor },
+					// The leak tests force collections and read the heap where the engine allows it.
+					launchOptions:
+						browser === 'chromium' ? { args: ['--js-flags=--expose-gc', '--enable-precise-memory-info'] } : {}
+				}),
 				headless: true,
 				// Large enough that the harness grids (100px cells) and their drags stay on screen.
 				viewport: { width: 1600, height: 1200 },
@@ -64,7 +70,7 @@ export default defineConfig({
 				extends: true,
 				test: {
 					name: 'stress',
-					include: ['tests/stress/**/*.test.ts'],
+					include: STRESS_TESTS,
 					// Leak tests call gc() to tell a released grid from a retained one.
 					pool: 'forks',
 					execArgv: ['--expose-gc']

@@ -16,7 +16,18 @@ import {
 	useLayoutHarness,
 	type MountedLayout
 } from '../unit/layout-harness';
-import { collectGarbage, gridsOnPage, heapUsed, layoutItems, report, trackWindowListeners } from './stress-utils';
+import {
+	RETAINED_AFTER_PRESS,
+	canForceGc,
+	canMeasureHeap,
+	collectGarbage,
+	gridsOnPage,
+	heapUsed,
+	layoutItems,
+	report,
+	stillReachable,
+	trackWindowListeners
+} from './stress-utils';
 
 const harness = useLayoutHarness();
 // Measured on 2026-11-10 (3 runs): the heap rises 0.2 MiB while the JIT warms up, then the
@@ -25,10 +36,8 @@ const HEAP_GROWTH_BOUND = 0.2 * 2 ** 20;
 const listeners = trackWindowListeners();
 const pointerListeners = () => listeners.live('pointermove', 'pointerup');
 
-function pressAndMove(grid: MountedLayout, selector: string) {
-	grid.container.querySelector(selector)!.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0 }));
-	window.dispatchEvent(new MouseEvent('pointermove', { clientX: 100, clientY: 100 }));
-}
+/** Presses and moves one cell, leaving the pointer down (real input in a browser). */
+const pressAndMove = (grid: MountedLayout, selector: string) => grid.hold(selector, 1, 1);
 
 describe('mount and destroy churn', () => {
 	test.each(MODES)(
@@ -73,15 +82,13 @@ describe('destroyed mid-gesture', () => {
 				items: [item('a', 0, 0), item('b', 1, 0)]
 			});
 			await grid.settle();
-			pressAndMove(grid, '.it-a');
-			await tick();
+			const pointer = await pressAndMove(grid, '.it-a');
 			expect(pointerListeners()).toBe(2);
 			grid.unmount();
 			await tick();
 			// The pointer keeps moving and is released after the grid is gone.
-			window.dispatchEvent(new MouseEvent('pointermove', { clientX: 200, clientY: 0 }));
-			window.dispatchEvent(new MouseEvent('pointerup', { button: 0 }));
-			await tick();
+			await pointer.move(2, 0);
+			await pointer.release();
 			expect(pointerListeners()).toBe(0);
 		}
 	);
@@ -92,12 +99,10 @@ describe('destroyed mid-gesture', () => {
 			items: [item('a', 0, 0), item('b', 2, 0)]
 		});
 		await grid.settle();
-		pressAndMove(grid, '.it-a .resizer-default');
-		await tick();
+		const pointer = await pressAndMove(grid, '.it-a .resizer-default');
 		grid.component.remove('a');
 		await grid.settle();
-		window.dispatchEvent(new MouseEvent('pointerup', { button: 0 }));
-		await grid.settle();
+		await pointer.release();
 		expect(pointerListeners()).toBe(0);
 		expect(layoutProblems(grid, { collision, cols: 4, rows: Infinity })).toEqual([]);
 	});
@@ -117,9 +122,10 @@ async function destroyMidDrag(collision: (typeof MODES)[number]): Promise<WeakRe
 	const grid = mountLayout({ grid: { cols: 4, collision, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
 	await grid.settle();
 	const ref = new WeakRef(grid.gridElement());
-	pressAndMove(grid, '.it-a');
-	await tick();
+	const pointer = await pressAndMove(grid, '.it-a');
 	grid.unmount();
+	// The real pointer is still down; release it so the next test starts with it up.
+	await pointer.release();
 	return ref;
 }
 
@@ -130,27 +136,45 @@ async function heapAfterRound(): Promise<number> {
 	// runs; without this the heap creeps by the harness, not the grid.
 	cleanup();
 	await collectGarbage();
-	return heapUsed();
+	return heapUsed()!;
 }
 
-describe('garbage collection', () => {
+// Firefox cannot force a collection from a page, so these run in jsdom and Chromium only;
+// see canForceGc in stress-utils.ts for the measurements behind that.
+describe.skipIf(!canForceGc)('garbage collection', () => {
 	test('destroyed grids and their items are released', async () => {
 		const refs: WeakRef<Element>[] = [];
 		for (let g = 0; g < 30; g++) refs.push(...(await mountAndDestroy(g)));
-		await collectGarbage();
-		expect(refs.filter((r) => r.deref() !== undefined)).toHaveLength(0);
+		expect(await stillReachable(refs)).toHaveLength(0);
 	});
 
-	test.each(MODES)('a grid destroyed mid-drag is released (%s)', async (collision) => {
-		const ref = await destroyMidDrag(collision);
-		await collectGarbage();
-		expect(ref.deref()).toBeUndefined();
+	test('a grid the test keeps reachable is reported as still reachable', async () => {
+		// Negative control for stillReachable(): a check that never finds anything looks the
+		// same as a clean result.
+		const grid = mountLayout({ grid: { cols: 4, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+		await grid.settle();
+		const kept = grid.gridElement();
+		grid.unmount();
+		expect(await stillReachable([new WeakRef(kept)])).toHaveLength(1);
+		expect(kept.isConnected).toBe(false);
 	});
 
-	test('heap use is flat across repeated mount and destroy', async () => {
-		const samples: number[] = [];
-		for (let r = 0; r < 12; r++) samples.push(await heapAfterRound());
-		report(`heap MiB per round of 20 grids: ${samples.map((b) => (b / 2 ** 20).toFixed(1)).join(' ')}`);
-		expect(samples.at(-1)! - samples.at(-7)!).toBeLessThan(HEAP_GROWTH_BOUND);
-	}, 120_000);
+	test.each(MODES)('grids destroyed mid-drag do not accumulate (%s)', async (collision) => {
+		const refs: WeakRef<Element>[] = [];
+		for (let g = 0; g < 6; g++) refs.push(await destroyMidDrag(collision));
+		// A leak would keep all six; see RETAINED_AFTER_PRESS for the one Chromium keeps.
+		const alive = await stillReachable(refs);
+		expect(alive.length).toBeLessThanOrEqual(RETAINED_AFTER_PRESS);
+	});
+
+	test.skipIf(!canMeasureHeap)(
+		'heap use is flat across repeated mount and destroy',
+		async () => {
+			const samples: number[] = [];
+			for (let r = 0; r < 12; r++) samples.push(await heapAfterRound());
+			report(`heap MiB per round of 20 grids: ${samples.map((b) => (b / 2 ** 20).toFixed(1)).join(' ')}`);
+			expect(samples.at(-1)! - samples.at(-7)!).toBeLessThan(HEAP_GROWTH_BOUND);
+		},
+		120_000
+	);
 });

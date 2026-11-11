@@ -80,6 +80,9 @@ export type LayoutComponent = {
 	getController: () => import('../../src/lib/types').GridController | undefined;
 };
 
+/** A pointer left pressed by `hold()`; moves are in cells from where it was pressed. */
+export type HeldPointer = { move: (dx: number, dy: number) => Promise<void>; release: () => Promise<void> };
+
 export type DragStep = readonly [number, number] | (() => void | Promise<void>);
 
 export type MountedLayout = {
@@ -98,6 +101,11 @@ export type MountedLayout = {
 	 */
 	dragSteps: (id: string, steps: readonly DragStep[], options?: { fast?: boolean }) => Promise<void>;
 	resize: (id: string, dw: number, dh: number, during?: () => Promise<void>) => Promise<void>;
+	/**
+	 * Presses on `selector` (inside the grid) and moves by `dx`, `dy` cells, then leaves the
+	 * pointer down: the test can change or destroy the grid, then move and release it.
+	 */
+	hold: (selector: string, dx: number, dy: number) => Promise<HeldPointer>;
 	drawn: () => Record<string, { x: number; y: number; w: number; h: number }>;
 	gridElement: () => HTMLElement;
 };
@@ -232,6 +240,31 @@ export function mountLayout(options: {
 	 * The same gesture with real input: press at the handle's centre, then each move in cells
 	 * from there. With `fast`, consecutive moves go to the browser in one batch.
 	 */
+	async function hold(selector: string, dx: number, dy: number): Promise<HeldPointer> {
+		const handle = container.querySelector(selector);
+		if (!handle) throw new Error(`nothing matches ${selector}`);
+		const box = handle.getBoundingClientRect();
+		const start = IN_JSDOM ? { x: 0, y: 0 } : { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+		let at = start;
+		const to = (cx: number, cy: number) => ({ x: start.x + cx * pitch, y: start.y + cy * pitch });
+		const send = async (type: 'move' | 'up', point: { x: number; y: number }) => {
+			if (IN_JSDOM) pointer(window, `pointer${type}`, point.x, point.y);
+			else await realMouse([{ type, ...point }]);
+			await settle();
+		};
+		if (IN_JSDOM) pointer(handle, 'pointerdown', start.x, start.y);
+		else await realMouse([{ type: 'down', ...start }]);
+		at = to(dx, dy);
+		await send('move', at);
+		return {
+			move: async (mx, my) => {
+				at = to(mx, my);
+				await send('move', at);
+			},
+			release: () => send('up', at)
+		};
+	}
+
 	async function realGesture(
 		handle: Element,
 		steps: readonly DragStep[],
@@ -279,6 +312,7 @@ export function mountLayout(options: {
 		dragPath: (id, path) => gesture(`.it-${id}`, path),
 		dragSteps: (id, steps, options) => gesture(`.it-${id}`, steps, undefined, options),
 		resize: (id, dw, dh, during) => gesture(`.it-${id} .resizer-default`, [[dw, dh]], during),
+		hold,
 		drawn: () =>
 			Object.fromEntries(
 				[...container.querySelectorAll<HTMLElement>('.it')].map((el) => {
