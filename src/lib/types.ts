@@ -92,8 +92,8 @@ export type GridItemDefaultSnippetProps = {
 
 export type GridItemProps = {
 	id?: string;
-	x: number;
-	y: number;
+	x?: number;
+	y?: number;
 	w?: number;
 	h?: number;
 	min?: Size;

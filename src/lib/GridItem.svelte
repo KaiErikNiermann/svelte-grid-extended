@@ -78,7 +78,7 @@
 	 * value keeps the item's current one. Changes made by the grid itself arrive here equal to
 	 * the item, through `invalidate`, and do nothing.
 	 */
-	function syncBox(next: { x: number; y: number; w: number; h: number }) {
+	function syncBox(next: { x: number | undefined; y: number | undefined; w: number; h: number }) {
 		const parsed = {
 			x: parseCoordinate(next.x),
 			y: parseCoordinate(next.y),
