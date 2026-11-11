@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { match } from 'ts-pattern';
-	import { resolve } from '$app/paths';
+	import { routeHref } from '#lib/route-href.ts';
 	import type { RouteId } from '$app/types';
 
 	const examples = [
@@ -60,6 +60,18 @@
 			category: 'collision'
 		},
 		{
+			slug: 'collision-shift',
+			title: 'Collision Shift',
+			description: 'Items make way for a drag',
+			category: 'collision'
+		},
+		{
+			slug: 'placement',
+			title: 'Placement Scenarios',
+			description: 'Numbered cases of how each mode places items',
+			category: 'collision'
+		},
+		{
 			slug: 'add-remove-item',
 			title: 'Add/Remove Items',
 			description: 'Dynamic item management',
@@ -90,7 +102,7 @@
 
 	type ExampleSlug = (typeof examples)[number]['slug'];
 
-	const exampleHref = (slug: ExampleSlug) => resolve(`/examples/${slug}` as RouteId);
+	const exampleHref = (slug: ExampleSlug) => routeHref(`/examples/${slug}` as RouteId);
 </script>
 
 <svelte:head>

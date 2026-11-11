@@ -248,7 +248,8 @@ pre.shiki:hover .code-copy-button {
 	@apply bg-primary/20 border border-primary/40 rounded-md flex items-center justify-center text-sm font-medium;
 }
 
-/* Example page grid sizing (prevents zero-height containers) */
-.examples-page .svelte-grid-extended {
+/* Example page grid sizing (prevents zero-height containers). Small fixed-size demo grids, such as
+   the placement scenarios, opt out with .grid-compact and keep their own height. */
+.examples-page .svelte-grid-extended:not(.grid-compact) {
 	min-height: clamp(320px, 45vh, 520px);
 }

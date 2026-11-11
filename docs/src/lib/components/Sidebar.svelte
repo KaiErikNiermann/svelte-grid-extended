@@ -1,7 +1,7 @@
 <script lang="ts">
 	import NavLink from './NavLink.svelte';
 	import { cn } from '#lib/utils/index.ts';
-	import { resolve } from '$app/paths';
+	import { routeHref } from '#lib/route-href.ts';
 	import type { RouteId } from '$app/types';
 
 	interface NavSection {
@@ -50,6 +50,8 @@
 				{ href: '/examples/events', label: 'Events' },
 				{ href: '/examples/collision-push', label: 'Collision Push' },
 				{ href: '/examples/collision-compress', label: 'Collision Compress' },
+				{ href: '/examples/collision-shift', label: 'Collision Shift' },
+				{ href: '/examples/placement', label: 'Placement Scenarios' },
 				{ href: '/examples/add-remove-item', label: 'Add/Remove Items' }
 			]
 		}
@@ -70,7 +72,7 @@
 			</h4>
 			<div class="space-y-1">
 				{#each section.items as item}
-					<NavLink href={resolve(item.href)}>
+					<NavLink href={routeHref(item.href)}>
 						{item.label}
 					</NavLink>
 				{/each}
