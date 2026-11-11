@@ -20,6 +20,50 @@ env:
   NODE_VERSION: 22
 
 jobs:
+  # Which parts of the repo a push or PR touches, so each job runs only when it can be
+  # affected: a docs-only change does not rerun the library's unit and browser tests. A
+  # skipped job still reports, so no required check is left pending. Manual runs run all.
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      lib: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.lib == 'true' }}
+      docs: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.docs == 'true' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dorny/paths-filter@v4.0.3
+        id: filter
+        with:
+          # What each group of jobs reads, directly or through tooling. When unsure whether a
+          # path matters, it goes in: a missed trigger lands a broken change green.
+          filters: |
+            lib:
+              - 'src/**'
+              - 'tests/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - '.npmrc'
+              - 'tsconfig.json'
+              - 'vite.config.ts'
+              - 'vitest.config.ts'
+              - 'postcss.config.cjs'
+              - 'tailwind.config.mjs'
+              - '.github/workflows/ci.yml'
+            docs:
+              - 'docs/**'
+              # The docs site is built against the packaged library.
+              - 'src/lib/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - '.npmrc'
+              - 'tsconfig.json'
+              - '.github/workflows/ci.yml'
+
+  # Unfiltered: it takes about a minute and covers every file in the repo.
   lint:
     name: Lint and format
     runs-on: ubuntu-latest
@@ -45,6 +89,8 @@ jobs:
 
   typecheck:
     name: Type check
+    needs: changes
+    if: needs.changes.outputs.lib == 'true' || needs.changes.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -66,15 +112,19 @@ jobs:
         run: pnpm --dir docs install --frozen-lockfile
 
       - name: Type check library
+        if: needs.changes.outputs.lib == 'true'
         run: pnpm check
 
       # Builds dist/ first: the docs site consumes the package through a link:
       # dependency, so its types do not exist until the library is packaged.
       - name: Type check docs site
+        if: needs.changes.outputs.docs == 'true'
         run: pnpm check:docs
 
   test:
     name: Unit tests (node ${{ matrix.node }})
+    needs: changes
+    if: needs.changes.outputs.lib == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -107,6 +157,8 @@ jobs:
 
   browser-tests:
     name: Browser tests (Chromium, Firefox)
+    needs: changes
+    if: needs.changes.outputs.lib == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -132,6 +184,8 @@ jobs:
 
   build:
     name: Package build
+    needs: changes
+    if: needs.changes.outputs.lib == 'true' || needs.changes.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -154,6 +208,8 @@ jobs:
 
   docs:
     name: Docs build
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
