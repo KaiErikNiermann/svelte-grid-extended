@@ -31,7 +31,7 @@ description: Get started with @appulsauce/svelte-grid
 
 ## Requirements
 
-- Svelte 5.0.0 or higher
+- Svelte 5.15.0 or higher
 - A bundler that supports ES modules (Vite, SvelteKit, etc.)
 
 ## Quick Links
