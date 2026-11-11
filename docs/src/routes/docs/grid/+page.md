@@ -15,19 +15,20 @@ import Grid from '@appulsauce/svelte-grid';
 
 ## Props
 
-| Prop           | Type                                        | Default     | Description                                                                                    |
-| -------------- | ------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| `cols`         | `number`                                    | `0`         | Grid columns count. If set to 0, grid will grow infinitely. Must be >= 0.                      |
-| `rows`         | `number`                                    | `0`         | Grid rows count. If set to 0, grid will grow infinitely. Must be >= 0.                         |
-| `itemSize`     | `{ width?: number, height?: number }`       | `{}`        | Size of each grid cell in pixels. If not set, calculated from container size.                  |
-| `gap`          | `number`                                    | `10`        | Gap between grid items in pixels.                                                              |
-| `bounds`       | `boolean`                                   | `false`     | Whether grid items should be bounded by the container.                                         |
-| `readOnly`     | `boolean`                                   | `false`     | If true, disables all interactions with grid items.                                            |
-| `collision`    | `'none' \| 'push' \| 'compress' \| 'shift'` | `'none'`    | Collision behavior when items overlap.                                                         |
-| `autoCompress` | `boolean`                                   | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision. |
-| `onchange`     | `(detail: LayoutChangeDetail) => void`      | `undefined` | Callback when any item changes position or size.                                               |
-| `class`        | `string`                                    | `undefined` | CSS class for the grid container.                                                              |
-| `style`        | `string`                                    | `undefined` | Inline styles for the grid container.                                                          |
+| Prop            | Type                                        | Default     | Description                                                                                                                                              |
+| --------------- | ------------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cols`          | `number`                                    | `0`         | Grid columns count. If set to 0, grid will grow infinitely. Must be >= 0.                                                                                |
+| `rows`          | `number`                                    | `0`         | Grid rows count. If set to 0, grid will grow infinitely. Must be >= 0.                                                                                   |
+| `itemSize`      | `{ width?: number, height?: number }`       | `{}`        | Size of each grid cell in pixels. If not set, calculated from container size.                                                                            |
+| `gap`           | `number`                                    | `10`        | Gap between grid items in pixels.                                                                                                                        |
+| `bounds`        | `boolean`                                   | `false`     | Whether grid items should be bounded by the container.                                                                                                   |
+| `readOnly`      | `boolean`                                   | `false`     | If true, disables all interactions with grid items.                                                                                                      |
+| `collision`     | `'none' \| 'push' \| 'compress' \| 'shift'` | `'none'`    | Collision behavior when items overlap.                                                                                                                   |
+| `autoCompress`  | `boolean`                                   | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision.                                                           |
+| `skipOffscreen` | `boolean`                                   | `true`      | Let the browser skip rendering the grid while it is away from the viewport. Turn it off for items that draw outside the grid; see Pages With Many Grids. |
+| `onchange`      | `(detail: LayoutChangeDetail) => void`      | `undefined` | Callback when any item changes position or size.                                                                                                         |
+| `class`         | `string`                                    | `undefined` | CSS class for the grid container.                                                                                                                        |
+| `style`         | `string`                                    | `undefined` | Inline styles for the grid container.                                                                                                                    |
 
 ## Bindable Props
 
@@ -88,7 +89,15 @@ When `cols` or `rows` is set to 0, the grid grows infinitely in that dimension:
 
 ## Pages With Many Grids
 
-A grid that is more than one viewport height away from the screen is drawn with `content-visibility: auto`, so the browser skips painting and hit-testing its items until it scrolls near. On a page of 200 grids this keeps scrolling at full frame rate on slow machines. The grid keeps its size while skipped, and its items stay available to screen readers and find-in-page. Near or on screen a grid renders exactly as before, so items dragged or overflowing outside it are never clipped. Browsers without `IntersectionObserver` always render every grid.
+Every grid is drawn with `content-visibility: auto`, so the browser skips laying out, painting and hit-testing a grid's items while it is away from the viewport and catches up as it scrolls near. On a page of many large grids this keeps scrolling smooth on slow machines. A skipped grid keeps its size, and its items stay available to screen readers and find-in-page.
+
+The property also brings paint containment, which has two effects while it is on: anything an item draws outside the grid's box is clipped, and `position: fixed` content inside the grid is positioned relative to the grid instead of the viewport. Popovers and dialogs shown in the top layer (the `popover` attribute, `<dialog>` with `showModal()`) are not affected. The grid turns skipping off for the length of a drag or resize, so a dragged item is never clipped. For a grid whose items show menus or tooltips past its edges, turn it off with `skipOffscreen={false}`:
+
+```svelte
+<Grid cols={12} skipOffscreen={false}>
+	<!-- Items with dropdowns that reach outside the grid -->
+</Grid>
+```
 
 ## Example
 
