@@ -242,6 +242,19 @@
 	</p>
 </div>
 
+<aside class="callout mb-10">
+	<p>
+		If you disagree with a behaviour shown here, think it is wrong, or find it broken, please
+		<a
+			href="https://github.com/KaiErikNiermann/svelte-grid-extended/issues"
+			target="_blank"
+			rel="noopener noreferrer">open an issue on GitHub</a
+		>
+		and refer to the case by its id, for example "P4 in push". It is fine to open an issue even if you
+		are not sure it is a bug, and suggestions are welcome.
+	</p>
+</aside>
+
 <div class="flex flex-col gap-12">
 	{#each sections as section (section.title)}
 		<section class="flex flex-col gap-8">
