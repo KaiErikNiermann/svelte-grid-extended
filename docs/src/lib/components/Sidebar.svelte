@@ -64,8 +64,11 @@
 	let { class: className }: Props = $props();
 </script>
 
-<nav class={cn('space-y-6', className)}>
-	{#each sections as section}
+<nav class={cn('flex flex-col gap-4', className)}>
+	{#each sections as section, index (section.title)}
+		{#if index > 0}
+			<hr class="border-border" />
+		{/if}
 		<div>
 			<h4 class="px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
 				{section.title}
