@@ -151,6 +151,29 @@ const cases: { name: string; config: ScenarioConfig; ops: Op[] }[] = [
 			},
 			{ kind: 'cols', cols: 2 }
 		]
+	},
+	{
+		name: 'a drag that never moved keeps the cell the grid moved the item to mid-drag',
+		config: noneFixedRows,
+		ops: [
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addFree', w: 2, h: 2 },
+					{ kind: 'remove', pick: 0 }
+				]
+			},
+			{ kind: 'dragWild', pick: 0, fast: false, steps: [{ kind: 'op', op: { kind: 'addFree', w: 1, h: 1 } }] },
+			{
+				kind: 'dragWild',
+				pick: 9,
+				fast: false,
+				steps: [
+					{ kind: 'op', op: { kind: 'cols', cols: 2 } },
+					{ kind: 'op', op: { kind: 'addUnplaced', w: 1, h: 1 } }
+				]
+			}
+		]
 	}
 ];
 

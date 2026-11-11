@@ -171,15 +171,30 @@
 
 	const initialPointerPosition = { left: 0, top: 0 };
 
+	/** The preview's box when the gesture began, to tell a drop from a press that moved nothing. */
+	let gestureStart = { x: 0, y: 0, w: 0, h: 0 };
+
 	function initInteraction(event: PointerEvent) {
 		active = true;
+		gestureStart = { x: previewItem.x, y: previewItem.y, w: previewItem.w, h: previewItem.h };
 		initialPointerPosition.left = event.pageX;
 		initialPointerPosition.top = event.pageY;
 		itemRef.setPointerCapture(event.pointerId);
 	}
 
+	/**
+	 * Whether the drop should take the preview's box. A gesture that never moved the preview
+	 * keeps the item where it is now, which the grid may have changed meanwhile (a reflow, a
+	 * push), instead of putting it back where the gesture started.
+	 */
+	function previewIsDrop(): boolean {
+		const { x: px, y: py, w: pw, h: ph } = previewItem;
+		const start = gestureStart;
+		return px !== start.x || py !== start.y || pw !== start.w || ph !== start.h;
+	}
+
 	function endInteraction(event: PointerEvent) {
-		applyPreview();
+		if (previewIsDrop()) applyPreview();
 		active = false;
 		shiftState = undefined;
 		gridParams.setDragTarget(null);
