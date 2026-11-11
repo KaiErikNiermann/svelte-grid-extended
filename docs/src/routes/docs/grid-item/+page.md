@@ -15,19 +15,19 @@ import { GridItem } from '@appulsauce/svelte-grid';
 
 ## Props
 
-| Prop              | Type                                    | Default          | Description                                                   |
-| ----------------- | --------------------------------------- | ---------------- | ------------------------------------------------------------- |
-| `id`              | `string`                                | `uuid.v4`        | Unique identifier for the item. Used for collision detection. |
-| `x`               | `number`                                | **required**     | X position (column) in grid units.                            |
-| `y`               | `number`                                | **required**     | Y position (row) in grid units.                               |
-| `w`               | `number`                                | `1`              | Width in grid units.                                          |
-| `h`               | `number`                                | `1`              | Height in grid units.                                         |
-| `min`             | `{ w: number, h: number }`              | `{ w: 1, h: 1 }` | Minimum size constraints.                                     |
-| `max`             | `{ w: number, h: number } \| undefined` | `undefined`      | Maximum size constraints. If undefined, no max limit.         |
-| `movable`         | `boolean`                               | `true`           | Whether the item can be dragged.                              |
-| `resizable`       | `boolean`                               | `true`           | Whether the item can be resized.                              |
-| `onchange`        | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when this item changes.                              |
-| `onpreviewchange` | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when the preview position changes during drag.       |
+| Prop              | Type                                    | Default          | Description                                                                        |
+| ----------------- | --------------------------------------- | ---------------- | ---------------------------------------------------------------------------------- |
+| `id`              | `string`                                | `uuid.v4`        | Unique identifier for the item. Used for collision detection.                      |
+| `x`               | `number`                                | `undefined`      | X position (column) in grid units. Without `x` and `y` the item takes a free cell. |
+| `y`               | `number`                                | `undefined`      | Y position (row) in grid units.                                                    |
+| `w`               | `number`                                | `1`              | Width in grid units.                                                               |
+| `h`               | `number`                                | `1`              | Height in grid units.                                                              |
+| `min`             | `{ w: number, h: number }`              | `{ w: 1, h: 1 }` | Minimum size constraints.                                                          |
+| `max`             | `{ w: number, h: number } \| undefined` | `undefined`      | Maximum size constraints. If undefined, no max limit.                              |
+| `movable`         | `boolean`                               | `true`           | Whether the item can be dragged.                                                   |
+| `resizable`       | `boolean`                               | `true`           | Whether the item can be resized.                                                   |
+| `onchange`        | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when this item changes.                                                   |
+| `onpreviewchange` | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when the preview position changes during drag.                            |
 
 Positions and sizes are whole grid cells. A fractional value is rounded, a size is at least 1, and a value that is not a finite number (`NaN`, `Infinity`) is ignored: before the item joins the grid it gets the first free cell (or a size of 1), and afterwards it keeps its current value. An item placed outside a grid with fixed `cols` or `rows` is moved inside it. When the grid changes a value this way, the bound prop is updated to match.
 

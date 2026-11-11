@@ -3,6 +3,12 @@ title: Collision Behavior
 description: How collision detection works in the grid
 ---
 
+<script>
+	import { resolve } from '$app/paths';
+
+	const placementPath = resolve('/examples/placement');
+</script>
+
 # Collision Behavior
 
 The `collision` prop controls how the grid handles overlapping items when they are moved or resized.
@@ -71,6 +77,34 @@ Setting `collision="compress"` compresses items vertically toward the top of the
 
 > **Note:** When using `collision="compress"`, `rows` is automatically set to `0` (infinite), so `itemSize.height` must be provided.
 
+### Shift
+
+Setting `collision="shift"` makes items step aside for a drag, the way icons do on a phone home screen.
+
+```svelte
+<script>
+	const itemSize = { height: 40 };
+</script>
+
+<Grid {itemSize} cols={10} collision="shift">
+	<!-- Items make way in the direction the drag comes from -->
+</Grid>
+```
+
+**Behavior:**
+
+- The dragged item can hover over others; an item moves once the dragged item covers half of it (measured against the smaller of the two), and moves back when that drops below 30%
+- An item moves away from the side the drag approached from: approached from the left it moves right, from above it moves down; items it lands on move on in the same direction
+- An item pushed past the right edge wraps to the start of the next row; one with nowhere to go takes the nearest free cell
+- While dragging, the layout is recomputed from where the items were when the drag started, so items that made way return when the drag moves on; only the drop keeps the result
+- The cell the drag is heading for counts as taken: an item added or moved there mid-drag goes to the nearest free cell
+- A new item declared on an occupied cell, or one without a position, takes the nearest free cell
+- Resizing pushes items as `push` does
+
+> **Note:** As with `push`, `rows` is ignored and the grid grows downwards, so `itemSize.height` must be provided.
+
+The <a href={placementPath}>placement scenarios</a> show each of these rules, and how every mode handles the same case.
+
 ## Comparison
 
 | Mode       | Overlap | Auto-arrange | Best for                         |
@@ -78,6 +112,7 @@ Setting `collision="compress"` compresses items vertically toward the top of the
 | `none`     | Yes     | No           | Simple layouts, manual control   |
 | `push`     | No      | Pushes down  | Dashboard widgets, kanban boards |
 | `compress` | No      | Fills gaps   | Compact layouts, masonry-style   |
+| `shift`    | No      | Makes way    | Home-screen style rearranging    |
 
 ## Example: Push Collision
 

@@ -15,19 +15,19 @@ import Grid from '@appulsauce/svelte-grid';
 
 ## Props
 
-| Prop           | Type                                   | Default     | Description                                                                                    |
-| -------------- | -------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| `cols`         | `number`                               | `0`         | Grid columns count. If set to 0, grid will grow infinitely. Must be >= 0.                      |
-| `rows`         | `number`                               | `0`         | Grid rows count. If set to 0, grid will grow infinitely. Must be >= 0.                         |
-| `itemSize`     | `{ width?: number, height?: number }`  | `{}`        | Size of each grid cell in pixels. If not set, calculated from container size.                  |
-| `gap`          | `number`                               | `10`        | Gap between grid items in pixels.                                                              |
-| `bounds`       | `boolean`                              | `false`     | Whether grid items should be bounded by the container.                                         |
-| `readOnly`     | `boolean`                              | `false`     | If true, disables all interactions with grid items.                                            |
-| `collision`    | `'none' \| 'push' \| 'compress'`       | `'none'`    | Collision behavior when items overlap.                                                         |
-| `autoCompress` | `boolean`                              | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision. |
-| `onchange`     | `(detail: LayoutChangeDetail) => void` | `undefined` | Callback when any item changes position or size.                                               |
-| `class`        | `string`                               | `undefined` | CSS class for the grid container.                                                              |
-| `style`        | `string`                               | `undefined` | Inline styles for the grid container.                                                          |
+| Prop           | Type                                        | Default     | Description                                                                                    |
+| -------------- | ------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| `cols`         | `number`                                    | `0`         | Grid columns count. If set to 0, grid will grow infinitely. Must be >= 0.                      |
+| `rows`         | `number`                                    | `0`         | Grid rows count. If set to 0, grid will grow infinitely. Must be >= 0.                         |
+| `itemSize`     | `{ width?: number, height?: number }`       | `{}`        | Size of each grid cell in pixels. If not set, calculated from container size.                  |
+| `gap`          | `number`                                    | `10`        | Gap between grid items in pixels.                                                              |
+| `bounds`       | `boolean`                                   | `false`     | Whether grid items should be bounded by the container.                                         |
+| `readOnly`     | `boolean`                                   | `false`     | If true, disables all interactions with grid items.                                            |
+| `collision`    | `'none' \| 'push' \| 'compress' \| 'shift'` | `'none'`    | Collision behavior when items overlap.                                                         |
+| `autoCompress` | `boolean`                                   | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision. |
+| `onchange`     | `(detail: LayoutChangeDetail) => void`      | `undefined` | Callback when any item changes position or size.                                               |
+| `class`        | `string`                                    | `undefined` | CSS class for the grid container.                                                              |
+| `style`        | `string`                                    | `undefined` | Inline styles for the grid container.                                                          |
 
 ## Bindable Props
 
