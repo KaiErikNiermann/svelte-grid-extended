@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+@import './twoslash.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -269,7 +271,7 @@
 	@apply bg-[hsl(222,47%,8%)];
 }
 
-pre.shiki {
+pre.shiki:not(.twoslash-popup-code pre) {
 	@apply p-4 rounded-lg overflow-x-auto my-4 text-sm ring-1 ring-border/60;
 	position: relative;
 }
@@ -278,7 +280,7 @@ pre.shiki code {
 	@apply bg-transparent p-0;
 }
 
-.dark pre.shiki {
+.dark pre.shiki:not(.twoslash-popup-code pre) {
 	background-color: var(--shiki-dark-bg) !important;
 	color: var(--shiki-dark) !important;
 }

@@ -5,3 +5,4 @@ export { default as ThemeToggle } from './ThemeToggle.svelte';
 export { default as CodeBlock } from './CodeBlock.svelte';
 export { default as CodeCopyEnhancer } from './CodeCopyEnhancer.svelte';
 export { default as SearchPalette } from './SearchPalette.svelte';
+export { default as TwoslashEnhancer } from './TwoslashEnhancer.svelte';

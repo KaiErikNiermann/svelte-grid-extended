@@ -11,6 +11,8 @@
 
 		for (const pre of pres) {
 			if (pre.closest('[data-codeblock]')) continue;
+			// The code inside a twoslash hover popup is not a block of its own.
+			if (pre.closest('.twoslash-popup-container')) continue;
 			if (pre.querySelector('.code-copy-button')) continue;
 
 			const button = document.createElement('button');

@@ -1,0 +1,139 @@
+/*
+ * Hover popups on the code blocks that twoslash annotates at build time (docs/tooling/highlight.ts).
+ * The markup is @shikijs/twoslash's rich renderer: `.twoslash-hover` wraps the token and holds a
+ * `.twoslash-popup-container`. TwoslashEnhancer.svelte places the popup (it is `position: fixed`,
+ * so the block's own `overflow-x: auto` cannot clip it) and sets `data-open` on the token.
+ * Colours come from the site's HSL variables in app.css, so light and dark follow the `.dark` class.
+ */
+
+@layer base {
+	:root {
+		--popup-code-size: 0.875rem;
+		--popup-docs-size: 0.8125rem;
+		--popup-docs-leading: 1.5;
+		--popup-pad-block: 0.5rem;
+		--popup-pad-inline: 0.75rem;
+		--popup-max-inline-size: 40rem;
+		--popup-viewport-gutter: 1rem;
+		--popup-radius: 0.5rem;
+		--popup-shadow: 0 0.5rem 1.5rem hsl(222 47% 11% / 0.18);
+		--popup-fade: 0.12s;
+		--twoslash-hint-width: 1px;
+	}
+
+	.dark {
+		--popup-shadow: 0 0.5rem 1.5rem hsl(0 0% 0% / 0.5);
+	}
+}
+
+@layer components {
+	/* A dotted underline marks what can be hovered: on the whole block while the pointer is in it, and
+	   always where there is no hover to reveal it. */
+	.twoslash .twoslash-hover {
+		border-block-end: var(--twoslash-hint-width) dotted transparent;
+		position: relative;
+	}
+
+	.twoslash:hover .twoslash-hover {
+		border-block-end-color: hsl(var(--muted-foreground) / 0.5);
+	}
+
+	.twoslash .twoslash-hover[data-open='true'] {
+		border-block-end-color: hsl(var(--primary));
+	}
+
+	@media (hover: none) {
+		.twoslash .twoslash-hover {
+			border-block-end-color: hsl(var(--muted-foreground) / 0.5);
+		}
+	}
+
+	.twoslash .twoslash-popup-container {
+		position: fixed;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		z-index: 40;
+		display: flex;
+		flex-direction: column;
+		inline-size: max-content;
+		max-inline-size: min(var(--popup-max-inline-size), 100vw - 2 * var(--popup-viewport-gutter));
+		max-block-size: 60vh;
+		overflow: auto;
+		overscroll-behavior: contain;
+		white-space: normal;
+		text-align: start;
+		font-family: Inter, system-ui, sans-serif;
+		background: hsl(var(--card));
+		color: hsl(var(--card-foreground));
+		border: 1px solid hsl(var(--muted-foreground) / 0.35);
+		border-radius: var(--popup-radius);
+		box-shadow: var(--popup-shadow);
+		visibility: hidden;
+		opacity: 0;
+		pointer-events: none;
+		transition:
+			opacity var(--popup-fade) ease,
+			visibility var(--popup-fade) ease;
+	}
+
+	.twoslash .twoslash-hover[data-open='true'] > .twoslash-popup-container {
+		visibility: visible;
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.twoslash .twoslash-popup-container {
+			transition: none;
+		}
+	}
+
+	.twoslash .twoslash-popup-code,
+	.twoslash .twoslash-popup-docs {
+		padding: var(--popup-pad-block) var(--popup-pad-inline);
+	}
+
+	.twoslash .twoslash-popup-code {
+		display: block;
+		background: transparent;
+		border: 0;
+		border-radius: 0;
+		font-family: 'JetBrains Mono', 'Fira Code', monospace;
+		font-size: var(--popup-code-size);
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+	}
+
+	/* The code inside the popup is a Shiki block too; it takes the popup's surface and padding. */
+	.twoslash .twoslash-popup-code pre {
+		margin: 0;
+		padding: 0;
+		overflow: visible;
+		background: transparent;
+		box-shadow: none;
+		white-space: inherit;
+	}
+
+	.twoslash .twoslash-popup-code code {
+		font-size: inherit;
+	}
+
+	.twoslash .twoslash-popup-docs {
+		font-size: var(--popup-docs-size);
+		line-height: var(--popup-docs-leading);
+		color: hsl(var(--muted-foreground));
+		border-block-start: 1px solid hsl(var(--border));
+		user-select: text;
+	}
+
+	.twoslash .twoslash-popup-docs-tags {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.twoslash .twoslash-popup-docs-tag-name {
+		font-family: 'JetBrains Mono', 'Fira Code', monospace;
+		margin-inline-end: 0.5em;
+	}
+}

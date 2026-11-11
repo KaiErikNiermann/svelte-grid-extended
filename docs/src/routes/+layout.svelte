@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	import { Header, Sidebar, CodeCopyEnhancer } from '#lib/components/index.ts';
+	import { Header, Sidebar, CodeCopyEnhancer, TwoslashEnhancer } from '#lib/components/index.ts';
 	import { afterNavigate } from '$app/navigation';
 
 	interface Props {
@@ -45,3 +45,4 @@
 </div>
 
 <CodeCopyEnhancer />
+<TwoslashEnhancer />
