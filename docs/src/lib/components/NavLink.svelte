@@ -5,9 +5,11 @@
 	interface Props {
 		href: string;
 		children: import('svelte').Snippet;
+		/** Called when the link is followed, e.g. to close the menu it sits in. */
+		onfollow?: () => void;
 	}
 
-	let { href, children }: Props = $props();
+	let { href, children, onfollow }: Props = $props();
 
 	// Trailing slashes are trimmed without a regex: `/\/+$/` backtracks super-linearly
 	// on a run of slashes, and sonarjs rejects it.
@@ -23,6 +25,7 @@
 
 <a
 	{href}
+	onclick={onfollow}
 	class={cn(
 		'block px-3 py-2 text-sm rounded-md transition-colors',
 		isActive

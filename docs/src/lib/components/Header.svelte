@@ -5,6 +5,7 @@
 	import Sidebar from './Sidebar.svelte';
 	import SearchPalette from './SearchPalette.svelte';
 	import { resolve } from '$app/paths';
+	import { afterNavigate } from '$app/navigation';
 
 	let mobileMenuOpen = $state(false);
 	let palette: SearchPalette | undefined = $state();
@@ -22,6 +23,9 @@
 	function closeMobileMenu() {
 		mobileMenuOpen = false;
 	}
+
+	// Any other way of leaving the page (back, forward, the search palette) closes it too.
+	afterNavigate(closeMobileMenu);
 
 	const homePath = resolve('/');
 	const docsPath = resolve('docs');
@@ -109,7 +113,8 @@
 			<div
 				class="fixed inset-y-0 left-0 top-14 w-72 border-r border-border bg-background p-6 overflow-y-auto overscroll-contain"
 			>
-				<Sidebar />
+				<!-- A followed link closes the menu, also one to the page already open, which navigates nowhere. -->
+				<Sidebar onfollow={closeMobileMenu} />
 			</div>
 		</div>
 	{/if}
