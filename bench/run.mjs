@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 /**
  * Browser benchmark for svelte-grid-extended: builds the demo app, serves the production
- * build, runs every scenario in bench/scenarios.json several times in headless Chromium,
- * and compares the medians with bench/baseline.json.
+ * build, runs every scenario in bench/scenarios.json several times in a headless browser,
+ * and compares the medians with that browser's baseline (bench/baseline.json for Chromium,
+ * bench/baseline.firefox.json for Firefox).
  *
  *   node bench/run.mjs                      # 5 runs per scenario, compare with the baseline
  *   node bench/run.mjs --runs 10 --update-baseline
  *   node bench/run.mjs --only drag-large-push --runs 3
+ *   node bench/run.mjs --browser firefox    # page-side metrics only; see lib/measure.mjs
  *
  * Exit status: 0 within the baseline's variation, 1 on a regression, 2 on a usage error.
  * Baselines are per machine; bench/remote.sh runs this on the exec host, where the
@@ -20,9 +22,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { chromium } from '@playwright/test';
-
-import { runScenario } from './lib/measure.mjs';
+import { ENGINES, runScenario, unsupported } from './lib/measure.mjs';
 import { METRICS, judge, summarize } from './lib/stats.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -35,7 +35,8 @@ const { values: opts } = parseArgs({
 		'update-baseline': { type: 'boolean', default: false },
 		'no-build': { type: 'boolean', default: false },
 		port: { type: 'string', default: '4319' },
-		baseline: { type: 'string', default: path.join(benchDir, 'baseline.json') },
+		browser: { type: 'string', default: 'chromium' },
+		baseline: { type: 'string' },
 		help: { type: 'boolean', short: 'h', default: false }
 	}
 });
@@ -50,6 +51,14 @@ if (!Number.isInteger(runs) || runs < 1) {
 	console.error(`--runs must be a positive integer, got ${opts.runs}`);
 	process.exit(2);
 }
+
+const engine = ENGINES[opts.browser];
+if (!engine) {
+	console.error(`--browser must be one of ${Object.keys(ENGINES).join(', ')}, got ${opts.browser}`);
+	process.exit(2);
+}
+// Chromium keeps the original file name, so its baseline history stays in one place.
+opts.baseline ??= path.join(benchDir, opts.browser === 'chromium' ? 'baseline.json' : `baseline.${opts.browser}.json`);
 
 const allScenarios = JSON.parse(await readFile(path.join(benchDir, 'scenarios.json'), 'utf8'));
 const scenarios = opts.only ? allScenarios.filter((s) => opts.only.includes(s.name)) : allScenarios;
@@ -74,9 +83,13 @@ function machine(browserVersion) {
 		cpu: cpus[0]?.model ?? 'unknown',
 		cores: cpus.length,
 		node: process.version,
-		chromium: browserVersion
+		browser: opts.browser,
+		browserVersion
 	};
 }
+
+/** The browser a baseline was measured in; baselines from before --browser are Chromium's. */
+const browserOf = (env) => `${env.browser ?? 'chromium'} ${env.browserVersion ?? env.chromium}`;
 
 function build() {
 	execFileSync(bin('svelte-kit'), ['sync'], { cwd: root, stdio: ['ignore', 'ignore', 'inherit'] });
@@ -116,7 +129,12 @@ async function measureAll(browser, url) {
 	const samples = Object.fromEntries(scenarios.map((s) => [s.name, {}]));
 	for (let r = 0; r < runs; r++) {
 		for (const scenario of scenarios) {
-			const result = await runScenario(browser, scenario, url);
+			const reason = unsupported(engine, scenario);
+			if (reason) {
+				if (r === 0) process.stderr.write(`skip ${scenario.name}: ${reason}\n`);
+				continue;
+			}
+			const result = await runScenario(browser, scenario, url, engine);
 			const bucket = samples[scenario.name];
 			for (const [metric, value] of Object.entries(result)) {
 				bucket[metric] = [...(bucket[metric] ?? []), value];
@@ -128,8 +146,10 @@ async function measureAll(browser, url) {
 }
 
 function summarizeAll(samples) {
+	// A scenario the engine skipped has no samples and stays out of the baseline.
+	const measured = Object.entries(samples).filter(([, metrics]) => Object.keys(metrics).length > 0);
 	return Object.fromEntries(
-		Object.entries(samples).map(([name, metrics]) => [
+		measured.map(([name, metrics]) => [
 			name,
 			Object.fromEntries(Object.entries(metrics).map(([metric, values]) => [metric, summarize(metric, values)]))
 		])
@@ -143,9 +163,9 @@ function summarizeAll(samples) {
 async function mergeIntoBaseline(file, env, summary) {
 	if (!existsSync(file)) return summary;
 	const previous = JSON.parse(await readFile(file, 'utf8'));
-	if (previous.env.cpu !== env.cpu || previous.env.chromium !== env.chromium) {
+	if (previous.env.cpu !== env.cpu || browserOf(previous.env) !== browserOf(env)) {
 		throw new Error(
-			`--only --update-baseline would mix machines: the baseline is from ${previous.env.cpu} / Chromium ${previous.env.chromium}. Update every scenario instead.`
+			`--only --update-baseline would mix machines: the baseline is from ${previous.env.cpu} / ${browserOf(previous.env)}. Update every scenario instead.`
 		);
 	}
 	return { ...previous.scenarios, ...summary };
@@ -185,7 +205,7 @@ function printComparison(rows) {
 const build_ = !opts['no-build'];
 if (build_) build();
 const server = await serve(opts.port);
-const browser = await chromium.launch();
+const browser = await engine.launcher.launch();
 let exitCode = 0;
 try {
 	// bench/remote.sh runs on a copy without .git and passes the commit in.
@@ -208,9 +228,9 @@ try {
 		console.log(`baseline written: ${path.relative(root, opts.baseline)}`);
 	} else if (existsSync(opts.baseline)) {
 		const baseline = JSON.parse(await readFile(opts.baseline, 'utf8'));
-		if (baseline.env.cpu !== env.cpu || baseline.env.chromium !== env.chromium) {
+		if (baseline.env.cpu !== env.cpu || browserOf(baseline.env) !== browserOf(env)) {
 			console.warn(
-				`warning: baseline is from ${baseline.env.cpu} / Chromium ${baseline.env.chromium}; this machine is ${env.cpu} / Chromium ${env.chromium}. Verdicts are only meaningful on the same machine.`
+				`warning: baseline is from ${baseline.env.cpu} / ${browserOf(baseline.env)}; this is ${env.cpu} / ${browserOf(env)}. Verdicts are only meaningful on the same machine and browser.`
 			);
 		}
 		const rows = compare(baseline, samples);

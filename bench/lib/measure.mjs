@@ -1,8 +1,21 @@
 /**
- * One benchmark run in Chromium: load the bench page for a scenario, then scroll it or drag
- * an item, and return the metrics named in stats.mjs.
+ * One benchmark run: load the bench page for a scenario, then scroll it or drag an item, and
+ * return the metrics named in stats.mjs that the engine can measure.
  */
+import { chromium, firefox } from '@playwright/test';
+
 import { percentile } from './stats.mjs';
+
+/**
+ * The engines the bench runs in. Chromium adds what its DevTools protocol measures: script
+ * time, heap after a forced GC, and CPU throttling. Firefox has no such protocol in
+ * Playwright, so it reports what the page measures itself (ready time, frames, drag time)
+ * and skips scenarios that need a throttled CPU.
+ */
+export const ENGINES = {
+	chromium: { launcher: chromium, devtools: true },
+	firefox: { launcher: firefox, devtools: false }
+};
 
 /** A frame longer than this is visibly slow (1.5 frames at 60 Hz). */
 const SLOW_FRAME_MS = 25;
@@ -47,6 +60,7 @@ async function load(page, cdp, url, expected) {
 	);
 	const readyMs = await ready.jsonValue();
 	await page.waitForTimeout(300);
+	if (!cdp) return { readyMs };
 	await cdp.send('HeapProfiler.collectGarbage');
 	const { metrics } = await cdp.send('Performance.getMetrics');
 	const m = Object.fromEntries(metrics.map((x) => [x.name, x.value]));
@@ -84,20 +98,26 @@ async function drag(page) {
 	return { dragMs, ...(await stopFrameRecorder(page)) };
 }
 
+/** Why `engine` cannot run `scenario`, or null when it can. */
+export function unsupported(engine, scenario) {
+	return scenario.cpuThrottle && !engine.devtools ? 'needs CPU throttling (Chromium DevTools only)' : null;
+}
+
 /**
  * Runs one scenario once in a fresh browser context.
  * @param {import('@playwright/test').Browser} browser
  * @param {{ page: Record<string, string | number>, measure: string[], cpuThrottle?: number }} scenario
  * @param {string} baseUrl
+ * @param {(typeof ENGINES)[keyof typeof ENGINES]} engine
  */
-export async function runScenario(browser, scenario, baseUrl) {
+export async function runScenario(browser, scenario, baseUrl, engine) {
 	const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
 	try {
 		const page = await context.newPage();
 		const errors = [];
 		page.on('pageerror', (e) => errors.push(e.message));
-		const cdp = await context.newCDPSession(page);
-		await cdp.send('Performance.enable');
+		const cdp = engine.devtools ? await context.newCDPSession(page) : null;
+		await cdp?.send('Performance.enable');
 		if (scenario.cpuThrottle) await cdp.send('Emulation.setCPUThrottlingRate', { rate: scenario.cpuThrottle });
 		const query = new URLSearchParams(Object.entries(scenario.page).map(([k, v]) => [k, String(v)]));
 		const expected = Number(scenario.page.grids) * Number(scenario.page.items);

@@ -5,6 +5,7 @@
 #
 #   BENCH_HOST=user@host bench/remote.sh                    # compare with the baseline
 #   BENCH_HOST=user@host bench/remote.sh --runs 10 --update-baseline
+#   BENCH_HOST=user@host bench/remote.sh --browser firefox   # baseline.firefox.json
 #
 # Needs ssh access and Docker on the host. BENCH_CPUS picks the cores (default 2-5);
 # keep it the same between the baseline and later runs.
@@ -39,5 +40,6 @@ REMOTE
 
 mkdir -p bench/results
 rsync -a "$host:$remote_dir/bench/results/" bench/results/ || echo "no results came back" >&2
-rsync -a "$host:$remote_dir/bench/baseline.json" bench/baseline.json 2>/dev/null || true
+# One baseline per browser (baseline.json is Chromium's, baseline.<browser>.json the others).
+rsync -a "$host:$remote_dir/bench/baseline*.json" bench/ 2>/dev/null || true
 exit "$status"
