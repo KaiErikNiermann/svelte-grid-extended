@@ -136,6 +136,21 @@ function summarizeAll(samples) {
 	);
 }
 
+/**
+ * With --only, an updated baseline keeps the scenarios that were not run. Merging is only
+ * sound for numbers from the same machine and browser, so anything else is refused.
+ */
+async function mergeIntoBaseline(file, env, summary) {
+	if (!existsSync(file)) return summary;
+	const previous = JSON.parse(await readFile(file, 'utf8'));
+	if (previous.env.cpu !== env.cpu || previous.env.chromium !== env.chromium) {
+		throw new Error(
+			`--only --update-baseline would mix machines: the baseline is from ${previous.env.cpu} / Chromium ${previous.env.chromium}. Update every scenario instead.`
+		);
+	}
+	return { ...previous.scenarios, ...summary };
+}
+
 function compare(baseline, samples) {
 	const rows = [];
 	for (const [name, metrics] of Object.entries(samples)) {
@@ -188,7 +203,8 @@ try {
 	console.log(`results: ${path.relative(root, resultFile)}`);
 
 	if (opts['update-baseline']) {
-		await writeFile(opts.baseline, `${JSON.stringify({ env, runs, scenarios: summary }, null, '\t')}\n`);
+		const scenarios = opts.only ? await mergeIntoBaseline(opts.baseline, env, summary) : summary;
+		await writeFile(opts.baseline, `${JSON.stringify({ env, runs, scenarios }, null, '\t')}\n`);
 		console.log(`baseline written: ${path.relative(root, opts.baseline)}`);
 	} else if (existsSync(opts.baseline)) {
 		const baseline = JSON.parse(await readFile(opts.baseline, 'utf8'));
