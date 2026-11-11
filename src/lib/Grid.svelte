@@ -335,9 +335,13 @@
 		updateGrid();
 	}
 
+	// Only a change of mode needs the pass: at mount, placement already keeps the mode's rules,
+	// and a full pass over every pair of items made a 200-item push grid mount 15% slower.
+	let adoptedMode: Collision | undefined;
 	$effect(() => {
 		const mode = collision;
-		untrack(() => adoptMode(mode));
+		if (adoptedMode !== undefined && adoptedMode !== mode) untrack(() => adoptMode(mode));
+		adoptedMode = mode;
 	});
 
 	function unregisterItem(item: LayoutItem): void {
