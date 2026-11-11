@@ -50,8 +50,11 @@ export function useLayoutHarness(): {
 				}
 			}
 		);
-		HTMLElement.prototype.setPointerCapture = () => {};
-		HTMLElement.prototype.releasePointerCapture = () => {};
+		// jsdom has no pointer capture; a real browser keeps its own, which real input exercises.
+		if (IN_JSDOM) {
+			HTMLElement.prototype.setPointerCapture = () => {};
+			HTMLElement.prototype.releasePointerCapture = () => {};
+		}
 	});
 	afterEach(() => {
 		cleanup();
@@ -84,7 +87,7 @@ export type MountedLayout = {
 	container: HTMLElement;
 	unmount: () => void;
 	settle: () => Promise<void>;
-	/** Distance in pixels from one cell's origin to the next: `CELL + gap`. */
+	/** Distance in pixels from one cell's origin to the next: the cell size plus the gap. */
 	pitch: number;
 	drag: (id: string, dx: number, dy: number, during?: () => Promise<void>) => Promise<void>;
 	/** A drag through several pointer moves, each in cells from the start; push reacts to each. */
@@ -104,8 +107,71 @@ async function settle(): Promise<void> {
 	for (let i = 0; i < 3; i++) await tick();
 }
 
+/**
+ * The suite runs in jsdom and in real browsers (Vitest browser mode). jsdom gets synthetic
+ * pointer events; a browser gets real mouse input from Playwright, so its own hit-testing,
+ * pointer capture and event order are part of every drag.
+ */
+export const IN_JSDOM = navigator.userAgent.includes('jsdom');
+
 function pointer(target: EventTarget, type: string, x: number, y: number) {
 	target.dispatchEvent(new MouseEvent(type, { bubbles: true, button: 0, clientX: x, clientY: y }));
+}
+
+const clampTo = (v: number, max: number) => Math.min(Math.max(v, 0), max - 1);
+
+/** A real pointer cannot leave the window: moves are kept inside the test viewport. */
+function onScreen(x: number, y: number): { x: number; y: number } {
+	return { x: clampTo(x, window.innerWidth), y: clampTo(y, window.innerHeight) };
+}
+
+type MouseStep = { type: 'move' | 'down' | 'up'; x: number; y: number };
+
+/** The last pointer event the page received, recorded before any handler can stop it. */
+let lastPointer: { type: string; x: number; y: number } | undefined;
+if (!IN_JSDOM) {
+	for (const type of ['pointermove', 'pointerdown', 'pointerup']) {
+		window.addEventListener(
+			type,
+			(event) => {
+				const { clientX: x, clientY: y } = event as PointerEvent;
+				lastPointer = { type, x, y };
+			},
+			{ capture: true }
+		);
+	}
+}
+
+const EVENT_OF = { move: 'pointermove', down: 'pointerdown', up: 'pointerup' } as const;
+
+/**
+ * Waits until the page has received the event for `step`. Playwright's Firefox resolves a
+ * mouse call before the page has handled the event (Chromium waits for it), so reading the
+ * layout right after the call raced the event. Bounded: fails loudly after `timeoutMs`.
+ */
+async function received(step: MouseStep, timeoutMs = 2000): Promise<void> {
+	const deadline = performance.now() + timeoutMs;
+	const matches = () =>
+		lastPointer?.type === EVENT_OF[step.type] &&
+		Math.abs(lastPointer.x - step.x) < 1 &&
+		Math.abs(lastPointer.y - step.y) < 1;
+	while (!matches()) {
+		if (performance.now() > deadline) {
+			throw new Error(
+				`the page never received ${EVENT_OF[step.type]} at (${step.x}, ${step.y}); last: ${JSON.stringify(lastPointer)}`
+			);
+		}
+		await new Promise((resolve) => requestAnimationFrame(resolve));
+	}
+}
+
+/** Sends real mouse input through the Playwright browser command (browser mode only). */
+async function realMouse(steps: MouseStep[]): Promise<void> {
+	if (steps.length === 0) return;
+	const { commands } = await import('vitest/browser');
+	const placed = steps.map((step) => ({ ...step, ...onScreen(step.x, step.y) }));
+	await commands.mouse(placed);
+	await received(placed.at(-1)!);
 }
 
 export function mountLayout(options: {
@@ -118,7 +184,9 @@ export function mountLayout(options: {
 	});
 	const layout = component as unknown as LayoutComponent;
 	const gap = typeof options.grid.gap === 'number' ? options.grid.gap : 0;
-	const pitch = CELL + gap;
+	// Square cells: a grid may pass its own itemSize (e.g. a fractional one), else CELL.
+	const cell = (options.grid.itemSize as { width?: number } | undefined)?.width ?? CELL;
+	const pitch = cell + gap;
 	// Inverse of calcPosition: $\text{left} = x \cdot pitch + gap$, $\text{width} = w \cdot pitch - gap$.
 	const toCells = (left: string, top: string, width: string, height: string) => ({
 		x: (Number.parseFloat(left) - gap) / pitch,
@@ -135,6 +203,15 @@ export function mountLayout(options: {
 	) {
 		const handle = container.querySelector(selector);
 		if (!handle) throw new Error(`nothing matches ${selector}`);
+		await (IN_JSDOM ? syntheticGesture : realGesture)(handle, steps, during, options);
+	}
+
+	async function syntheticGesture(
+		handle: Element,
+		steps: readonly DragStep[],
+		during: (() => Promise<void>) | undefined,
+		options: { fast?: boolean }
+	) {
 		pointer(handle, 'pointerdown', 0, 0);
 		let last: readonly [number, number] = [0, 0];
 		for (const step of steps) {
@@ -148,6 +225,44 @@ export function mountLayout(options: {
 		}
 		if (during) await during();
 		pointer(window, 'pointerup', last[0] * pitch, last[1] * pitch);
+		await settle();
+	}
+
+	/**
+	 * The same gesture with real input: press at the handle's centre, then each move in cells
+	 * from there. With `fast`, consecutive moves go to the browser in one batch.
+	 */
+	async function realGesture(
+		handle: Element,
+		steps: readonly DragStep[],
+		during: (() => Promise<void>) | undefined,
+		options: { fast?: boolean }
+	) {
+		const box = handle.getBoundingClientRect();
+		const start = { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+		const at = ([dx, dy]: readonly [number, number]) => ({ x: start.x + dx * pitch, y: start.y + dy * pitch });
+		await realMouse([{ type: 'down', ...start }]);
+		await settle();
+		let last: readonly [number, number] = [0, 0];
+		let batch: MouseStep[] = [];
+		const flush = async () => {
+			await realMouse(batch);
+			batch = [];
+			await settle();
+		};
+		for (const step of steps) {
+			if (typeof step === 'function') {
+				await flush();
+				await step();
+				continue;
+			}
+			last = step;
+			batch.push({ type: 'move', ...at(step) });
+			if (!options.fast) await flush();
+		}
+		await flush();
+		if (during) await during();
+		await realMouse([{ type: 'up', ...at(last) }]);
 		await settle();
 	}
 
@@ -229,6 +344,45 @@ export function layoutProblems(mounted: MountedLayout, options: InvariantOptions
 	return [
 		...(options.allowOverlap ? [] : overlapProblems(items)),
 		...items.flatMap((it) => itemProblems(it, drawn, options.cols, rows)),
-		...(rows === Infinity ? heightProblems(mounted, items) : [])
+		...(rows === Infinity ? heightProblems(mounted, items) : []),
+		...(IN_JSDOM ? [] : renderedProblems(mounted))
 	];
+}
+
+/**
+ * In a real browser: each item is laid out where its inline style says, within half a pixel.
+ * jsdom does no layout, so this is where engine differences in positioning (subpixel
+ * rounding, transforms, borders) would show up.
+ */
+/**
+ * The largest coordinate both engines lay out: Firefox stores lengths as 1/60px integers up
+ * to $2^{30}$, so $2^{30} / 60 \approx 17\,895\,697$px (beyond it an item is drawn with no
+ * height); Chromium clamps at 33 554 428px. Items placed further (the edge-value tests' 1e6
+ * cells) keep a correct state but cannot be drawn there by any engine.
+ */
+const LAYOUT_LIMIT_PX = 17_895_697;
+
+function renderedProblems(mounted: MountedLayout): string[] {
+	const grid = mounted.gridElement();
+	const origin = grid.getBoundingClientRect();
+	return [...grid.querySelectorAll<HTMLElement>('.it')].flatMap((el) => {
+		const id = [...el.classList].find((c) => c.startsWith('it-'))!.slice(3);
+		// Items animate to a new place (CSS transitions); the check is about where they end up.
+		for (const animation of el.getAnimations()) animation.finish();
+		const rect = el.getBoundingClientRect();
+		const actual = {
+			left: rect.left - origin.left - grid.clientLeft,
+			top: rect.top - origin.top - grid.clientTop,
+			width: rect.width,
+			height: rect.height
+		};
+		const px = (side: 'left' | 'top' | 'width' | 'height') => Number.parseFloat(el.style[side]);
+		if (px('left') + px('width') > LAYOUT_LIMIT_PX || px('top') + px('height') > LAYOUT_LIMIT_PX) return [];
+		return (['left', 'top', 'width', 'height'] as const).flatMap((side) => {
+			const declared = Number.parseFloat(el.style[side]);
+			return Math.abs(actual[side] - declared) > 0.5
+				? [`${id} is rendered with ${side} ${actual[side].toFixed(2)}px, its style says ${declared}px`]
+				: [];
+		});
+	});
 }

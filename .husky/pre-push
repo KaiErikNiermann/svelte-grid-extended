@@ -12,5 +12,8 @@ pnpm exec eslint . --max-warnings=0
 echo "› svelte-check"
 pnpm run check
 
-echo "› vitest"
+echo "› vitest (jsdom)"
 pnpm run test:unit
+
+echo "› vitest (Chromium, Firefox)"
+pnpm run test:browsers

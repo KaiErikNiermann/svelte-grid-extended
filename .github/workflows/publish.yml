@@ -33,6 +33,10 @@ jobs:
 
       # Releases are cut from tags, which may not have gone through a PR, so the
       # full gate runs again here rather than trusting an earlier CI run.
+      # verify runs the unit suite in Chromium and Firefox too.
+      - name: Install Chromium and Firefox
+        run: pnpm exec playwright install --with-deps chromium firefox
+
       - name: Verify (lint, types, tests)
         run: pnpm verify
 

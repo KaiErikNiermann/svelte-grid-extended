@@ -14,9 +14,8 @@
 		"package": "svelte-kit sync && svelte-package && publint",
 		"prepublishOnly": "pnpm package",
 		"test": "svelte-kit sync && vitest",
-		"test:unit": "svelte-kit sync && vitest run",
-		"coverage": "svelte-kit sync && vitest run --coverage",
-		"e2e": "playwright test",
+		"test:unit": "svelte-kit sync && vitest run --project unit --project stress",
+		"coverage": "svelte-kit sync && vitest run --coverage --project unit --project stress",
 		"bench": "node bench/run.mjs",
 		"bench:remote": "bench/remote.sh",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -25,12 +24,13 @@
 		"lint": "prettier --check . && eslint . --max-warnings=0",
 		"lint:fix": "prettier --write . && eslint . --fix",
 		"format": "prettier --write .",
-		"verify": "pnpm lint && pnpm check && pnpm test:unit",
+		"verify": "pnpm lint && pnpm check && pnpm test:unit && pnpm test:browsers",
 		"prepare": "husky",
 		"docs:dev": "pnpm --dir docs dev",
 		"docs:build": "pnpm --dir docs build",
 		"docs:preview": "pnpm --dir docs preview",
-		"docs:install": "pnpm --dir docs install"
+		"docs:install": "pnpm --dir docs install",
+		"test:browsers": "svelte-kit sync && vitest run --project chromium --project firefox --project chromium-1.5x --project firefox-1.5x"
 	},
 	"exports": {
 		".": {
@@ -73,6 +73,7 @@
 		"@sveltejs/package": "^3.0.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@testing-library/svelte": "^5.4.2",
+		"@vitest/browser-playwright": "4.1.11",
 		"@vitest/coverage-v8": "^4.1.11",
 		"autoprefixer": "^10.5.4",
 		"daisyui": "^4.12.24",

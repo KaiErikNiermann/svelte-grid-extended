@@ -51,6 +51,8 @@ export type ScenarioConfig = {
 	rows: number;
 	withPatches: boolean;
 	gap?: number;
+	/** Square cell size in px; a fractional one makes engines round subpixel positions. */
+	cell?: number;
 	/** Breakpoint-based cols; the container width then decides the column count. */
 	breakpointCols?: Exclude<GridSize, number>;
 };
@@ -324,7 +326,8 @@ export async function runScenario(
 	const { collision, rows, withPatches } = config;
 	const fixedRows = rows || Infinity;
 	const cols = config.breakpointCols ?? 4;
-	const mounted = mountLayout({ grid: { cols, rows, collision, gap: config.gap ?? 0, ...FIXED_SIZE }, items: [] });
+	const itemSize = config.cell ? { width: config.cell, height: config.cell } : FIXED_SIZE.itemSize;
+	const mounted = mountLayout({ grid: { cols, rows, collision, gap: config.gap ?? 0, itemSize }, items: [] });
 	const run: Run = { mounted, config, cols: 4, rows: fixedRows, nextId: 0, resizeTo, unsettled: false };
 	await mounted.settle();
 	if (config.breakpointCols) {

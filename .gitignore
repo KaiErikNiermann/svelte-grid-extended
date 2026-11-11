@@ -28,3 +28,6 @@ LOG.md
 
 # Benchmark run outputs (the baseline in bench/baseline.json is committed)
 /bench/results/
+
+# Vitest browser mode writes attachments here
+.vitest-attachments/
