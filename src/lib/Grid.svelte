@@ -130,19 +130,11 @@
 		}
 	});
 
-	const containerWidth = $derived.by(() => {
-		if (gridItemSize && resolvedCols === 0) {
-			return _cols * (gridItemSize.width + gap + 1);
-		}
-		return null;
-	});
-
-	const containerHeight = $derived.by(() => {
-		if (gridItemSize && resolvedRows === 0) {
-			return _rows * (gridItemSize.height + gap + 1);
-		}
-		return null;
-	});
+	// A given cell size fixes the grid's pixel size: $\text{cols} \cdot (\text{width} + gap + 1)$,
+	// for a grid that grows with its content as for one with fixed cols/rows. Without one, the
+	// cells are measured from the container, which the grid then fills.
+	const containerWidth = $derived(itemSize?.width ? _cols * (itemSize.width + gap + 1) : null);
+	const containerHeight = $derived(itemSize?.height ? _rows * (itemSize.height + gap + 1) : null);
 
 	let gridContainer: HTMLDivElement;
 

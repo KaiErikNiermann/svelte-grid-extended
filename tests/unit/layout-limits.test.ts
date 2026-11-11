@@ -80,3 +80,22 @@ describe('a drag preview below the last row', () => {
 		expect(grid.gridElement().style.height).toBe('101px');
 	});
 });
+
+describe('a grid with fixed cols and rows and a given cell size', () => {
+	test('takes its size from the cells, not from its container', async () => {
+		const grid = mountLayout({ grid: { cols: 4, rows: 2, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+		await grid.settle();
+
+		// $n \cdot (\text{cell} + gap + 1)$ with 100px cells and gap 0, as for a growing grid.
+		expect(grid.gridElement().style.width).toBe('404px');
+		expect(grid.gridElement().style.height).toBe('202px');
+	});
+
+	test('with only a height given, fills the container width and takes its height from the rows', async () => {
+		const grid = mountLayout({ grid: { cols: 4, rows: 2, itemSize: { height: CELL } }, items: [item('a', 0, 0)] });
+		await grid.settle();
+
+		expect(grid.gridElement().style.width).toBe('100%');
+		expect(grid.gridElement().style.height).toBe('202px');
+	});
+});
