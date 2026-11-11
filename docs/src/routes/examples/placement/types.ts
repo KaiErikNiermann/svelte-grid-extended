@@ -24,3 +24,15 @@ export type ScenarioSpec = {
 	 */
 	duringDrag?: 'add' | 'move';
 };
+
+/**
+ * An id no item has yet: `n`, then `n2`, `n3`. Items are keyed by id, and a repeated id makes
+ * Svelte's keyed each and the grid's registerItem throw, so every added item needs a new one.
+ */
+export function freshId(items: Spec[], base = 'n'): string {
+	const taken = new Set(items.map((it) => it.id));
+	if (!taken.has(base)) return base;
+	let i = 2;
+	while (taken.has(`${base}${i}`)) i++;
+	return `${base}${i}`;
+}

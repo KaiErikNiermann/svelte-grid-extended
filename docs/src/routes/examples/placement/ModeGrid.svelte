@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Grid, { GridItem, type Collision } from '@appulsauce/svelte-grid';
-	import type { ScenarioSpec, Spec } from './types';
+	import { freshId, type ScenarioSpec, type Spec } from './types';
 
 	let {
 		scenario,
@@ -81,8 +81,9 @@
 		armed = false;
 		const { x, y } = lastPreview;
 		if (scenario.duringDrag === 'add') {
-			items = [...items, { id: 'n', x, y, w: 1, h: 1 }];
-			note = `n was added at (${x}, ${y}), under the outline. Release now.`;
+			const id = freshId(items);
+			items = [...items, { id, x, y, w: 1, h: 1 }];
+			note = `${id} was added at (${x}, ${y}), under the outline. Release now.`;
 		} else {
 			items = items.map((it) => (it.id === 'b' ? { ...it, x, y } : it));
 			note = `b was moved to (${x}, ${y}), under the outline. Release now.`;

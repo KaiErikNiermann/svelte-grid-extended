@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Collision } from '@appulsauce/svelte-grid';
 	import ModeGrid from './ModeGrid.svelte';
-	import type { ScenarioSpec, Spec } from './types';
+	import { freshId, type ScenarioSpec, type Spec } from './types';
 
 	const ALL: Collision[] = ['none', 'push', 'compress', 'shift'];
 	const cell = (id: string, x: number, y: number, w = 1, h = 1): Spec => ({ id, x, y, w, h });
@@ -88,7 +88,9 @@
 			modes: ALL,
 			cols: 4,
 			items: [cell('a', 0, 0)],
-			actions: [{ label: 'Add n at (0, 0)', apply: (items) => [...items, cell('n', 0, 0)] }]
+			actions: [
+				{ label: 'Add n at (0, 0)', apply: (items) => [...items, cell(freshId(items), 0, 0)] }
+			]
 		},
 		{
 			id: 'P2',
@@ -181,7 +183,7 @@
 			actions: [
 				{
 					label: 'Add n without x/y',
-					apply: (items) => [...items, { id: `n${items.length}`, w: 1, h: 1 }]
+					apply: (items) => [...items, { id: freshId(items), w: 1, h: 1 }]
 				}
 			]
 		},
@@ -196,7 +198,7 @@
 			rows: 1,
 			items: [cell('a', 0, 0), cell('b', 1, 0)],
 			actions: [
-				{ label: 'Add n', apply: (items) => [...items, { id: 'n', w: 1, h: 1 }] },
+				{ label: 'Add n', apply: (items) => [...items, { id: freshId(items), w: 1, h: 1 }] },
 				{ label: 'Remove b', apply: (items) => items.filter((it) => it.id !== 'b') }
 			]
 		}
