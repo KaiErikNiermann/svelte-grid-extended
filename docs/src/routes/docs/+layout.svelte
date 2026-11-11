@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
+	import { ChevronDown } from 'lucide-svelte';
 
 	interface Props {
 		children: import('svelte').Snippet;
@@ -48,6 +49,34 @@
 	afterNavigate(() => {
 		headings = readHeadings();
 		activeId = '';
+		mobileOpen = false;
+	});
+
+	// Narrow screens: the list folds into a bar under the header (see .toc-mobile in app.css).
+	let mobileOpen = $state(false);
+	let mobileToc: HTMLDetailsElement | undefined = $state();
+	const activeText = $derived(
+		headings.find((h) => h.id === activeId)?.text ?? headings[0]?.text ?? ''
+	);
+
+	// An open list closes on Escape and on a press anywhere outside it.
+	$effect(() => {
+		if (!mobileOpen) return;
+		const onKey = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				mobileOpen = false;
+				mobileToc?.querySelector('summary')?.focus();
+			}
+		};
+		const onPress = (event: PointerEvent) => {
+			if (!mobileToc?.contains(event.target as Node)) mobileOpen = false;
+		};
+		document.addEventListener('keydown', onKey);
+		document.addEventListener('pointerdown', onPress);
+		return () => {
+			document.removeEventListener('keydown', onKey);
+			document.removeEventListener('pointerdown', onPress);
+		};
 	});
 
 	$effect(() => {
@@ -67,27 +96,44 @@
 	});
 </script>
 
+{#snippet tocList(onpick?: () => void)}
+	<ul>
+		{#each headings as heading (heading.id)}
+			<li data-level={heading.level}>
+				<a
+					href={`#${heading.id}`}
+					aria-current={heading.id === activeId ? 'location' : undefined}
+					onclick={onpick}
+				>
+					{heading.text}
+				</a>
+			</li>
+		{/each}
+	</ul>
+{/snippet}
+
 <div class="docs-frame">
+	{#if headings.length > 1}
+		<details class="toc-mobile" bind:open={mobileOpen} bind:this={mobileToc}>
+			<summary>
+				<span class="toc-mobile-label">On this page</span>
+				<span class="toc-mobile-current">{activeText}</span>
+				<ChevronDown class="toc-mobile-chevron" aria-hidden="true" />
+			</summary>
+			<nav class="toc toc-mobile-list" aria-label="On this page">
+				{@render tocList(() => (mobileOpen = false))}
+			</nav>
+		</details>
+	{/if}
 	<div class="docs-layout" data-toc={headings.length > 1}>
 		<div class="prose" bind:this={content}>
 			{@render children()}
 		</div>
 
 		{#if headings.length > 1}
-			<aside class="toc" aria-label="On this page">
+			<aside class="toc toc-side" aria-label="On this page">
 				<p class="toc-title">On this page</p>
-				<ul>
-					{#each headings as heading (heading.id)}
-						<li data-level={heading.level}>
-							<a
-								href={`#${heading.id}`}
-								aria-current={heading.id === activeId ? 'location' : undefined}
-							>
-								{heading.text}
-							</a>
-						</li>
-					{/each}
-				</ul>
+				{@render tocList()}
 			</aside>
 		{/if}
 	</div>
