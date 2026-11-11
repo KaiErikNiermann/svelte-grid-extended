@@ -71,8 +71,14 @@ export type LayoutChangeDetail = {
 export type Collision = 'none' | 'push' | 'compress' | 'shift';
 
 export type GridController = {
+	/** The grid's current settings and items. */
 	gridParams: GridParams;
+	/**
+	 * The first free cell, in reading order, where an item of `w` x `h` cells fits; null when a
+	 * grid with fixed `cols` and `rows` has no room.
+	 */
 	getFirstAvailablePosition: (w: number, h: number) => Position | null;
+	/** Packs every item upwards now, whatever `autoCompress` is set to. */
 	compress: () => void;
 };
 
@@ -93,23 +99,59 @@ export type GridItemDefaultSnippetProps = {
 };
 
 export type GridItemProps = {
+	/**
+	 * Unique id within the grid; a random UUID when left out.
+	 */
 	id?: string;
+	/** Column of the left edge, in cells. Without `x` and `y` the item takes a free cell. */
 	x?: number;
+	/** Row of the top edge, in cells. */
 	y?: number;
+	/**
+	 * Width in cells. Fractions are rounded and the width is capped at a fixed `cols`.
+	 * @default 1
+	 */
 	w?: number;
+	/**
+	 * Height in cells.
+	 * @default 1
+	 */
 	h?: number;
+	/**
+	 * Smallest size a resize can reach, in cells.
+	 * @default { w: 1, h: 1 }
+	 */
 	min?: Size;
+	/** Largest size a resize can reach, in cells; no limit when left out. */
 	max?: Size;
+	/**
+	 * Whether the item can be dragged.
+	 * @default true
+	 */
 	movable?: boolean;
+	/**
+	 * Whether the item can be resized.
+	 * @default true
+	 */
 	resizable?: boolean;
+	/** CSS class for the item. */
 	class?: string;
+	/** CSS class added while the item is being dragged or resized. */
 	activeClass?: string;
+	/** CSS class for the outline that shows where a drag or resize will land. */
 	previewClass?: string;
+	/** CSS class for the resize handle. */
 	resizerClass?: string;
+	/** Inline style for the item. */
 	style?: string;
+	/** Called when this item's position or size changes. */
 	onchange?: (detail: LayoutChangeDetail) => void;
+	/** Called when the outline moves during a drag or resize, before the drop. */
 	onpreviewchange?: (detail: LayoutChangeDetail) => void;
+	/** The item's content. */
 	children?: Snippet<[GridItemDefaultSnippetProps]>;
+	/** A custom drag handle; without one the whole item drags. */
 	moveHandle?: Snippet<[MoveHandleSnippetProps]>;
+	/** A custom resize handle in place of the default corner. */
 	resizeHandle?: Snippet<[ResizeHandleSnippetProps]>;
 };

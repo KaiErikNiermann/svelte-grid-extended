@@ -45,20 +45,72 @@
 	} from './types';
 
 	type Props = {
+		/**
+		 * Number of columns. `0` grows with the content, and then `itemSize.width` is required. A
+		 * breakpoint map (`{ xs: 2, md: 4, lg: 6 }`) takes the value whose breakpoint width is
+		 * closest to the container's width.
+		 * @default 0
+		 */
 		cols?: GridSize;
+		/**
+		 * Number of rows, like `cols`. Ignored with `collision` `push`, `compress` or `shift`,
+		 * which always grow downwards.
+		 * @default 0
+		 */
 		rows?: GridSize;
+		/**
+		 * Cell size in pixels. A side that is left out is measured from the container. A given
+		 * width or height also fixes the grid's size on that axis.
+		 * @default {}
+		 */
 		itemSize?: Partial<ItemSize>;
+		/**
+		 * Gap between cells, in pixels.
+		 * @default 10
+		 */
 		gap?: number;
+		/**
+		 * Container widths, in pixels, for the keys of a `cols` or `rows` breakpoint map.
+		 * @default { xxl: 1536, xl: 1280, lg: 1024, md: 768, sm: 640, xs: 320 }
+		 */
 		breakpoints?: Breakpoints;
+		/**
+		 * Keeps dragged items inside the grid's container.
+		 * @default false
+		 */
 		bounds?: boolean;
+		/**
+		 * Turns off dragging and resizing for every item.
+		 * @default false
+		 */
 		readOnly?: boolean;
+		/**
+		 * Reserved; it currently has no effect.
+		 * @default false
+		 */
 		debug?: boolean;
+		/** CSS class for the grid container. */
 		class?: string;
+		/** Inline style for the grid container. */
 		style?: string;
+		/**
+		 * What happens when items would overlap: `none` allows it, `push` moves the other items to
+		 * the first free cell, `compress` packs every item upwards, and `shift` makes items step
+		 * aside during a drag the way icons do on a phone home screen.
+		 * @default 'none'
+		 */
 		collision?: Collision;
+		/**
+		 * With `collision="compress"`, compresses after changes made through props, once per
+		 * microtask. Turn it off to compress only when you call `controller.compress()`.
+		 * @default true
+		 */
 		autoCompress?: boolean;
+		/** Bind to it (`bind:controller`) for `getFirstAvailablePosition` and `compress`. */
 		controller?: GridControllerType;
+		/** Called when any item's position or size changes. */
 		onchange?: (detail: LayoutChangeDetail) => void;
+		/** The grid's items: `GridItem` components. */
 		children?: Snippet;
 	};
 
