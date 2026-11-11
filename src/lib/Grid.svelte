@@ -116,6 +116,15 @@
 		 * @default true
 		 */
 		skipOffscreen?: boolean;
+		/**
+		 * How long, in milliseconds, a finger or pen has to be held on an item before a drag
+		 * starts, so that a swipe across the grid still scrolls the page. A finger that moves
+		 * during the wait scrolls instead. `0` drags at once, and the items then cannot be used
+		 * to scroll. A mouse always drags at once, and so does a touch on a handle with
+		 * `touch-action: none`, such as the default resize handle.
+		 * @default 300
+		 */
+		touchDelay?: number;
 		/** Bind to it (`bind:controller`) for `getFirstAvailablePosition` and `compress`. */
 		controller?: GridControllerType;
 		/** Called when any item's position or size changes. */
@@ -145,6 +154,7 @@
 		collision = 'none',
 		autoCompress = true,
 		skipOffscreen = true,
+		touchDelay = 300,
 		controller = $bindable(),
 		onchange,
 		children
@@ -309,6 +319,19 @@
 		return changed;
 	}
 
+	/** The item whose drag or resize runs now; the grid's layout logic assumes one at a time. */
+	let gestureOwner: string | null = null;
+
+	function claimGesture(id: string): boolean {
+		if (gestureOwner !== null && gestureOwner !== id) return false;
+		gestureOwner = id;
+		return true;
+	}
+
+	function releaseGesture(id: string): void {
+		if (gestureOwner === id) gestureOwner = null;
+	}
+
 	function setDragTarget(target: Placed | null): void {
 		dragTarget = target;
 	}
@@ -429,6 +452,9 @@
 		readOnly,
 		debug,
 		collision,
+		touchDelay,
+		claimGesture,
+		releaseGesture,
 		registerItem,
 		unregisterItem,
 		settleItem,

@@ -24,6 +24,11 @@ describe('GridController firstAvailablePosition', () => {
 		readOnly: false,
 		debug: false,
 		collision: 'none',
+		touchDelay: 0,
+		claimGesture: () => true,
+		releaseGesture: () => {
+			/* .. */
+		},
 		registerItem: () => {
 			/* .. */
 		},

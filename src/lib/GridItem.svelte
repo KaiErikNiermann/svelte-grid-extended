@@ -5,6 +5,7 @@
 	import { blockingRow, hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 	import { assignBox, parseCoordinate, parseSize } from './utils/placement';
 	import { displaceStep, type DragState, type Placed } from './utils/displace';
+	import { leftPress, waitsForPress } from './utils/press';
 
 	import type { LayoutItem, GridItemProps } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -123,8 +124,9 @@
 			registered = false;
 			// A drag or resize only removes its window listeners on pointerup. Destroyed
 			// mid-gesture (the item removed, or its grid), they stayed attached, kept the
-			// destroyed item alive and threw on the next pointerup.
-			removeGestureListeners();
+			// destroyed item alive and threw on the next pointerup. The grid's gesture slot is
+			// freed too, or no other item could be dragged.
+			stopGesture();
 			// Destroyed mid-drag: the drag never drops, so items that made way go back.
 			abortShift();
 			if (active) gridParams.setDragTarget(null);
@@ -219,17 +221,18 @@
 	const _movable = $derived(!gridParams.readOnly && movable);
 
 	function moveStart(event: PointerEvent) {
-		if (event.button !== 0) return;
-		event.stopPropagation();
+		beginGesture(event, startMove);
+	}
+
+	function startMove(event: PointerEvent) {
 		initInteraction(event);
 		initialPosition = { left, top };
 		if (gridParams.collision === 'shift') startShift();
 		window.addEventListener('pointermove', move);
-		window.addEventListener('pointerup', gestureEnd);
-		window.addEventListener('pointercancel', cancelGesture);
 	}
 
 	function move(event: PointerEvent) {
+		if (event.pointerId !== gesturePointer) return;
 		if (!gridParams.itemSize) {
 			throw new Error('Grid is not mounted yet');
 		}
@@ -443,18 +446,98 @@
 		}
 	}
 
-	/** Pointerup for a move or a resize: both end the same way. */
-	function gestureEnd(event: PointerEvent) {
-		if (event.button !== 0) return;
-		endInteraction(event);
-		removeGestureListeners();
+	// GESTURES: a drag or a resize belongs to the pointer that started it, and a grid runs one at
+	// a time, so a second finger neither moves this item nor starts a gesture on another one.
+
+	/** The pointer that owns the current gesture or press. */
+	let gesturePointer: number | undefined;
+	/** A touch held down on the item, not yet long enough to start its gesture. */
+	let press: { x: number; y: number; timer: ReturnType<typeof setTimeout> } | undefined;
+
+	/**
+	 * Starts a drag or resize for a primary-button press. A finger or pen on a part of the item
+	 * the page could scroll from first has to be held still for the grid's `touchDelay`, so a
+	 * swipe across the grid still scrolls the page.
+	 */
+	function beginGesture(event: PointerEvent, start: (event: PointerEvent) => void) {
+		if (event.button !== 0 || active || press) return;
+		event.stopPropagation();
+		if (!gridParams.claimGesture(item.id)) return;
+		gesturePointer = event.pointerId;
+		window.addEventListener('pointerup', gestureEnd);
+		window.addEventListener('pointercancel', cancelGesture);
+		if (!waitsForPress(event, gridParams.touchDelay)) {
+			start(event);
+			return;
+		}
+		press = {
+			x: event.clientX,
+			y: event.clientY,
+			timer: setTimeout(() => {
+				endPress();
+				start(event);
+			}, gridParams.touchDelay)
+		};
+		window.addEventListener('pointermove', pressMove);
 	}
 
-	function removeGestureListeners() {
+	/** A finger that moves away during the press is a swipe: the browser gets to scroll. */
+	function pressMove(event: PointerEvent) {
+		if (event.pointerId === gesturePointer && press && leftPress(press, event)) stopGesture();
+	}
+
+	function endPress() {
+		if (press) clearTimeout(press.timer);
+		press = undefined;
+		window.removeEventListener('pointermove', pressMove);
+	}
+
+	/**
+	 * While a touch drag runs, no finger may scroll or zoom the page under it: not the dragging
+	 * one, nor a second one elsewhere, which would start a pinch and cancel the drag.
+	 */
+	function holdPage(event: TouchEvent) {
+		if (active && event.cancelable) event.preventDefault();
+	}
+
+	/** A long press would open the context menu (or the text callout) over the dragged item. */
+	function holdMenu(event: Event) {
+		if (active || press) event.preventDefault();
+	}
+
+	// Not passive: only a listener that may cancel touchmove can stop the page scrolling. The
+	// item's own listener is there from the start, since iOS Safari decides when a touch starts
+	// whether its moves can be cancelled; the window's covers fingers that land elsewhere.
+	$effect(() => {
+		itemRef.addEventListener('touchmove', holdPage, { passive: false });
+		return () => itemRef.removeEventListener('touchmove', holdPage);
+	});
+	$effect(() => {
+		if (!active) return;
+		window.addEventListener('touchmove', holdPage, { passive: false });
+		return () => window.removeEventListener('touchmove', holdPage);
+	});
+
+	/** Pointerup for a move or a resize: both end the same way. A press released early is a tap. */
+	function gestureEnd(event: PointerEvent) {
+		if (event.pointerId !== gesturePointer || event.button !== 0) return;
+		if (active) endInteraction(event);
+		stopGesture();
+	}
+
+	function stopListening() {
+		endPress();
 		window.removeEventListener('pointermove', move);
 		window.removeEventListener('pointermove', resize);
 		window.removeEventListener('pointerup', gestureEnd);
 		window.removeEventListener('pointercancel', cancelGesture);
+	}
+
+	/** Lets go of the pointer and of the grid's gesture slot. */
+	function stopGesture() {
+		stopListening();
+		gesturePointer = undefined;
+		gridParams.releaseGesture(item.id);
 	}
 
 	/**
@@ -462,8 +545,9 @@
 	 * gesture): nothing is dropped, and items that made way for a shift drag go back. The
 	 * browser releases pointer capture itself after pointercancel.
 	 */
-	function cancelGesture() {
-		removeGestureListeners();
+	function cancelGesture(event: PointerEvent) {
+		if (event.pointerId !== gesturePointer) return;
+		stopGesture();
 		if (!active) return;
 		previewItem = { ...item };
 		abortShift();
@@ -497,16 +581,17 @@
 	const _resizable = $derived(!gridParams.readOnly && item.resizable);
 
 	function resizeStart(event: PointerEvent) {
-		if (event.button !== 0) return;
-		event.stopPropagation();
+		beginGesture(event, startResize);
+	}
+
+	function startResize(event: PointerEvent) {
 		initInteraction(event);
 		initialSize = { width, height };
 		window.addEventListener('pointermove', resize);
-		window.addEventListener('pointerup', gestureEnd);
-		window.addEventListener('pointercancel', cancelGesture);
 	}
 
 	function resize(event: PointerEvent) {
+		if (event.pointerId !== gesturePointer) return;
 		if (!gridParams.itemSize) {
 			throw new Error('Grid is not mounted yet');
 		}
@@ -605,6 +690,16 @@
 	}
 
 	const hasMoveHandle = $derived(!!moveHandle);
+
+	/**
+	 * A finger on a draggable item may still scroll the page; `holdPage` stops it once a drag has
+	 * started. With no touch delay a touch drags at once, so the item cannot scroll at all, and
+	 * an item that cannot be dragged from its body leaves `touch-action` to the page.
+	 */
+	const touchAction = $derived.by(() => {
+		if (!_movable || hasMoveHandle) return '';
+		return gridParams.touchDelay > 0 ? 'touch-action: manipulation;' : 'touch-action: none;';
+	});
 </script>
 
 <div
@@ -614,8 +709,10 @@
 	class:active-default={!activeClass && active}
 	class:non-active-default={!active}
 	onpointerdown={_movable && !hasMoveHandle ? moveStart : undefined}
+	oncontextmenu={holdMenu}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
-			${_movable && !hasMoveHandle ? 'cursor: move;' : ''} touch-action: none; user-select: none;
+			${_movable && !hasMoveHandle ? 'cursor: move;' : ''} ${touchAction} user-select: none;
+			-webkit-user-select: none; -webkit-touch-callout: none;
 			${style}`}
 	bind:this={itemRef}
 >

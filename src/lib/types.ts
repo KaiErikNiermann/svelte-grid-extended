@@ -54,6 +54,12 @@ export type GridParams = {
 	readOnly: boolean;
 	debug: boolean;
 	collision: Collision;
+	/** How long, in ms, a finger or pen is held on an item before its drag starts; 0 starts at once. */
+	touchDelay: number;
+	/** Takes the grid's one gesture slot for `id`; false while another item's gesture runs. */
+	claimGesture: (id: string) => boolean;
+	/** Frees the gesture slot if `id` holds it. */
+	releaseGesture: (id: string) => void;
 	registerItem: (item: LayoutItem) => void;
 	unregisterItem: (item: LayoutItem) => void;
 	/** Re-validates an item whose position or size changed outside the grid's own moves. */
