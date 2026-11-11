@@ -88,6 +88,11 @@ export default tseslint.config(
 			parserOptions: {
 				parser: tseslint.parser
 			}
+		},
+		rules: {
+			// `{@render snippet()}` is template syntax, not a use of a call's return value; the
+			// rule reads it as one and flags every snippet render.
+			'sonarjs/no-use-of-empty-return-value': 'off'
 		}
 	},
 
