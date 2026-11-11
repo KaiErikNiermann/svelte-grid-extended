@@ -50,7 +50,7 @@
 	.palette-footer {
 		margin: 0;
 		padding: 0.5rem 1rem;
-		font-size: 0.75rem;
+		font-size: 0.875rem;
 		color: hsl(var(--muted-foreground));
 	}
 
@@ -71,7 +71,8 @@
 	ninja-keys {
 		--ninja-width: min(40rem, calc(100vw - 2rem));
 		--ninja-top: 12%;
-		--ninja-font-size: 0.875rem;
+		/* Entries render at 0.8125em and group headings at 0.75em of this: about 14.6px and 13.5px. */
+		--ninja-font-size: 1.125rem;
 		--ninja-z-index: 60;
 		--ninja-text-color: hsl(var(--foreground));
 		--ninja-accent-color: hsl(var(--primary));
