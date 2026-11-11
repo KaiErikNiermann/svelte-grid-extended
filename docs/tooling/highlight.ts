@@ -1,4 +1,7 @@
 import { transformerTwoslash, rendererRich, defaultHoverInfoProcessor } from '@shikijs/twoslash';
+import type { ElementContent } from 'hast';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { toHast } from 'mdast-util-to-hast';
 import { escapeSvelte } from 'mdsvex';
 import { codeToHtml } from 'shiki';
 import path from 'node:path';
@@ -52,12 +55,32 @@ const LEGACY_INSTANCE_TYPE = /^type \w+ = \{\n\s+\$on\?[\s\S]*?\n\}\n(?=const )/
 const processHoverInfo = (info: string): string =>
 	defaultHoverInfoProcessor(info).replace(LEGACY_INSTANCE_TYPE, '');
 
+/** Hover docs are JSDoc, i.e. Markdown: rendered so `code`, emphasis and links show as such. */
+function renderMarkdown(markdown: string): ElementContent[] {
+	const tree = toHast(fromMarkdown(markdown));
+	return tree.type === 'root' ? (tree.children as ElementContent[]) : [tree as ElementContent];
+}
+
+/** The same for inline places (a tag's text): one paragraph renders as its contents. */
+function renderMarkdownInline(markdown: string): ElementContent[] {
+	const nodes = renderMarkdown(markdown);
+	const [only] = nodes;
+	return nodes.length === 1 && only?.type === 'element' && only.tagName === 'p'
+		? only.children
+		: nodes;
+}
+
 const twoslash = transformerTwoslash({
 	// Blocks opt in with a `twoslash` meta on the fence, so a page can keep illustrative fragments.
 	explicitTrigger: true,
 	langs: ['ts', 'typescript', 'svelte'],
 	twoslasher,
-	renderer: rendererRich({ errorRendering: 'hover', processHoverInfo })
+	renderer: rendererRich({
+		errorRendering: 'hover',
+		processHoverInfo,
+		renderMarkdown,
+		renderMarkdownInline
+	})
 });
 
 const normalizeLanguage = (lang: string | null | undefined): string => {

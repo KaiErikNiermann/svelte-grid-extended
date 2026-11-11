@@ -119,11 +119,21 @@
 	}
 
 	.twoslash .twoslash-popup-docs {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
 		font-size: var(--popup-docs-size);
 		line-height: var(--popup-docs-leading);
 		color: hsl(var(--muted-foreground));
 		border-block-start: 1px solid hsl(var(--border));
 		user-select: text;
+	}
+
+	/* Docs are rendered Markdown, so they hold <p> and <code>: the block owns the spacing, and
+	   the page's prose rules (margins, a taller line height) do not reach in. */
+	.twoslash .twoslash-popup-docs :is(p, ul, ol) {
+		margin: 0;
+		line-height: inherit;
 	}
 
 	.twoslash .twoslash-popup-docs-tags {
