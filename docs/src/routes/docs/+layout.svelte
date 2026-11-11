@@ -19,8 +19,8 @@
 	let activeId = $state('');
 
 	// A heading counts as the one being read from the moment it passes this far below the top
-	// of the scrolling pane.
-	const READING_LINE_PX = 96;
+	// of the viewport: the sticky header (56px) and a little more.
+	const READING_LINE_PX = 152;
 
 	/** The page's h2 and h3, read from the rendered Markdown; rehype-slug gives them their ids. */
 	function readHeadings(): Heading[] {
@@ -32,10 +32,11 @@
 		}));
 	}
 
-	/** The last heading above the reading line; the last one outright once the pane is scrolled to its end. */
-	function findActive(pane: HTMLElement): string {
-		const line = pane.getBoundingClientRect().top + READING_LINE_PX;
-		const atEnd = pane.scrollTop + pane.clientHeight >= pane.scrollHeight - 1;
+	/** The last heading above the reading line; the last one outright once the page is scrolled to its end. */
+	function findActive(): string {
+		const line = READING_LINE_PX;
+		const page = document.documentElement;
+		const atEnd = window.scrollY + window.innerHeight >= page.scrollHeight - 1;
 		if (atEnd && headings.length > 0) return headings.at(-1)?.id ?? '';
 		let active = headings[0]?.id ?? '';
 		for (const { id } of headings) {
@@ -80,18 +81,17 @@
 	});
 
 	$effect(() => {
-		const pane = content?.closest('main');
-		if (!pane || headings.length === 0) return;
+		if (headings.length === 0) return;
 		let frame = 0;
 		const update = () => {
 			cancelAnimationFrame(frame);
-			frame = requestAnimationFrame(() => (activeId = findActive(pane)));
+			frame = requestAnimationFrame(() => (activeId = findActive()));
 		};
 		update();
-		pane.addEventListener('scroll', update, { passive: true });
+		window.addEventListener('scroll', update, { passive: true });
 		return () => {
 			cancelAnimationFrame(frame);
-			pane.removeEventListener('scroll', update);
+			window.removeEventListener('scroll', update);
 		};
 	});
 </script>

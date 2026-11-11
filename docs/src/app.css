@@ -52,11 +52,6 @@
 
 	body {
 		@apply bg-background text-foreground;
-		overflow: hidden;
-	}
-
-	html {
-		scroll-behavior: smooth;
 	}
 
 	html,
@@ -141,10 +136,10 @@
 		@apply hidden;
 	}
 
-	/* Narrow panes: a bar pinned to the top of the scrolling pane, naming the section being read;
-	   it opens a list that overlays the page rather than pushing it down. */
+	/* Narrow panes: a bar pinned under the header, naming the section being read; it opens a
+	   list that overlays the page rather than pushing it down. */
 	.toc-mobile {
-		@apply sticky top-0 z-10 mb-6 border-b border-border bg-background;
+		@apply sticky top-14 z-10 mb-6 border-b border-border bg-background;
 	}
 
 	.toc-mobile > summary {
@@ -172,9 +167,9 @@
 		max-block-size: 60dvh;
 	}
 
-	/* Jumping to a heading leaves it below the bar instead of under it. */
+	/* Jumping to a heading leaves it below the header and the bar instead of under them. */
 	.docs-frame .prose :is(h2, h3)[id] {
-		scroll-margin-block-start: 4rem;
+		scroll-margin-block-start: 7.5rem;
 	}
 
 	@container (min-width: 60rem) {
@@ -183,7 +178,7 @@
 		}
 
 		.docs-frame .prose :is(h2, h3)[id] {
-			scroll-margin-block-start: 1rem;
+			scroll-margin-block-start: 4.5rem;
 		}
 
 		.docs-layout[data-toc='true'] {
@@ -191,7 +186,7 @@
 		}
 
 		.docs-layout[data-toc='true'] > .toc-side {
-			@apply sticky top-0 flex flex-col gap-2 self-start overflow-y-auto;
+			@apply sticky top-20 flex flex-col gap-2 self-start overflow-y-auto;
 			max-block-size: calc(100dvh - 8rem);
 		}
 	}
