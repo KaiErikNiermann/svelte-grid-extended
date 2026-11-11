@@ -1,9 +1,9 @@
-import { transformerTwoslash, rendererRich } from '@shikijs/twoslash';
+import { transformerTwoslash, rendererRich, defaultHoverInfoProcessor } from '@shikijs/twoslash';
 import { escapeSvelte } from 'mdsvex';
 import { codeToHtml } from 'shiki';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createTwoslasher } from 'twoslash-svelte';
+import { createTwoslasher } from './twoslash-svelte-props.ts';
 
 const SHIKI_THEMES = {
 	light: 'github-light',
@@ -45,12 +45,19 @@ const twoslasher = createTwoslasher({
 	}
 });
 
+// A Svelte 5 component is declared as `const Grid: Component<...>` plus `type Grid =
+// ReturnType<typeof Grid>`, and TypeScript prints the second as the legacy `{ $on?, $set? }`
+// shape. Only the `const` line says anything about the component.
+const LEGACY_INSTANCE_TYPE = /^type \w+ = \{\n\s+\$on\?[\s\S]*?\n\}\n(?=const )/;
+const processHoverInfo = (info: string): string =>
+	defaultHoverInfoProcessor(info).replace(LEGACY_INSTANCE_TYPE, '');
+
 const twoslash = transformerTwoslash({
 	// Blocks opt in with a `twoslash` meta on the fence, so a page can keep illustrative fragments.
 	explicitTrigger: true,
 	langs: ['ts', 'typescript', 'svelte'],
 	twoslasher,
-	renderer: rendererRich({ errorRendering: 'hover' })
+	renderer: rendererRich({ errorRendering: 'hover', processHoverInfo })
 });
 
 const normalizeLanguage = (lang: string | null | undefined): string => {
@@ -81,9 +88,13 @@ export async function highlight(
 		return `{@html \`${escapeSvelte(html)}\`}`;
 	} catch (error) {
 		const where = path.relative(docsRoot, filename ?? '<unknown>');
-		const head = code.split('\n').slice(0, 3).join('\n');
+		// The offsets in twoslash's error list are into generated code, so show the whole block.
+		const block = code
+			.split('\n')
+			.map((line, index) => `${String(index + 1).padStart(3)} | ${line}`)
+			.join('\n');
 		const reason = error instanceof Error ? error.message : String(error);
-		throw new Error(`${where}: ${safeLang} block failed\n${head}\n...\n${reason}`, {
+		throw new Error(`${where}: ${safeLang} block failed\n${block}\n\n${reason}`, {
 			cause: error
 		});
 	}
