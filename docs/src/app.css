@@ -253,15 +253,17 @@ pre.shiki:hover .code-copy-button {
 	opacity: 1;
 }
 
-.code-copy-button::before {
-	content: '⧉';
-	font-size: 1rem;
-	line-height: 1;
+.code-copy-icon {
+	@apply h-4 w-4;
 }
 
-.code-copy-button[data-copied='true']::before {
-	content: '✓';
-	color: #22c55e;
+.code-copy-icon-done,
+.code-copy-button[data-copied='true'] .code-copy-icon-idle {
+	@apply hidden;
+}
+
+.code-copy-button[data-copied='true'] .code-copy-icon-done {
+	@apply block text-primary;
 }
 
 /* Grid demo item styles */

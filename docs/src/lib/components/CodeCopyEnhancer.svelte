@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { mount, onMount, tick } from 'svelte';
+	import { Check, Copy } from 'lucide-svelte';
 	import { afterNavigate } from '$app/navigation';
 
 	const COPY_LABEL = 'Copy code';
@@ -18,6 +19,9 @@
 			button.setAttribute('aria-label', COPY_LABEL);
 			button.setAttribute('title', COPY_LABEL);
 			button.dataset.copied = 'false';
+			// Both glyphs are in the button; the stylesheet shows the one the copied state asks for.
+			mount(Copy, { target: button, props: { class: 'code-copy-icon code-copy-icon-idle' } });
+			mount(Check, { target: button, props: { class: 'code-copy-icon code-copy-icon-done' } });
 
 			button.addEventListener('click', async () => {
 				const codeEl = pre.querySelector('code');
@@ -28,6 +32,12 @@
 					button.setAttribute('title', COPIED_LABEL);
 					window.setTimeout(() => {
 						button.dataset.copied = 'false';
+						// Both glyphs are in the button; the stylesheet shows the one the copied state asks for.
+						mount(Copy, { target: button, props: { class: 'code-copy-icon code-copy-icon-idle' } });
+						mount(Check, {
+							target: button,
+							props: { class: 'code-copy-icon code-copy-icon-done' }
+						});
 						button.setAttribute('title', COPY_LABEL);
 					}, 2000);
 				} catch {
