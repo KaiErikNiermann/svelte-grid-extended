@@ -22,6 +22,9 @@
 			return;
 		}
 
+		// A first load starts at the top already, and the reader may have scrolled the prerendered
+		// page before it hydrated: resetting then threw them back to the top.
+		if (type === 'enter') return;
 		mainEl?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 	});
 </script>
