@@ -190,16 +190,20 @@
 		{
 			id: 'P7',
 			title: 'A full fixed-size grid frees a cell',
-			steps: 'Click "Add n", then "Remove b".',
+			steps: 'Click "Add n" once or more, then "Remove b".',
 			expect:
-				'The 2 x 1 grid is full, so n has to overlap a. When b is removed, n moves into the freed cell.',
+				'The 2 x 1 grid is full, so each n has to overlap a. Removing b frees one cell: the first n moves into it and any others keep overlapping, since the grid has no other cell to give them.',
 			modes: ['none'],
 			cols: 2,
 			rows: 1,
 			items: [cell('a', 0, 0), cell('b', 1, 0)],
 			actions: [
 				{ label: 'Add n', apply: (items) => [...items, { id: freshId(items), w: 1, h: 1 }] },
-				{ label: 'Remove b', apply: (items) => items.filter((it) => it.id !== 'b') }
+				{
+					label: 'Remove b',
+					apply: (items) => items.filter((it) => it.id !== 'b'),
+					enabled: (items) => items.some((it) => it.id === 'b')
+				}
 			]
 		}
 	];

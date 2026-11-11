@@ -95,7 +95,11 @@
 	<code class="text-sm font-semibold">{mode}</code>
 	<div class="flex flex-wrap gap-2">
 		{#each scenario.actions ?? [] as action (action.label)}
-			<button class="btn btn-sm btn-primary" onclick={() => (items = action.apply(items))}>
+			<button
+				class="btn btn-sm btn-primary"
+				disabled={action.enabled ? !action.enabled(items) : false}
+				onclick={() => (items = action.apply(items))}
+			>
 				{action.label}
 			</button>
 		{/each}

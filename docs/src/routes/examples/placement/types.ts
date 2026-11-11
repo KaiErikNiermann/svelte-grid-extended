@@ -3,7 +3,12 @@ import type { Collision } from '@appulsauce/svelte-grid';
 export type Spec = { id: string; x?: number; y?: number; w: number; h: number };
 
 /** A button that changes the layout the way an app would: through the items it renders. */
-export type Action = { label: string; apply: (items: Spec[]) => Spec[] };
+export type Action = {
+	label: string;
+	apply: (items: Spec[]) => Spec[];
+	/** Whether the action can do anything now; the button is disabled when it cannot. */
+	enabled?: (items: Spec[]) => boolean;
+};
 
 export type ScenarioSpec = {
 	/** Stable id to refer to the case by, e.g. "S3"; also its anchor on the page. */
