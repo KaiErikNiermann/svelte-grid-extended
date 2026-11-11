@@ -66,6 +66,12 @@
 			category: 'collision'
 		},
 		{
+			slug: 'touch',
+			title: 'Touch',
+			description: 'Cards built for fingers: hold to lift, swipe to scroll',
+			category: 'interaction'
+		},
+		{
 			slug: 'placement',
 			title: 'Placement Scenarios',
 			description: 'Numbered cases of how each mode places items',

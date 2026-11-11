@@ -102,7 +102,7 @@ The property also brings paint containment, which has two effects while it is on
 
 ## Touch Screens
 
-On a touch screen a grid can fill the whole screen, so a finger on an item must still be able to scroll the page. A finger or pen therefore has to be held still on an item for `touchDelay` milliseconds (300 by default) before its drag starts; the item is then shown as active and follows the finger. A finger that moves before then scrolls the page as usual, and a quick tap does nothing. A mouse always drags at once.
+On a touch screen a grid can fill the whole screen, so a finger on an item must still be able to scroll the page. A finger or pen therefore has to be held still on an item for `touchDelay` milliseconds (300 by default) before its drag starts; the item is then shown as active and follows the finger. A finger that moves before then scrolls the page as usual, and a quick tap does nothing. A mouse always drags at once. While the finger is held, before the drag starts, the item has a `data-holding` attribute, so a page can show that the press is being counted, as the Touch example does with a bar that fills over `touchDelay`.
 
 Some parts of an item start at the first touch, because the browser could not scroll from them anyway: the default resize handle, and any handle of your own with `touch-action: none` (see Customization). While a drag runs, the page does not scroll or zoom under it, and a second finger neither moves the dragged item nor starts a drag on another item of the same grid.
 
