@@ -26,7 +26,8 @@ export default tseslint.config(
 			'.svelte-kit/',
 			'docs/build/',
 			'docs/.svelte-kit/',
-			'docs/node_modules/'
+			'docs/node_modules/',
+			'docs/src/lib/vendor/'
 		]
 	},
 
