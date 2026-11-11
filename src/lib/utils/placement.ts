@@ -3,7 +3,7 @@ import { getAvailablePosition, getCollisions, hasCollisions } from './grid';
 import { clamp } from './item';
 
 export type Limits = { maxCols: number; maxRows: number };
-type Box = Pick<LayoutItem, 'x' | 'y' | 'w' | 'h'>;
+export type Box = Pick<LayoutItem, 'x' | 'y' | 'w' | 'h'>;
 
 /**
  * The closest box to `box` that fits inside the grid's fixed limits: the size is capped at

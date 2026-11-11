@@ -15,7 +15,7 @@ export type { LayoutSpec } from './fixtures/layout-types';
 
 /** Cell size used by every harness grid; with `gap: 0` a cell's pixel origin is `x * CELL`. */
 export const CELL = 100;
-export const MODES: readonly Collision[] = ['none', 'push', 'compress'];
+export const MODES: readonly Collision[] = ['none', 'push', 'compress', 'shift'];
 /** Item size given in full, so items mount before the first resize, as in a browser. */
 export const FIXED_SIZE = { itemSize: { width: CELL, height: CELL } };
 
@@ -77,6 +77,8 @@ export type LayoutComponent = {
 	getController: () => import('../../src/lib/types').GridController | undefined;
 };
 
+export type DragStep = readonly [number, number] | (() => void | Promise<void>);
+
 export type MountedLayout = {
 	component: LayoutComponent;
 	container: HTMLElement;
@@ -87,6 +89,11 @@ export type MountedLayout = {
 	drag: (id: string, dx: number, dy: number, during?: () => Promise<void>) => Promise<void>;
 	/** A drag through several pointer moves, each in cells from the start; push reacts to each. */
 	dragPath: (id: string, path: readonly (readonly [number, number])[]) => Promise<void>;
+	/**
+	 * A drag whose steps are pointer moves (in cells from the start) or changes the page makes
+	 * mid-drag. With `fast`, moves are not followed by a settle, so several arrive in one tick.
+	 */
+	dragSteps: (id: string, steps: readonly DragStep[], options?: { fast?: boolean }) => Promise<void>;
 	resize: (id: string, dw: number, dh: number, during?: () => Promise<void>) => Promise<void>;
 	drawn: () => Record<string, { x: number; y: number; w: number; h: number }>;
 	gridElement: () => HTMLElement;
@@ -120,17 +127,27 @@ export function mountLayout(options: {
 		h: (Number.parseFloat(height) + gap) / pitch
 	});
 
-	async function gesture(selector: string, path: readonly (readonly [number, number])[], during?: () => Promise<void>) {
+	async function gesture(
+		selector: string,
+		steps: readonly DragStep[],
+		during?: () => Promise<void>,
+		options: { fast?: boolean } = {}
+	) {
 		const handle = container.querySelector(selector);
 		if (!handle) throw new Error(`nothing matches ${selector}`);
 		pointer(handle, 'pointerdown', 0, 0);
-		for (const [dx, dy] of path) {
-			pointer(window, 'pointermove', dx * pitch, dy * pitch);
-			await settle();
+		let last: readonly [number, number] = [0, 0];
+		for (const step of steps) {
+			if (typeof step === 'function') {
+				await step();
+				continue;
+			}
+			last = step;
+			pointer(window, 'pointermove', step[0] * pitch, step[1] * pitch);
+			if (!options.fast) await settle();
 		}
 		if (during) await during();
-		const [endX, endY] = path.at(-1) ?? [0, 0];
-		pointer(window, 'pointerup', endX * pitch, endY * pitch);
+		pointer(window, 'pointerup', last[0] * pitch, last[1] * pitch);
 		await settle();
 	}
 
@@ -145,6 +162,7 @@ export function mountLayout(options: {
 		pitch,
 		drag: (id, dx, dy, during) => gesture(`.it-${id}`, [[dx, dy]], during),
 		dragPath: (id, path) => gesture(`.it-${id}`, path),
+		dragSteps: (id, steps, options) => gesture(`.it-${id}`, steps, undefined, options),
 		resize: (id, dw, dh, during) => gesture(`.it-${id} .resizer-default`, [[dw, dh]], during),
 		drawn: () =>
 			Object.fromEntries(

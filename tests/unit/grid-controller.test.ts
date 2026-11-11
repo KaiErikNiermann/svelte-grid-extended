@@ -33,6 +33,9 @@ describe('GridController firstAvailablePosition', () => {
 		settleItem: () => {
 			/* .. */
 		},
+		setDragTarget: () => {
+			/* .. */
+		},
 		updateGrid: () => {
 			/* .. */
 		},

@@ -58,6 +58,8 @@ export type GridParams = {
 	unregisterItem: (item: LayoutItem) => void;
 	/** Re-validates an item whose position or size changed outside the grid's own moves. */
 	settleItem: (item: LayoutItem) => void;
+	/** The cell a shift-mode drag is heading for, which placement treats as taken; null ends it. */
+	setDragTarget: (target: (Size & Position & { id: string }) | null) => void;
 	updateGrid: () => void;
 	onchange: (detail: LayoutChangeDetail) => void;
 };
@@ -66,7 +68,7 @@ export type LayoutChangeDetail = {
 	item: LayoutItem;
 };
 
-export type Collision = 'none' | 'push' | 'compress';
+export type Collision = 'none' | 'push' | 'compress' | 'shift';
 
 export type GridController = {
 	gridParams: GridParams;

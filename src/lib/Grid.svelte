@@ -22,12 +22,14 @@
 	import { findGridSize } from './utils/breakpoints';
 	import { offscreenCss, watchOffscreen, type OffscreenState } from './utils/offscreen';
 	import { getGridDimensions, hasCollisions } from './utils/grid';
+	import { nearestFree, overlaps, type Placed } from './utils/displace';
 	import {
 		assignBox,
 		clampToLimits,
 		hasPosition,
 		pushAside,
 		relocateIfColliding,
+		type Box,
 		type Limits
 	} from './utils/placement';
 	import { GridController } from './GridController';
@@ -232,6 +234,11 @@
 		const positioned = hasPosition(item);
 		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
 		const moved = !positioned || box.x !== item.x || box.y !== item.y;
+		if (collision === 'shift') {
+			const changed = assignBox(item, moved || overlapsTaken({ ...item, ...box }) ? nearestFreeBox(item, box) : box);
+			trackPlacement(item);
+			return changed;
+		}
 		if (!moved && collision !== 'push') return assignBox(item, box);
 		const others = Object.values(items);
 		// The common push case, an item declared on a free cell, costs one scan and no tracking.
@@ -239,6 +246,28 @@
 		const changed = assignBox(item, relocateIfColliding(item, box, others, limits()));
 		trackPlacement(item);
 		return changed;
+	}
+
+	// Shift mode: the cell a drag is heading for counts as taken, so an item added or moved
+	// there mid-drag goes to the nearest free cell instead of ending up under the drop.
+	let dragTarget: Placed | null = null;
+
+	function setDragTarget(target: Placed | null): void {
+		dragTarget = target;
+	}
+
+	/** Everything `item` must keep off in shift mode: the other items and the drag target. */
+	function takenFor(item: LayoutItem): Placed[] {
+		const others: Placed[] = Object.values(items).filter((other) => other.id !== item.id);
+		return dragTarget && dragTarget.id !== item.id ? [...others, dragTarget] : others;
+	}
+
+	const overlapsTaken = (item: LayoutItem) => takenFor(item).some((taken) => overlaps(item, taken));
+
+	/** The free cell nearest to `box`, or `box` itself when the grid has none. */
+	function nearestFreeBox(item: LayoutItem, box: Box): Box {
+		const free = nearestFree({ ...item, ...box }, box, takenFor(item), { cols: maxCols, rows: maxRows });
+		return free ? { ...box, ...free } : box;
 	}
 
 	function registerItem(item: LayoutItem): void {
@@ -260,7 +289,10 @@
 	 * are pushed aside, the same rule a drag follows. `none` mode applies the props as given.
 	 */
 	function settleItem(item: LayoutItem): void {
-		const changed = assignBox(item, clampToLimits(item, limits()));
+		let changed = assignBox(item, clampToLimits(item, limits()));
+		if (collision === 'shift' && dragTarget && dragTarget.id !== item.id && overlaps(item, dragTarget)) {
+			changed = assignBox(item, nearestFreeBox(item, item)) || changed;
+		}
 		if (collision !== 'none') {
 			for (const other of pushAside(item, Object.values(items), limits())) other.invalidate();
 		}
@@ -321,6 +353,7 @@
 		registerItem,
 		unregisterItem,
 		settleItem,
+		setDragTarget,
 		updateGrid,
 		onchange: handleChange
 	});

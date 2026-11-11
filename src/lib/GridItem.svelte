@@ -4,6 +4,7 @@
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
 	import { blockingRow, hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
 	import { assignBox, parseCoordinate, parseSize } from './utils/placement';
+	import { displaceStep, type DragState, type Placed } from './utils/displace';
 
 	import type { LayoutItem, GridItemProps } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -123,10 +124,9 @@
 			// A drag or resize only removes its window listeners on pointerup. Destroyed
 			// mid-gesture (the item removed, or its grid), they stayed attached, kept the
 			// destroyed item alive and threw on the next pointerup.
-			window.removeEventListener('pointermove', move);
-			window.removeEventListener('pointerup', moveEnd);
-			window.removeEventListener('pointermove', resize);
-			window.removeEventListener('pointerup', resizeEnd);
+			removeGestureListeners();
+			// Destroyed mid-drag: the drag never drops, so items that made way go back.
+			abortShift();
 			gridParams.unregisterItem(item);
 		};
 	});
@@ -181,6 +181,8 @@
 	function endInteraction(event: PointerEvent) {
 		applyPreview();
 		active = false;
+		shiftState = undefined;
+		gridParams.setDragTarget(null);
 		// Props may have moved another item onto this one during the gesture.
 		gridParams.settleItem(item);
 		initialPointerPosition.left = 0;
@@ -200,8 +202,9 @@
 		event.stopPropagation();
 		initInteraction(event);
 		initialPosition = { left, top };
+		if (gridParams.collision === 'shift') startShift();
 		window.addEventListener('pointermove', move);
-		window.addEventListener('pointerup', moveEnd);
+		window.addEventListener('pointerup', gestureEnd);
 	}
 
 	function move(event: PointerEvent) {
@@ -233,8 +236,13 @@
 		// Snap and handle collisions
 		const snapParams = gridParams as SnapGridParams;
 		const { x: newX, y: newY } = snapOnMove(left, top, previewItem, snapParams);
+		movePreview(newX, newY);
+	}
 
-		if (gridParams.collision === 'none') {
+	function movePreview(newX: number, newY: number) {
+		if (gridParams.collision === 'shift') {
+			moveWithShift(newX, newY);
+		} else if (gridParams.collision === 'none') {
 			if (!hasCollisions({ ...previewItem, x: newX, y: newY }, Object.values(gridParams.items))) {
 				previewItem = { ...previewItem, x: newX, y: newY };
 			}
@@ -323,6 +331,88 @@
 		}
 	}
 
+	// SHIFT: the other items make way around the drag, recomputed from where they were when it
+	// started, so an item that moved aside returns once the drag moves on.
+
+	let shiftSnapshot = new Map<string, Placed>();
+	/** Where the last applied layout put each item; a different position means the app moved it. */
+	let shiftExpected = new Map<string, { x: number; y: number }>();
+	let shiftState: DragState | undefined;
+
+	const placed = ({ id: pid, x: px, y: py, w: pw, h: ph }: LayoutItem): Placed => ({
+		id: pid,
+		x: px,
+		y: py,
+		w: pw,
+		h: ph
+	});
+
+	function startShift() {
+		shiftSnapshot = new Map();
+		shiftExpected = new Map();
+		shiftState = { displaced: new Set(), target: { x: item.x, y: item.y }, layout: new Map() };
+		gridParams.setDragTarget(placed(item));
+	}
+
+	/** Takes items added, removed or moved by the app during the drag into the snapshot. */
+	function refreshShiftSnapshot() {
+		const others = Object.values(gridParams.items).filter((other) => other.id !== item.id);
+		const live = new Set(others.map((other) => other.id));
+		for (const id of shiftSnapshot.keys()) if (!live.has(id)) shiftSnapshot.delete(id);
+		for (const other of others) {
+			const expected = shiftExpected.get(other.id);
+			if (!expected || expected.x !== other.x || expected.y !== other.y) {
+				shiftSnapshot.set(other.id, placed(other));
+				shiftExpected.set(other.id, { x: other.x, y: other.y });
+			}
+		}
+	}
+
+	/** Ends a shift drag without a drop: items the drag moved go back where they started, when that cell is still free. */
+	function abortShift() {
+		if (!shiftState) return;
+		for (const [otherId, start] of shiftSnapshot) {
+			const other = gridParams.items[otherId];
+			const expected = shiftExpected.get(otherId);
+			// Skip items the app moved itself during the drag, and ones already home.
+			if (!other || !expected || other.x !== expected.x || other.y !== expected.y) continue;
+			if (other.x === start.x && other.y === start.y) continue;
+			if (hasCollisions({ ...other, x: start.x, y: start.y }, Object.values(gridParams.items))) continue;
+			other.x = start.x;
+			other.y = start.y;
+			other.invalidate();
+		}
+		shiftState = undefined;
+		gridParams.setDragTarget(null);
+	}
+
+	function moveWithShift(newX: number, newY: number) {
+		if (!shiftState) return;
+		refreshShiftSnapshot();
+		const { itemSize, gap, maxCols, maxRows } = gridParams as SnapGridParams;
+		// The live, unsnapped position in cells: how far the drag has come over its neighbours.
+		// Inverse of calcPosition: $\text{left} = x \cdot (\text{width} + gap) + gap$.
+		const approach = { x: (left - gap) / (itemSize.width + gap), y: (top - gap) / (itemSize.height + gap) };
+		const step = displaceStep([...shiftSnapshot.values()], previewItem, approach, { x: newX, y: newY }, shiftState, {
+			cols: maxCols,
+			rows: maxRows
+		});
+		shiftState = step;
+		if (!step.changed) return;
+		for (const [otherId, cell] of step.layout) {
+			shiftExpected.set(otherId, cell);
+			const other = gridParams.items[otherId];
+			if (other && (other.x !== cell.x || other.y !== cell.y)) {
+				other.x = cell.x;
+				other.y = cell.y;
+				other.invalidate();
+			}
+		}
+		previewItem = { ...previewItem, ...step.target };
+		gridParams.setDragTarget(placed(previewItem));
+		gridParams.updateGrid();
+	}
+
 	function movePreviewWithCollisions(x: number, y: number) {
 		if (gridParams.collision === 'compress') {
 			movePreviewWithCollisionsWithCompress(x, y);
@@ -331,11 +421,17 @@
 		}
 	}
 
-	function moveEnd(event: PointerEvent) {
+	/** Pointerup for a move or a resize: both end the same way. */
+	function gestureEnd(event: PointerEvent) {
 		if (event.button !== 0) return;
 		endInteraction(event);
+		removeGestureListeners();
+	}
+
+	function removeGestureListeners() {
 		window.removeEventListener('pointermove', move);
-		window.removeEventListener('pointerup', moveEnd);
+		window.removeEventListener('pointermove', resize);
+		window.removeEventListener('pointerup', gestureEnd);
 	}
 
 	// RESIZE ITEM LOGIC
@@ -368,7 +464,7 @@
 		initInteraction(event);
 		initialSize = { width, height };
 		window.addEventListener('pointermove', resize);
-		window.addEventListener('pointerup', resizeEnd);
+		window.addEventListener('pointerup', gestureEnd);
 	}
 
 	function resize(event: PointerEvent) {
@@ -435,13 +531,6 @@
 		} else {
 			resizePreviewWithCollisionsWithPush(w, h);
 		}
-	}
-
-	function resizeEnd(event: PointerEvent) {
-		if (event.button !== 0) return;
-		endInteraction(event);
-		window.removeEventListener('pointermove', resize);
-		window.removeEventListener('pointerup', resizeEnd);
 	}
 
 	function compressItems() {
