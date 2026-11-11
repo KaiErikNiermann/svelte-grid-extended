@@ -20,7 +20,7 @@
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
-	import { offscreenCss, watchOffscreen, type OffscreenState } from './utils/offscreen';
+	import { offscreenCss } from './utils/offscreen';
 	import { getGridDimensions, hasCollisions } from './utils/grid';
 	import { nearestFree, overlaps, type Placed } from './utils/displace';
 	import {
@@ -106,6 +106,16 @@
 		 * @default true
 		 */
 		autoCompress?: boolean;
+		/**
+		 * Lets the browser skip rendering the grid while it is away from the viewport
+		 * (`content-visibility: auto`), which keeps scrolling smooth on pages with many grids. It
+		 * clips whatever items draw outside the grid and makes the grid the containing block of
+		 * `position: fixed` content in it (popovers and dialogs in the top layer are not affected),
+		 * so set it to `false` for a grid whose items show menus or tooltips past its edges. It is
+		 * off during a drag or resize either way.
+		 * @default true
+		 */
+		skipOffscreen?: boolean;
 		/** Bind to it (`bind:controller`) for `getFirstAvailablePosition` and `compress`. */
 		controller?: GridControllerType;
 		/** Called when any item's position or size changes. */
@@ -134,6 +144,7 @@
 		style = '',
 		collision = 'none',
 		autoCompress = true,
+		skipOffscreen = true,
 		controller = $bindable(),
 		onchange,
 		children
@@ -236,12 +247,10 @@
 		});
 
 		sizeObserver.observe(gridContainer);
-		const stopWatching = watchOffscreen(gridContainer, (state) => (offscreen = state));
 
 		return () => {
 			destroyed = true;
 			sizeObserver.disconnect();
-			stopWatching();
 		};
 	});
 
@@ -442,13 +451,14 @@
 
 	setContext(GRID_CONTEXT_NAME, contextRef);
 
-	// Rendering is skipped while the grid is far off screen; see offscreenCss.
-	let offscreen = $state<OffscreenState>();
+	// The browser may skip rendering the grid away from the viewport; see offscreenCss. Not during
+	// a drag or resize, whose item may be drawn outside the grid.
+	const skipping = $derived(skipOffscreen && dragTarget === null);
 
 	const containerCss = $derived.by(() => {
 		const width = containerWidth ? `${containerWidth}px` : '100%';
 		const height = containerHeight ? `${containerHeight}px` : '100%';
-		return `width: ${width}; height: ${height}; ${offscreenCss(offscreen)} ${style}`;
+		return `width: ${width}; height: ${height}; ${offscreenCss(skipping)} ${style}`;
 	});
 </script>
 

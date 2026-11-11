@@ -188,7 +188,15 @@ export function mountLayout(options: {
 	onchange?: (id: string) => void;
 }): MountedLayout {
 	const { component, container, unmount } = render(Layout, {
-		props: { grid: { gap: 0, ...options.grid }, initial: options.items, onchange: options.onchange }
+		// skipOffscreen is off unless a test turns it on: with content-visibility: auto a browser
+		// decides at its next rendering update whether a grid is near the viewport, and until then
+		// Firefox reports its items at 0x0, so geometry read right after a change is not the
+		// layout. Skipping has its own tests (layout-offscreen.test.ts).
+		props: {
+			grid: { gap: 0, skipOffscreen: false, ...options.grid },
+			initial: options.items,
+			onchange: options.onchange
+		}
 	});
 	const layout = component as unknown as LayoutComponent;
 	const gap = typeof options.grid.gap === 'number' ? options.grid.gap : 0;

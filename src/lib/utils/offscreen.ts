@@ -1,40 +1,17 @@
 /**
- * How far outside the viewport a grid may be before its rendering is skipped: one viewport
- * height above and below, so a grid is rendered again well before it scrolls into view.
+ * Styles that let the browser skip rendering a grid while it is away from the viewport:
+ * `content-visibility: auto` skips the paint, layout and hit-testing of thousands of positioned
+ * items while scrolling past them, and they stay in the accessibility tree and find-in-page.
+ * The browser decides when to skip; `contain-intrinsic-size: auto none` keeps a skipped grid at
+ * its last rendered size.
+ *
+ * It replaced toggling the property from an IntersectionObserver: on the exec host that switch
+ * itself cost Firefox 15-20 slow frames per scroll of 20 grids x 200 items (3-5 with the native
+ * property; Chromium 2 with either). The property also brings paint containment, which clips
+ * whatever an item draws outside the grid and makes the grid the containing block of
+ * `position: fixed` content inside it; the grid turns it off during a drag or resize, and
+ * `skipOffscreen={false}` turns it off for good.
  */
-export const OFFSCREEN_MARGIN = '100% 0px';
-
-export type OffscreenState = { offscreen: boolean; width: number; height: number };
-
-/**
- * Reports whether `element` is far from the viewport, with its last measured size.
- * Returns a cleanup function. Without IntersectionObserver (old browsers, jsdom) it never
- * reports, so the element always renders normally.
- */
-export function watchOffscreen(element: Element, onChange: (state: OffscreenState) => void): () => void {
-	if (typeof IntersectionObserver === 'undefined') return () => {};
-	const observer = new IntersectionObserver(
-		(entries) => {
-			const entry = entries.at(-1);
-			if (!entry) return;
-			const { width, height } = entry.boundingClientRect;
-			onChange({ offscreen: !entry.isIntersecting, width, height });
-		},
-		{ rootMargin: OFFSCREEN_MARGIN }
-	);
-	observer.observe(element);
-	return () => observer.disconnect();
-}
-
-/**
- * Styles for a grid that is far off screen: `content-visibility: auto` lets the browser skip
- * its paint and hit-testing (the cost of thousands of positioned items, resize handles and
- * `touch-action` regions while scrolling), while it stays in the accessibility tree and
- * find-in-page. It is applied only off screen because it also brings paint containment,
- * which on screen would clip items dragged or overflowing outside the grid and capture
- * `position: fixed` content. The intrinsic size keeps the page height stable.
- */
-export function offscreenCss(state: OffscreenState | undefined): string {
-	if (!state?.offscreen || state.width <= 0 || state.height <= 0) return '';
-	return `content-visibility: auto; contain-intrinsic-size: auto ${state.width}px auto ${state.height}px;`;
+export function offscreenCss(skip: boolean): string {
+	return skip ? 'content-visibility: auto; contain-intrinsic-size: auto none;' : '';
 }

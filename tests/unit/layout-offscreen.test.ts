@@ -1,68 +1,62 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { FIXED_SIZE, item, mountLayout, useLayoutHarness } from './layout-harness';
+import { FIXED_SIZE, IN_JSDOM, item, mountLayout, useLayoutHarness } from './layout-harness';
 
 useLayoutHarness();
 
-type Callback = (entries: Partial<IntersectionObserverEntry>[]) => void;
+const visibility = (grid: ReturnType<typeof mountLayout>) => grid.gridElement().style.contentVisibility;
 
-/** A stub IntersectionObserver whose callback the test fires; returns the live callbacks. */
-function stubIntersectionObserver(): { fire: (isIntersecting: boolean) => void; live: () => number } {
-	let callbacks: Callback[] = [];
-	vi.stubGlobal(
-		'IntersectionObserver',
-		class {
-			private readonly callback: Callback;
-			constructor(callback: Callback) {
-				this.callback = callback;
-				callbacks.push(callback);
-			}
-			observe() {}
-			disconnect() {
-				callbacks = callbacks.filter((c) => c !== this.callback);
-			}
-		}
-	);
-	return {
-		fire: (isIntersecting) => {
-			for (const cb of callbacks) cb([{ isIntersecting, boundingClientRect: { width: 400, height: 300 } as DOMRect }]);
-		},
-		live: () => callbacks.length
-	};
-}
-
-describe('rendering of off-screen grids', () => {
-	test('a grid far off screen skips rendering and keeps its size, and renders again near the viewport', async () => {
-		const io = stubIntersectionObserver();
-		const grid = mountLayout({ grid: { cols: 4, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+describe('rendering of grids away from the viewport', () => {
+	test('a grid lets the browser skip it while it is away from the viewport', async () => {
+		const grid = mountLayout({ grid: { cols: 4, skipOffscreen: true, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
 		await grid.settle();
-		expect(grid.gridElement().style.contentVisibility).toBe('');
 
-		io.fire(false);
-		await grid.settle();
-		expect(grid.gridElement().style.contentVisibility).toBe('auto');
-		expect(grid.gridElement().style.getPropertyValue('contain-intrinsic-size')).toBe('auto 400px auto 300px');
-
-		io.fire(true);
-		await grid.settle();
-		expect(grid.gridElement().style.contentVisibility).toBe('');
+		expect(visibility(grid)).toBe('auto');
+		expect(grid.gridElement().getAttribute('style')).toContain('contain-intrinsic-size: auto none');
 	});
 
-	test('without IntersectionObserver a grid always renders normally', async () => {
-		// undefined is the stubbed value (a browser without the API), not a default argument.
-		// eslint-disable-next-line unicorn/no-useless-undefined
-		vi.stubGlobal('IntersectionObserver', undefined);
-		const grid = mountLayout({ grid: { cols: 4, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+	test('a drag turns skipping off, so the dragged item is not clipped, and the drop turns it on', async () => {
+		const grid = mountLayout({ grid: { cols: 4, skipOffscreen: true, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
 		await grid.settle();
-		expect(grid.gridElement().style.contentVisibility).toBe('');
+		const pointer = await grid.hold('.it-a', 1, 0);
+		expect(visibility(grid)).toBe('');
+
+		await pointer.release();
+		expect(visibility(grid)).toBe('auto');
 	});
 
-	test('a destroyed grid stops observing', async () => {
-		const io = stubIntersectionObserver();
-		const grid = mountLayout({ grid: { cols: 4, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+	test('a resize turns skipping off until it ends', async () => {
+		const grid = mountLayout({ grid: { cols: 4, skipOffscreen: true, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
 		await grid.settle();
-		expect(io.live()).toBe(1);
-		grid.unmount();
-		expect(io.live()).toBe(0);
+		const pointer = await grid.hold('.it-a .resizer-default', 1, 0);
+		expect(visibility(grid)).toBe('');
+
+		await pointer.release();
+		expect(visibility(grid)).toBe('auto');
+	});
+
+	// In a real engine: skipping must never leave an on-screen grid undrawn once a frame has run.
+	test.skipIf(IN_JSDOM)('an on-screen grid with skipping on is drawn after a frame', async () => {
+		const grid = mountLayout({
+			grid: { cols: 4, skipOffscreen: true, ...FIXED_SIZE },
+			items: [item('a', 0, 0), item('b', 1, 0, 2, 1)]
+		});
+		await grid.settle();
+		await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+		const sizes = [...grid.container.querySelectorAll<HTMLElement>('.it')].map((el) => {
+			const r = el.getBoundingClientRect();
+			return [Math.round(r.width), Math.round(r.height)];
+		});
+		expect(sizes).toEqual([
+			[100, 100],
+			[200, 100]
+		]);
+	});
+
+	test('skipOffscreen={false} keeps every grid rendered', async () => {
+		const grid = mountLayout({ grid: { cols: 4, skipOffscreen: false, ...FIXED_SIZE }, items: [item('a', 0, 0)] });
+		await grid.settle();
+
+		expect(visibility(grid)).toBe('');
 	});
 });
