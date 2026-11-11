@@ -143,7 +143,7 @@ Tailwind classes work directly on the props:
 
 Centring a grid item's content, or padding it, does not centre or align the letters. A line of text is as tall as its line box, and the line box includes room above the capitals and below the baseline that the letters do not fill. That room differs from font to font, and browsers round it to whole pixels in their own way, so labels in items of the same height sit at slightly different heights, and the first lines of top-aligned labels do not line up across items. This is not specific to the grid: it applies to any text in any box.
 
-Measured on the <a href={textAlignmentPath}>text alignment example</a>, as the offset of the letters from where they should sit, in device pixels:
+Measured on the <a href={textAlignmentPath}>text alignment example</a> without the trim, as the offset of the letters from where they should sit, in device pixels (Chromium 151, Firefox 153):
 
 | Font, 14px             | Chromium, 1x | Chromium, 1.5x | Firefox, 1x | Firefox, 1.5x |
 | ---------------------- | ------------ | -------------- | ----------- | ------------- |
@@ -175,7 +175,7 @@ The fix is `text-box: trim-both cap alphabetic`. It trims a block's first and la
 
 - Put the trim on an element around the text, not on the item itself: the item's box would lose its own padding to the trim.
 - Padding then measures from the letters, so a top padding of `0.75rem` puts the top of the capitals `0.75rem` below the item's edge, whatever the font.
-- `text-box` is supported in Chromium-based browsers and Safari, but not in Firefox (as of Firefox 153). Keep it inside `@supports`: Firefox then shows the untrimmed layout above, which is how the text looked before.
+- `text-box` is supported in Chrome and Edge 133+, Safari 18.2+ and Firefox 154+ (August 2026). Keep it inside `@supports`: an older browser then shows the untrimmed layout above, which is how the text looked before.
 
 ## Transitions
 

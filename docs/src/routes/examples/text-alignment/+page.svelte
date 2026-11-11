@@ -51,9 +51,9 @@
 
 	{#if !trimSupported}
 		<p class="note text-sm">
-			This browser does not support <code>text-box</code> yet (Firefox does not, as of version 153), so
-			the trim does nothing here and the labels keep their offsets. Chromium-based browsers and Safari
-			support it.
+			This browser does not support <code>text-box</code>, so the trim does nothing here and the
+			labels keep their offsets. Chrome and Edge support it since version 133, Safari since 18.2 and
+			Firefox since 154.
 		</p>
 	{/if}
 
