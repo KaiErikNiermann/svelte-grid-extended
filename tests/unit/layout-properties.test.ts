@@ -24,7 +24,10 @@ const configs: ScenarioConfig[] = [
 	{ collision: 'compress', rows: 0, withPatches: true },
 	{ collision: 'push', rows: 0, withPatches: true, gap: 10 },
 	{ collision: 'none', rows: 6, withPatches: false, breakpointCols: { xs: 2, md: 4, lg: 6 } },
-	{ collision: 'push', rows: 0, withPatches: true, breakpointCols: { xs: 2, md: 4, lg: 6 } }
+	{ collision: 'push', rows: 0, withPatches: true, breakpointCols: { xs: 2, md: 4, lg: 6 } },
+	{ collision: 'shift', rows: 0, withPatches: true },
+	{ collision: 'shift', rows: 0, withPatches: true, gap: 10 },
+	{ collision: 'shift', rows: 0, withPatches: true, breakpointCols: { xs: 2, md: 4, lg: 6 } }
 ];
 
 describe.each(configs)('random operations ($collision, rows=$rows, patches=$withPatches)', (config) => {
