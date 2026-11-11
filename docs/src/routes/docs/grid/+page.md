@@ -77,6 +77,10 @@ When `cols` or `rows` is set to 0, the grid grows infinitely in that dimension:
 
 > **Note:** When `cols` or `rows` is 0, the corresponding `itemSize.width` or `itemSize.height` must be set.
 
+## Pages With Many Grids
+
+A grid that is more than one viewport height away from the screen is drawn with `content-visibility: auto`, so the browser skips painting and hit-testing its items until it scrolls near. On a page of 200 grids this keeps scrolling at full frame rate on slow machines. The grid keeps its size while skipped, and its items stay available to screen readers and find-in-page. Near or on screen a grid renders exactly as before, so items dragged or overflowing outside it are never clipped. Browsers without `IntersectionObserver` always render every grid.
+
 ## Example
 
 ```svelte

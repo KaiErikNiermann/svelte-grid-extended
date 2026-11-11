@@ -1,0 +1,400 @@
+{
+	"env": {
+		"host": "aedf70941939",
+		"cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
+		"cores": 8,
+		"node": "v24.18.1",
+		"chromium": "151.0.7922.34",
+		"commit": "77021a2",
+		"dirty": false
+	},
+	"runs": 10,
+	"scenarios": {
+		"many-small-none": {
+			"readyMs": {
+				"median": 827.2,
+				"mad": 6.9,
+				"min": 815.3,
+				"max": 851.5,
+				"slack": 82.7,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 661.6,
+				"mad": 5.4,
+				"min": 648.3,
+				"max": 678,
+				"slack": 66.2,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 66.4,
+				"mad": 0,
+				"min": 66.4,
+				"max": 66.4,
+				"slack": 6.6,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 1,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.7,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"many-small-push": {
+			"readyMs": {
+				"median": 826.1,
+				"mad": 8.8,
+				"min": 812.1,
+				"max": 1041,
+				"slack": 82.6,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 660.2,
+				"mad": 7.3,
+				"min": 648.7,
+				"max": 708.7,
+				"slack": 66,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 66.4,
+				"mad": 0,
+				"min": 66.4,
+				"max": 66.4,
+				"slack": 6.6,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 1,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.8,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"many-small-compress": {
+			"readyMs": {
+				"median": 902.7,
+				"mad": 10,
+				"min": 884.8,
+				"max": 977.2,
+				"slack": 90.3,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 735.8,
+				"mad": 7,
+				"min": 724.5,
+				"max": 759.2,
+				"slack": 73.6,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 66.4,
+				"mad": 0,
+				"min": 66.4,
+				"max": 66.5,
+				"slack": 6.6,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 1,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.7,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"few-large-none": {
+			"readyMs": {
+				"median": 2255.3,
+				"mad": 20.7,
+				"min": 2211.3,
+				"max": 2298.3,
+				"slack": 225.5,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 2093.8,
+				"mad": 21,
+				"min": 2050.4,
+				"max": 2130.3,
+				"slack": 209.4,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 64.2,
+				"mad": 0,
+				"min": 64.1,
+				"max": 64.2,
+				"slack": 6.4,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 1,
+				"mad": 0.5,
+				"min": 0,
+				"max": 6,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.8,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"few-large-compress": {
+			"readyMs": {
+				"median": 2519.6,
+				"mad": 3.7,
+				"min": 2507.2,
+				"max": 2605.1,
+				"slack": 252,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 2361.8,
+				"mad": 6.6,
+				"min": 2350.2,
+				"max": 2446.5,
+				"slack": 236.2,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 64.2,
+				"mad": 0,
+				"min": 64.2,
+				"max": 64.2,
+				"slack": 6.4,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 1,
+				"mad": 1,
+				"min": 0,
+				"max": 4,
+				"slack": 4,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.8,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"one-huge-none": {
+			"readyMs": {
+				"median": 994.7,
+				"mad": 19.6,
+				"min": 971.1,
+				"max": 1079.2,
+				"slack": 99.5,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 928.7,
+				"mad": 19.4,
+				"min": 907.4,
+				"max": 985.6,
+				"slack": 92.9,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 11.3,
+				"mad": 0,
+				"min": 11.3,
+				"max": 11.4,
+				"slack": 2,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 0,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.7,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"many-small-fluid": {
+			"readyMs": {
+				"median": 780.4,
+				"mad": 7.4,
+				"min": 764.6,
+				"max": 803.8,
+				"slack": 78,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 602.6,
+				"mad": 3.4,
+				"min": 593.8,
+				"max": 609.3,
+				"slack": 60.3,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 66.4,
+				"mad": 0,
+				"min": 66.4,
+				"max": 66.4,
+				"slack": 6.6,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 0,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.8,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"scroll-slow-cpu": {
+			"readyMs": {
+				"median": 3080.1,
+				"mad": 24.9,
+				"min": 3054.8,
+				"max": 3150.8,
+				"slack": 308,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 2475.8,
+				"mad": 15.8,
+				"min": 2455.2,
+				"max": 2524.3,
+				"slack": 247.6,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 66.4,
+				"mad": 0,
+				"min": 66.4,
+				"max": 66.4,
+				"slack": 6.6,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 10,
+				"mad": 3,
+				"min": 4,
+				"max": 15,
+				"slack": 12,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.8,
+				"mad": 0,
+				"min": 16.8,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"drag-large-push": {
+			"readyMs": {
+				"median": 187.8,
+				"mad": 2.6,
+				"min": 184.1,
+				"max": 199.7,
+				"slack": 25,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 137,
+				"mad": 0.9,
+				"min": 134.1,
+				"max": 146.2,
+				"slack": 25,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 5.1,
+				"mad": 0,
+				"min": 5.1,
+				"max": 5.1,
+				"slack": 2,
+				"runs": 10
+			},
+			"dragMs": {
+				"median": 1757.8,
+				"mad": 10.2,
+				"min": 1707.4,
+				"max": 1789.8,
+				"slack": 175.8,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 0,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.7,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		}
+	}
+}

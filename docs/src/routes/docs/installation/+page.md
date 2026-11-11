@@ -28,7 +28,7 @@ yarn add @appulsauce/svelte-grid
 
 ## Requirements
 
-- **Svelte 5.0.0** or higher
+- **Svelte 5.15.0** or higher
 - A module bundler (Vite, SvelteKit, etc.)
 
 ## TypeScript Support

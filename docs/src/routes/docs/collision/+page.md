@@ -7,6 +7,8 @@ description: How collision detection works in the grid
 
 The `collision` prop controls how the grid handles overlapping items when they are moved or resized.
 
+With `push` and `compress`, this covers every way an item can end up on another one, not only dragging. An item moved through its `x`, `y`, `w` or `h` props moves the items it lands on. An item added on a cell that is already taken does not displace anything: with `push` it goes to the first free cell, and with `compress` it is compressed in below the items above it. With `none`, positions from props are applied as given, overlaps included.
+
 ## Collision Modes
 
 ### None (Default)

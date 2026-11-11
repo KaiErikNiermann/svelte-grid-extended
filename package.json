@@ -1,6 +1,6 @@
 {
 	"name": "@appulsauce/svelte-grid",
-	"version": "2.0.3",
+	"version": "2.1.0",
 	"description": "A draggable and resizable grid layout, for Svelte 5",
 	"repository": {
 		"type": "git",
@@ -17,6 +17,8 @@
 		"test:unit": "svelte-kit sync && vitest run",
 		"coverage": "svelte-kit sync && vitest run --coverage",
 		"e2e": "playwright test",
+		"bench": "node bench/run.mjs",
+		"bench:remote": "bench/remote.sh",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"check:docs": "pnpm package:build && pnpm --dir docs check",
@@ -61,7 +63,7 @@
 	},
 	"homepage": "https://github.com/KaiErikNiermann/svelte-grid-extended#readme",
 	"peerDependencies": {
-		"svelte": "^5.0.0"
+		"svelte": "^5.15.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.5",
@@ -80,6 +82,7 @@
 		"eslint-plugin-sonarjs": "^4.2.0",
 		"eslint-plugin-svelte": "^2.46.1",
 		"eslint-plugin-unicorn": "^62.0.0",
+		"fast-check": "^4.10.2",
 		"globals": "^15.15.0",
 		"husky": "^9.1.7",
 		"jsdom": "^25.0.1",

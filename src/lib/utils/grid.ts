@@ -57,3 +57,20 @@ export function getAvailablePosition(
 
 	return null;
 }
+
+/**
+ * Moving `item` up from row `fromY`, the first row where it collides with one of `items`,
+ * or -1 when nothing blocks it; `blockingRow(...) + 1` is the highest row it can move to.
+ * No row past every item's bottom edge can collide, so the scan starts at
+ * $\min(\text{fromY},\ \max_i(y_i + h_i) - 1)$ and is bounded by the content height rather
+ * than by `fromY`: an item at y = 1e6 used to take a million steps to compress. A negative
+ * or non-finite `fromY` is returned as is, as the loop this replaces did.
+ */
+export function blockingRow(item: LayoutItem, items: LayoutItem[], fromY: number): number {
+	if (Number.isNaN(fromY) || fromY < 0) return fromY;
+	const bottom = items.reduce((lowest, other) => Math.max(lowest, other.y + other.h), 0);
+	for (let y = Math.min(fromY, bottom - 1); y >= 0; y--) {
+		if (hasCollisions({ ...item, y }, items)) return y;
+	}
+	return -1;
+}

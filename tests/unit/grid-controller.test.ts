@@ -30,6 +30,9 @@ describe('GridController firstAvailablePosition', () => {
 		unregisterItem: () => {
 			/* .. */
 		},
+		settleItem: () => {
+			/* .. */
+		},
 		updateGrid: () => {
 			/* .. */
 		},

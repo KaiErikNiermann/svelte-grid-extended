@@ -56,6 +56,8 @@ export type GridParams = {
 	collision: Collision;
 	registerItem: (item: LayoutItem) => void;
 	unregisterItem: (item: LayoutItem) => void;
+	/** Re-validates an item whose position or size changed outside the grid's own moves. */
+	settleItem: (item: LayoutItem) => void;
 	updateGrid: () => void;
 	onchange: (detail: LayoutChangeDetail) => void;
 };

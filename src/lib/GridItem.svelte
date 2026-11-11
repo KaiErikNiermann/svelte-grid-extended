@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
-	import { hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
+	import { blockingRow, hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
+	import { assignBox, parseCoordinate, parseSize } from './utils/placement';
 
 	import type { LayoutItem, GridItemProps } from './types';
 	import { getGridContext } from './Grid.svelte';
@@ -60,15 +61,45 @@
 	// Sync props to item
 	$effect(() => {
 		item.id = id;
-		item.x = x;
-		item.y = y;
-		item.w = w;
-		item.h = h;
 		item.min = min;
 		item.max = max;
 		item.movable = movable;
 		item.resizable = resizable;
+		const next = { x, y, w, h };
+		untrack(() => syncBox(next));
 	});
+
+	let registered = false;
+
+	/**
+	 * Copies the x/y/w/h props into the item, parsed into whole cells. Before registration a
+	 * missing or unusable x/y stays missing, so the grid places the item, and an unusable size
+	 * becomes 1. Afterwards a real change is handed to the grid to re-validate, and an unusable
+	 * value keeps the item's current one. Changes made by the grid itself arrive here equal to
+	 * the item, through `invalidate`, and do nothing.
+	 */
+	function syncBox(next: { x: number; y: number; w: number; h: number }) {
+		const parsed = {
+			x: parseCoordinate(next.x),
+			y: parseCoordinate(next.y),
+			w: parseSize(next.w),
+			h: parseSize(next.h)
+		};
+		if (!registered) {
+			// x/y may stay undefined here: registration places such an item and writes x/y back.
+			Object.assign(item, { x: parsed.x as number, y: parsed.y as number, w: parsed.w ?? 1, h: parsed.h ?? 1 });
+			return;
+		}
+		const box = { x: parsed.x ?? item.x, y: parsed.y ?? item.y, w: parsed.w ?? item.w, h: parsed.h ?? item.h };
+		// A drag or resize in progress settles the item when it ends.
+		if (assignBox(item, box) && !active) gridParams.settleItem(item);
+		writeBackIfNormalized();
+	}
+
+	/** Writes the item's values to the bound props when they differ (rounded, clamped, placed). */
+	function writeBackIfNormalized() {
+		if (x !== item.x || y !== item.y || w !== item.w || h !== item.h) item.invalidate();
+	}
 
 	/**
 	 * Updates svelte-components props behind that item.
@@ -85,7 +116,17 @@
 
 	onMount(() => {
 		gridParams.registerItem(item);
+		registered = true;
+		writeBackIfNormalized();
 		return () => {
+			registered = false;
+			// A drag or resize only removes its window listeners on pointerup. Destroyed
+			// mid-gesture (the item removed, or its grid), they stayed attached, kept the
+			// destroyed item alive and threw on the next pointerup.
+			window.removeEventListener('pointermove', move);
+			window.removeEventListener('pointerup', moveEnd);
+			window.removeEventListener('pointermove', resize);
+			window.removeEventListener('pointerup', resizeEnd);
 			gridParams.unregisterItem(item);
 		};
 	});
@@ -140,6 +181,8 @@
 	function endInteraction(event: PointerEvent) {
 		applyPreview();
 		active = false;
+		// Props may have moved another item onto this one during the gesture.
+		gridParams.settleItem(item);
 		initialPointerPosition.left = 0;
 		initialPointerPosition.top = 0;
 		itemRef.releasePointerCapture(event.pointerId);
@@ -405,9 +448,6 @@
 		const gridItems = Object.values(gridParams.items);
 		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 		sortedItems.reduce(
-			// Same story as movePreviewWithCollisionsWithCompress: branchy layout math
-			// with no component-level tests behind it.
-			// eslint-disable-next-line sonarjs/cognitive-complexity
 			(accItem, currentItem) => {
 				if (currentItem.id === previewItem.id) {
 					// if previewItem do nothing
@@ -415,26 +455,14 @@
 					// compress items above previewItem
 					const maxY =
 						currentItem.y >= previewItem.y ? currentItem.y + previewItem.h + 1 : previewItem.y + currentItem.h + 1;
-					let newY = maxY;
-					while (newY >= 0) {
-						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
-							break;
-						}
-						newY--;
-					}
+					const newY = blockingRow(currentItem, accItem, maxY);
 					currentItem.y = newY + 1;
 					currentItem.invalidate();
 					gridParams.updateGrid();
 					accItem.push(currentItem);
 				} else {
 					// compress items below previewItem
-					let newY = currentItem.y;
-					while (newY >= 0) {
-						if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
-							break;
-						}
-						newY--;
-					}
+					const newY = blockingRow(currentItem, accItem, currentItem.y);
 					if (newY < currentItem.y && newY > 0) {
 						currentItem.y = newY + 1;
 					}

@@ -1,0 +1,57 @@
+[
+	{
+		"name": "many-small-none",
+		"why": "200 grids of 20 items: page load and scroll with the default mode",
+		"page": { "grids": 200, "items": 20, "collision": "none" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "many-small-push",
+		"why": "the same page in push mode",
+		"page": { "grids": 200, "items": 20, "collision": "push" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "many-small-compress",
+		"why": "the same page in compress mode, which compresses on registration",
+		"page": { "grids": 200, "items": 20, "collision": "compress" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "few-large-none",
+		"why": "20 grids of 200 items: per-grid costs that grow with item count",
+		"page": { "grids": 20, "items": 200, "collision": "none" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "few-large-compress",
+		"why": "20 grids of 200 items in compress mode (9.5 s to load before compression was coalesced)",
+		"page": { "grids": 20, "items": 200, "collision": "compress" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "one-huge-none",
+		"why": "a single grid of 600 items: the steepest per-grid scaling",
+		"page": { "grids": 1, "items": 600, "collision": "none" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "many-small-fluid",
+		"why": "item width from the container, so every grid is sized by its ResizeObserver",
+		"page": { "grids": 200, "items": 20, "collision": "none", "size": "fluid" },
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "scroll-slow-cpu",
+		"why": "200 x 20 scrolled on a 4x slower CPU: paint and hit-testing of off-screen grids made a third of the frames slow",
+		"page": { "grids": 200, "items": 20, "collision": "none" },
+		"cpuThrottle": 4,
+		"measure": ["load", "scroll"]
+	},
+	{
+		"name": "drag-large-push",
+		"why": "dragging one item across a 200-item push grid, which pushes items on every move",
+		"page": { "grids": 1, "items": 200, "collision": "push" },
+		"measure": ["load", "drag"]
+	}
+]

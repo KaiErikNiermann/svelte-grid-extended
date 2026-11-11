@@ -1,4 +1,4 @@
-import { getAvailablePosition, hasCollisions } from './utils/grid';
+import { blockingRow, getAvailablePosition } from './utils/grid';
 import type { GridParams, GridController as GridControllerType, LayoutItem } from './types';
 
 export class GridController implements GridControllerType {
@@ -43,8 +43,13 @@ export class GridController implements GridControllerType {
 		this._compress(this.gridParams.items);
 	}
 
-	_internalCompress(): void {
-		this._compress(this.gridParams.items, true);
+	/**
+	 * Compresses `items`, which the grid passes as its live state: reading them through the
+	 * context instead returned a stale snapshot during an item's teardown, so removing several
+	 * items in one tick compressed against items that were already gone.
+	 */
+	_internalCompress(items: Record<string, LayoutItem>): void {
+		this._compress(items, true);
 	}
 
 	private _compress(items: Record<string, LayoutItem>, skipUpdate = false): void {
@@ -52,13 +57,7 @@ export class GridController implements GridControllerType {
 		const sortedItems = [...gridItems].sort((a, b) => a.y - b.y);
 
 		sortedItems.reduce((accItem, currentItem) => {
-			let newY = currentItem.y;
-			while (newY >= 0) {
-				if (hasCollisions({ ...currentItem, y: newY }, accItem)) {
-					break;
-				}
-				newY--;
-			}
+			const newY = blockingRow(currentItem, accItem, currentItem.y);
 			if (newY !== currentItem.y - 1) {
 				currentItem.y = newY + 1;
 				currentItem.invalidate();

@@ -16,11 +16,20 @@
 </script>
 
 <script lang="ts">
-	import { setContext, onMount, type Snippet } from 'svelte';
+	import { setContext, onMount, untrack, type Snippet } from 'svelte';
 
 	import { assertGridOptions } from './utils/assert';
 	import { findGridSize } from './utils/breakpoints';
-	import { getGridDimensions } from './utils/grid';
+	import { offscreenCss, watchOffscreen, type OffscreenState } from './utils/offscreen';
+	import { getGridDimensions, hasCollisions } from './utils/grid';
+	import {
+		assignBox,
+		clampToLimits,
+		hasPosition,
+		pushAside,
+		relocateIfColliding,
+		type Limits
+	} from './utils/placement';
 	import { GridController } from './GridController';
 
 	import type {
@@ -82,23 +91,28 @@
 		assertGridOptions({ cols, rows, itemSize, collision });
 	});
 
-	let _cols = $state(0);
-	let _rows = $state(0);
-	let maxCols = $state(Infinity);
-	let maxRows = $state(Infinity);
-	let shouldExpandRows = $state(false);
-	let shouldExpandCols = $state(false);
+	// What the ResizeObserver resolved breakpoint-based sizes to; unused when the prop is a number.
+	let observedCols = $state<number | undefined>();
+	let observedRows = $state<number | undefined>();
 	let gridItemSize = $state<ItemSize | undefined>();
+
+	// Every limit below is derived rather than written by effects: an effect that wrote `_rows`
+	// was clobbered by the resize its own growth caused, so a growing grid fell back to `100%`
+	// and items overflowed it until the next interaction recomputed the size.
+	// `0` means "grow with the content"; `undefined` means breakpoints are not measured yet.
+	const resolvedCols = $derived(typeof cols === 'number' ? cols : observedCols);
+	// Push and compress always grow downwards: `rows` is documented as ignored there.
+	const resolvedRows = $derived.by(() => {
+		if (collision !== 'none') return 0;
+		return typeof rows === 'number' ? rows : observedRows;
+	});
 
 	const calculatedGridSize = $derived(getGridDimensions(Object.values(items)));
 
-	$effect(() => {
-		if (typeof cols === 'number') _cols = cols;
-	});
-
-	$effect(() => {
-		if (typeof rows === 'number') _rows = rows;
-	});
+	const maxCols = $derived(resolvedCols || Infinity);
+	const maxRows = $derived(resolvedRows || Infinity);
+	const _cols = $derived(resolvedCols || calculatedGridSize.cols);
+	const _rows = $derived(resolvedRows || calculatedGridSize.rows);
 
 	$effect(() => {
 		if (itemSize?.width && itemSize?.height) {
@@ -106,31 +120,15 @@
 		}
 	});
 
-	$effect(() => {
-		_cols = shouldExpandCols ? calculatedGridSize.cols : _cols;
-		maxCols = shouldExpandCols ? Infinity : _cols;
-	});
-
-	$effect(() => {
-		_rows = shouldExpandRows ? calculatedGridSize.rows : _rows;
-		maxRows = shouldExpandRows ? Infinity : _rows;
-	});
-
-	$effect(() => {
-		if (collision !== 'none') {
-			_rows = 0;
-		}
-	});
-
 	const containerWidth = $derived.by(() => {
-		if (gridItemSize && cols === 0) {
+		if (gridItemSize && resolvedCols === 0) {
 			return _cols * (gridItemSize.width + gap + 1);
 		}
 		return null;
 	});
 
 	const containerHeight = $derived.by(() => {
-		if (gridItemSize && rows === 0) {
+		if (gridItemSize && resolvedRows === 0) {
 			return _rows * (gridItemSize.height + gap + 1);
 		}
 		return null;
@@ -139,11 +137,27 @@
 	let gridContainer: HTMLDivElement;
 
 	function updateGrid() {
-		items = { ...items };
+		retryUnplaced();
 
-		if (autoCompress && collision === 'compress') {
-			_controller._internalCompress();
-		}
+		if (autoCompress && collision === 'compress') scheduleCompress();
+	}
+
+	let compressQueued = false;
+	let destroyed = false;
+
+	/**
+	 * Compresses once per microtask, however many changes asked for it. Compressing on every
+	 * change made a burst of N registrations or removals cost N passes of $O(n^2)$ each, and
+	 * destroying a compress grid ran one pass per item for a grid about to disappear: 150
+	 * items took over 10 s to unmount in jsdom.
+	 */
+	function scheduleCompress(): void {
+		if (compressQueued) return;
+		compressQueued = true;
+		queueMicrotask(() => {
+			compressQueued = false;
+			if (!destroyed && autoCompress && collision === 'compress') _controller._internalCompress(items);
+		});
 	}
 
 	onMount(() => {
@@ -156,33 +170,133 @@
 			const width = entry.contentRect.width;
 			const height = entry.contentRect.height;
 
-			_cols = findGridSize(cols, width, breakpoints);
-			_rows = findGridSize(rows, height, breakpoints);
+			observedCols = findGridSize(cols, width, breakpoints);
+			observedRows = findGridSize(rows, height, breakpoints);
 
-			shouldExpandCols = _cols === 0;
-			shouldExpandRows = _rows === 0;
-
+			const fitCols = resolvedCols ?? 0;
+			const fitRows = resolvedRows ?? 0;
 			gridItemSize = {
-				width: itemSize.width ?? (width - (_cols + 1) * gap) / _cols,
-				height: itemSize.height ?? (height - (_rows + 1) * gap) / _rows
+				width: itemSize.width ?? (width - (fitCols + 1) * gap) / fitCols,
+				height: itemSize.height ?? (height - (fitRows + 1) * gap) / fitRows
 			};
 		});
 
 		sizeObserver.observe(gridContainer);
+		const stopWatching = watchOffscreen(gridContainer, (state) => (offscreen = state));
 
-		return () => sizeObserver.disconnect();
+		return () => {
+			destroyed = true;
+			sizeObserver.disconnect();
+			stopWatching();
+		};
 	});
+
+	const limits = (): Limits => ({ maxCols, maxRows });
+
+	// Items the grid had to leave overlapping because a fixed-size grid had no free cell.
+	// Overlaps set by props are not tracked: `none` mode allows them.
+	const unplaced = new Set<string>();
+
+	/** Records `item` as unplaced when the position the grid chose for it still overlaps. */
+	function trackPlacement(item: LayoutItem): void {
+		if (hasCollisions(item, Object.values(items))) unplaced.add(item.id);
+		else unplaced.delete(item.id);
+	}
+
+	/** Moves unplaced items into a cell that has freed up since (removal, resize, more columns). */
+	function retryUnplaced(): void {
+		// A snapshot: the loop re-adds items that still do not fit, which a live Set would revisit.
+		for (const id of new Set(unplaced)) {
+			unplaced.delete(id);
+			const it = items[id];
+			if (!it) continue;
+			const others = Object.values(items);
+			const box = relocateIfColliding(it, it, others, limits());
+			if (hasCollisions({ ...it, ...box }, others)) {
+				unplaced.add(id);
+			} else if (assignBox(it, box)) {
+				it.invalidate();
+			}
+		}
+	}
+
+	/**
+	 * Fits a new item into the grid before it joins: an item past the fixed limits is clamped
+	 * inside, and one without `x`/`y` gets the first free cell. Either move avoids landing on
+	 * another item. In push mode a new item declared on an occupied cell also moves to the first
+	 * free cell, rather than pushing the items already there; compress resolves the overlap by
+	 * compressing, and `none` allows it. Otherwise an item that fits is left exactly as given.
+	 * Returns whether the item changed, so its bindings can be updated.
+	 */
+	function placeNewItem(item: LayoutItem): boolean {
+		const positioned = hasPosition(item);
+		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
+		const moved = !positioned || box.x !== item.x || box.y !== item.y;
+		if (!moved && collision !== 'push') return assignBox(item, box);
+		const others = Object.values(items);
+		// The common push case, an item declared on a free cell, costs one scan and no tracking.
+		if (!moved && !hasCollisions({ ...item, ...box }, others)) return assignBox(item, box);
+		const changed = assignBox(item, relocateIfColliding(item, box, others, limits()));
+		trackPlacement(item);
+		return changed;
+	}
 
 	function registerItem(item: LayoutItem): void {
 		if (item.id in items) {
 			throw new Error(`Item with id ${item.id} already exists`);
 		}
+		const changed = placeNewItem(item);
 		items[item.id] = item;
-		updateGrid();
+		if (changed) {
+			item.invalidate();
+		} else {
+			updateGrid();
+		}
 	}
+
+	/**
+	 * Re-validates an item whose x/y/w/h changed from outside a drag, or at the end of one:
+	 * it is clamped into the limits, and in push and compress mode the items it now covers
+	 * are pushed aside, the same rule a drag follows. `none` mode applies the props as given.
+	 */
+	function settleItem(item: LayoutItem): void {
+		const changed = assignBox(item, clampToLimits(item, limits()));
+		if (collision !== 'none') {
+			for (const other of pushAside(item, Object.values(items), limits())) other.invalidate();
+		}
+		if (changed) {
+			item.invalidate();
+		} else {
+			updateGrid();
+		}
+	}
+
+	/** Moves items that a smaller grid (fewer columns, a new breakpoint) left outside it. */
+	function reflow(bounds: Limits): void {
+		const ordered = Object.values(items).sort((a, b) => a.y - b.y || a.x - b.x);
+		for (const it of ordered) {
+			const box = clampToLimits(it, bounds);
+			if (box.x === it.x && box.y === it.y && box.w === it.w && box.h === it.h) continue;
+			if (collision === 'none') {
+				assignBox(it, relocateIfColliding(it, box, Object.values(items), bounds));
+				trackPlacement(it);
+			} else {
+				assignBox(it, box);
+				for (const other of pushAside(it, Object.values(items), bounds)) other.invalidate();
+			}
+			it.invalidate();
+		}
+		retryUnplaced();
+	}
+
+	$effect(() => {
+		const bounds = { maxCols, maxRows };
+		untrack(() => reflow(bounds));
+	});
 
 	function unregisterItem(item: LayoutItem): void {
 		delete items[item.id];
+		unplaced.delete(item.id);
 		updateGrid();
 	}
 
@@ -206,6 +320,7 @@
 		collision,
 		registerItem,
 		unregisterItem,
+		settleItem,
 		updateGrid,
 		onchange: handleChange
 	});
@@ -224,10 +339,13 @@
 
 	setContext(GRID_CONTEXT_NAME, contextRef);
 
+	// Rendering is skipped while the grid is far off screen; see offscreenCss.
+	let offscreen = $state<OffscreenState>();
+
 	const containerCss = $derived.by(() => {
 		const width = containerWidth ? `${containerWidth}px` : '100%';
 		const height = containerHeight ? `${containerHeight}px` : '100%';
-		return `width: ${width}; height: ${height}; ${style}`;
+		return `width: ${width}; height: ${height}; ${offscreenCss(offscreen)} ${style}`;
 	});
 </script>
 
