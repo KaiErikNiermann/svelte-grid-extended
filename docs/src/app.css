@@ -93,6 +93,19 @@
 		@apply border border-border rounded-lg p-4 bg-muted/30;
 	}
 
+	/* Holds a demo grid's final height before the grid has measured itself and rendered its items. */
+	.grid-slot {
+		@apply relative;
+	}
+
+	.grid-skeleton {
+		@apply absolute inset-0 rounded-md bg-muted animate-pulse motion-reduce:animate-none;
+	}
+
+	.grid-slot[data-ready='true'] .grid-skeleton {
+		@apply hidden;
+	}
+
 	.link-card {
 		@apply block rounded-lg border border-border p-4 hover:border-primary/50;
 	}

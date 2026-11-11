@@ -10,7 +10,38 @@
 
 	const DELAY_MS = 1000;
 	// No width: cells take the panel width divided by cols, so the whole panel is the grid.
-	const itemSize = { height: 40 };
+	const CELL_HEIGHT = 40;
+	const GAP = 4;
+	const itemSize = { height: CELL_HEIGHT };
+
+	// The grid renders nothing until its ResizeObserver has measured the panel, and it is as tall
+	// as its rows. The slot reserves the height the scenario's own items need, so the page does
+	// not move when the grid appears; a grid that grows later does so on the user's action.
+	const reservedRows = $derived(
+		scenario.rows || Math.max(1, ...scenario.items.map((it) => (it.y ?? 0) + it.h))
+	);
+	// The grid sizes each row as cell height + gap + 1px, see containerHeight in Grid.svelte.
+	const reservedHeight = $derived(reservedRows * (CELL_HEIGHT + GAP + 1));
+
+	let slot: HTMLDivElement | undefined = $state();
+	let measured = $state(false);
+
+	$effect(() => {
+		const el = slot;
+		if (!el || measured) return;
+		const sawItems = () => !!el.querySelector('.svelte-grid-extended > *');
+		if (sawItems()) {
+			measured = true;
+			return;
+		}
+		const observer = new MutationObserver(() => {
+			if (!sawItems()) return;
+			measured = true;
+			observer.disconnect();
+		});
+		observer.observe(el, { childList: true, subtree: true });
+		return () => observer.disconnect();
+	});
 
 	const fresh = () => scenario.items.map((it) => ({ ...it }));
 	let items = $state<Spec[]>(fresh());
@@ -112,29 +143,37 @@
 	</p>
 	<p class="font-mono text-xs min-h-4">{note}</p>
 	<div class="demo-panel mt-auto" onpointerdowncapture={onPress}>
-		{#key key}
-			<Grid
-				class="grid-compact"
-				cols={scenario.cols}
-				rows={scenario.rows ?? 0}
-				{itemSize}
-				collision={mode}
-				gap={4}
-			>
-				{#each items as it (it.id)}
-					<GridItem
-						id={it.id}
-						bind:x={it.x}
-						bind:y={it.y}
-						bind:w={it.w}
-						bind:h={it.h}
-						class="grid-demo-item"
-						onpreviewchange={({ item }) => onPreview(it.id, item)}
-					>
-						{#snippet children()}{it.id}{/snippet}
-					</GridItem>
-				{/each}
-			</Grid>
-		{/key}
+		<div
+			class="grid-slot"
+			bind:this={slot}
+			data-ready={measured}
+			style:min-block-size={`${reservedHeight}px`}
+		>
+			<div class="grid-skeleton" aria-hidden="true"></div>
+			{#key key}
+				<Grid
+					class="grid-compact"
+					cols={scenario.cols}
+					rows={scenario.rows ?? 0}
+					{itemSize}
+					collision={mode}
+					gap={GAP}
+				>
+					{#each items as it (it.id)}
+						<GridItem
+							id={it.id}
+							bind:x={it.x}
+							bind:y={it.y}
+							bind:w={it.w}
+							bind:h={it.h}
+							class="grid-demo-item"
+							onpreviewchange={({ item }) => onPreview(it.id, item)}
+						>
+							{#snippet children()}{it.id}{/snippet}
+						</GridItem>
+					{/each}
+				</Grid>
+			{/key}
+		</div>
 	</div>
 </div>
