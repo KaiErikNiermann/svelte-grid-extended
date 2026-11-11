@@ -13,6 +13,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@floating-ui/dom": "^1.8.0",
 		"@shikijs/twoslash": "^4.6.0",
 		"@sveltejs/adapter-static": "^4.0.1",
 		"@sveltejs/kit": "^3.1.1",
@@ -35,6 +36,7 @@
 		"ts-pattern": "^5.6.0",
 		"tslib": "^2.8.1",
 		"twoslash": "^0.3.9",
+		"twoslash-protocol": "0.3.9",
 		"twoslash-svelte": "^0.3.9",
 		"typescript": "^6.0.3",
 		"vite": "^8.3.6"
