@@ -99,7 +99,7 @@ pnpm docs:dev
 
 ## Requirements
 
-- Svelte 5.0.0+
+- Svelte 5.15.0+
 
 ## License
 

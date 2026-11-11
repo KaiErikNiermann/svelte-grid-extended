@@ -63,7 +63,7 @@
 	},
 	"homepage": "https://github.com/KaiErikNiermann/svelte-grid-extended#readme",
 	"peerDependencies": {
-		"svelte": "^5.0.0"
+		"svelte": "^5.15.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.39.5",
