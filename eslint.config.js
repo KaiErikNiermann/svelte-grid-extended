@@ -21,6 +21,8 @@ export default tseslint.config(
 			'.remember/',
 			'.serena/',
 			'.scratch/',
+			// Agent worktrees (Claude Code) are whole checkouts with their own build output.
+			'.claude/',
 			'.svelte-kit/',
 			'docs/build/',
 			'docs/.svelte-kit/',
