@@ -223,14 +223,16 @@
 	/**
 	 * Fits a new item into the grid before it joins: an item past the fixed limits is clamped
 	 * inside, and one without `x`/`y` gets the first free cell. Either move avoids landing on
-	 * another item. An item registered where it fits is left exactly as given.
+	 * another item. In push mode a new item declared on an occupied cell also moves to the first
+	 * free cell, rather than pushing the items already there; compress resolves the overlap by
+	 * compressing, and `none` allows it. Otherwise an item that fits is left exactly as given.
 	 * Returns whether the item changed, so its bindings can be updated.
 	 */
 	function placeNewItem(item: LayoutItem): boolean {
 		const positioned = hasPosition(item);
 		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
 		const moved = !positioned || box.x !== item.x || box.y !== item.y;
-		if (!moved) return assignBox(item, box);
+		if (!moved && collision !== 'push') return assignBox(item, box);
 		const changed = assignBox(item, relocateIfColliding(item, box, Object.values(items), limits()));
 		trackPlacement(item);
 		return changed;
