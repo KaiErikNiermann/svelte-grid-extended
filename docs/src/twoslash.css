@@ -137,3 +137,12 @@
 		margin-inline-end: 0.5em;
 	}
 }
+
+@layer components {
+	/* Keyboard focus on a token with a popup: the ring colour the site uses for focus elsewhere. */
+	.twoslash .twoslash-hover:focus-visible {
+		outline: 2px solid hsl(var(--ring));
+		outline-offset: 1px;
+		border-radius: 2px;
+	}
+}
