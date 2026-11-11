@@ -11,7 +11,7 @@ export function assertGridOptions(options: GridOptions) {
 	const { cols, rows, itemSize, collision } = options;
 
 	if (rows !== 0 && collision && collision !== 'none') {
-		console.warn('`rows` is ignored and setted to 0 when `collision` is not `none`');
+		console.warn('`rows` is ignored and set to 0 when `collision` is not `none`');
 	}
 
 	if (collision && collision !== 'none' && itemSize?.height === undefined) {
