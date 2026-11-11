@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { FIXED_SIZE, item, layoutProblems, mountLayout, useLayoutHarness } from './layout-harness';
+import { cancelPointer, FIXED_SIZE, item, layoutProblems, mountLayout, useLayoutHarness } from './layout-harness';
 
 useLayoutHarness();
 
@@ -180,7 +180,7 @@ describe('shift collision under hostile input', () => {
 			[0.7, 0],
 			[1, 0],
 			() => {
-				window.dispatchEvent(new MouseEvent('pointercancel', { bubbles: true }));
+				cancelPointer();
 			},
 			[3, 3]
 		]);

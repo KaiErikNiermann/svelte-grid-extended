@@ -136,18 +136,30 @@ function onScreen(x: number, y: number): { x: number; y: number } {
 type MouseStep = { type: 'move' | 'down' | 'up'; x: number; y: number };
 
 /** The last pointer event the page received, recorded before any handler can stop it. */
-let lastPointer: { type: string; x: number; y: number } | undefined;
+let lastPointer: { type: string; x: number; y: number; id: number } | undefined;
 if (!IN_JSDOM) {
 	for (const type of ['pointermove', 'pointerdown', 'pointerup']) {
 		window.addEventListener(
 			type,
 			(event) => {
-				const { clientX: x, clientY: y } = event as PointerEvent;
-				lastPointer = { type, x, y };
+				const { clientX: x, clientY: y, pointerId: id } = event as PointerEvent;
+				lastPointer = { type, x, y, id };
 			},
 			{ capture: true }
 		);
 	}
+}
+
+/**
+ * The browser takes the pointer that is down away, as it does when a touch turns into a scroll.
+ * A gesture follows only its own pointer, so in a browser the event carries that pointer's id.
+ */
+export function cancelPointer(): void {
+	window.dispatchEvent(
+		IN_JSDOM
+			? new MouseEvent('pointercancel', { bubbles: true })
+			: new PointerEvent('pointercancel', { bubbles: true, pointerId: lastPointer?.id })
+	);
 }
 
 const EVENT_OF = { move: 'pointermove', down: 'pointerdown', up: 'pointerup' } as const;

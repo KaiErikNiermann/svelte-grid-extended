@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { CELL, FIXED_SIZE, item, layoutProblems, mountLayout, useLayoutHarness } from './layout-harness';
+import { cancelPointer, CELL, FIXED_SIZE, item, layoutProblems, mountLayout, useLayoutHarness } from './layout-harness';
 
 const { resizeTo } = useLayoutHarness();
 describe('grid limits', () => {
@@ -73,7 +73,7 @@ describe('a drag preview below the last row', () => {
 		await grid.dragSteps('a', [
 			[0, 3],
 			() => {
-				window.dispatchEvent(new MouseEvent('pointercancel', { bubbles: true }));
+				cancelPointer();
 			}
 		]);
 
