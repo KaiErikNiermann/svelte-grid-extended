@@ -4,7 +4,7 @@
 	import ThemeToggle from './ThemeToggle.svelte';
 	import Sidebar from './Sidebar.svelte';
 	import SearchPalette from './SearchPalette.svelte';
-	import { resolve } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import { afterNavigate } from '$app/navigation';
 
 	let mobileMenuOpen = $state(false);
@@ -45,8 +45,11 @@
 			{/if}
 		</button>
 
-		<a href={homePath} class="flex items-center gap-2 font-semibold">
-			<span class="text-primary">Svelte 5 Grid</span>
+		<!-- On a phone the name gives way to the grid glyph (the favicon), so the search field
+		     keeps its width; the glyph's alt text keeps the link's name. -->
+		<a href={homePath} class="flex shrink-0 items-center gap-2 font-semibold">
+			<img src={asset('favicon.svg')} alt="Svelte 5 Grid" class="h-8 w-8 sm:hidden" />
+			<span class="hidden text-primary sm:inline">Svelte 5 Grid</span>
 		</a>
 
 		<button
