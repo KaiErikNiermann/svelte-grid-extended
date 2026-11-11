@@ -26,6 +26,7 @@ import Grid from '@appulsauce/svelte-grid';
 | `collision`     | `'none' \| 'push' \| 'compress' \| 'shift'` | `'none'`    | Collision behavior when items overlap.                                                                                                                   |
 | `autoCompress`  | `boolean`                                   | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision.                                                           |
 | `skipOffscreen` | `boolean`                                   | `true`      | Let the browser skip rendering the grid while it is away from the viewport. Turn it off for items that draw outside the grid; see Pages With Many Grids. |
+| `touchDelay`    | `number`                                    | `300`       | How long, in milliseconds, a finger or pen is held on an item before its drag starts. `0` drags at once. See Touch Screens.                              |
 | `onchange`      | `(detail: LayoutChangeDetail) => void`      | `undefined` | Callback when any item changes position or size.                                                                                                         |
 | `class`         | `string`                                    | `undefined` | CSS class for the grid container.                                                                                                                        |
 | `style`         | `string`                                    | `undefined` | Inline styles for the grid container.                                                                                                                    |
@@ -96,6 +97,20 @@ The property also brings paint containment, which has two effects while it is on
 ```svelte
 <Grid cols={12} skipOffscreen={false}>
 	<!-- Items with dropdowns that reach outside the grid -->
+</Grid>
+```
+
+## Touch Screens
+
+On a touch screen a grid can fill the whole screen, so a finger on an item must still be able to scroll the page. A finger or pen therefore has to be held still on an item for `touchDelay` milliseconds (300 by default) before its drag starts; the item is then shown as active and follows the finger. A finger that moves before then scrolls the page as usual, and a quick tap does nothing. A mouse always drags at once.
+
+Some parts of an item start at the first touch, because the browser could not scroll from them anyway: the default resize handle, and any handle of your own with `touch-action: none` (see Customization). While a drag runs, the page does not scroll or zoom under it, and a second finger neither moves the dragged item nor starts a drag on another item of the same grid.
+
+For a grid that never needs to scroll the page, such as a full-screen board, `touchDelay={0}` drags at the first touch. The items then take every touch, so the page cannot be scrolled from them:
+
+```svelte
+<Grid cols={6} rows={4} touchDelay={0}>
+	<!-- A board that fits the screen -->
 </Grid>
 ```
 

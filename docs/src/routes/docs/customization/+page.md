@@ -9,12 +9,14 @@ The Grid components provide several ways to customize behavior and appearance.
 
 ## Custom Move Handle
 
-By default, the entire item is draggable. Use the `moveHandle` snippet to restrict dragging to a specific element:
+By default, the entire item is draggable. Use the `moveHandle` snippet to restrict dragging to a specific element. Give the handle `touch-action: none` (Tailwind's `touch-none`) so that a finger drags it at once; without it, a finger has to be held on the handle for the grid's `touchDelay` first, as on an item without a handle:
 
 ```svelte
 <GridItem x={0} y={0}>
 	{#snippet moveHandle({ moveStart })}
-		<div class="drag-handle cursor-move bg-gray-200 p-2" onpointerdown={moveStart}>⠿ Drag here</div>
+		<div class="drag-handle cursor-move touch-none bg-gray-200 p-2" onpointerdown={moveStart}>
+			⠿ Drag here
+		</div>
 	{/snippet}
 
 	{#snippet children()}
@@ -25,13 +27,13 @@ By default, the entire item is draggable. Use the `moveHandle` snippet to restri
 
 ## Custom Resize Handle
 
-Replace the default resize handle with your own:
+Replace the default resize handle with your own. As with a move handle, `touch-action: none` lets a finger resize at once:
 
 ```svelte
 <GridItem x={0} y={0}>
 	{#snippet resizeHandle({ resizeStart })}
 		<button
-			class="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 text-white rounded-tl-lg cursor-se-resize"
+			class="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 text-white rounded-tl-lg cursor-se-resize touch-none"
 			onpointerdown={resizeStart}
 		>
 			↘

@@ -79,7 +79,7 @@ The main content of the grid item:
 
 ### moveHandle
 
-Custom drag handle. Receives a `moveStart` function to initiate dragging:
+Custom drag handle. Receives a `moveStart` function to initiate dragging. With a handle, only the handle starts a drag, and the rest of the item scrolls the page under a finger. Give the handle `touch-action: none` so a finger drags it at once rather than after the grid's `touchDelay`:
 
 ```svelte twoslash
 <script lang="ts">
@@ -100,7 +100,7 @@ Custom drag handle. Receives a `moveStart` function to initiate dragging:
 
 ### resizeHandle
 
-Custom resize handle. Receives a `resizeStart` function to initiate resizing:
+Custom resize handle. Receives a `resizeStart` function to initiate resizing. Like a move handle, it resizes at the first touch when it has `touch-action: none`:
 
 ```svelte twoslash
 <script lang="ts">

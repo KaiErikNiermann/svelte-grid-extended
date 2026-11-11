@@ -28,7 +28,7 @@
 		>
 			{#snippet moveHandle({ moveStart })}
 				<div
-					class="flex items-center gap-2 p-2 bg-muted border-b border-border cursor-move"
+					class="flex items-center gap-2 p-2 bg-muted border-b border-border cursor-move touch-none"
 					role="button"
 					tabindex="0"
 					onpointerdown={moveStart}
@@ -46,7 +46,7 @@
 
 			{#snippet resizeHandle({ resizeStart })}
 				<div
-					class="absolute bottom-1 right-1 p-1 rounded bg-muted hover:bg-accent cursor-se-resize"
+					class="absolute bottom-1 right-1 p-1 rounded bg-muted hover:bg-accent cursor-se-resize touch-none"
 					role="button"
 					tabindex="0"
 					onpointerdown={resizeStart}
@@ -66,7 +66,7 @@
 		>
 			{#snippet moveHandle({ moveStart })}
 				<div
-					class="flex items-center gap-2 p-2 bg-muted border-b border-border cursor-move"
+					class="flex items-center gap-2 p-2 bg-muted border-b border-border cursor-move touch-none"
 					role="button"
 					tabindex="0"
 					onpointerdown={moveStart}
@@ -103,7 +103,7 @@
 	lang="svelte"
 	code={`<GridItem x={0} y={0} w={3} h={4}>
   {#snippet moveHandle({ moveStart })}
-    <div onpointerdown={moveStart} class="cursor-move">
+    <div onpointerdown={moveStart} class="cursor-move touch-none">
       Drag here
     </div>
   {/snippet}
@@ -113,7 +113,7 @@
   {/snippet}
 
   {#snippet resizeHandle({ resizeStart })}
-    <button onpointerdown={resizeStart} class="cursor-se-resize">
+    <button onpointerdown={resizeStart} class="cursor-se-resize touch-none">
       ↘
     </button>
   {/snippet}
