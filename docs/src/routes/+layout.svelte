@@ -10,8 +10,17 @@
 	let { children }: Props = $props();
 	let mainEl: HTMLElement | null = null;
 
-	afterNavigate(({ shallow, type }) => {
+	afterNavigate(({ shallow, type, to }) => {
 		if (shallow && type === 'goto') return;
+
+		// The page scrolls inside <main>, so an address with a #hash (a case id such as #P4, a
+		// heading) is scrolled to here; the browser's own jump comes before the page has hydrated.
+		const id = to?.url.hash.slice(1);
+		const target = id ? mainEl?.querySelector(`#${CSS.escape(decodeURIComponent(id))}`) : null;
+		if (target) {
+			target.scrollIntoView({ behavior: 'auto' });
+			return;
+		}
 
 		mainEl?.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 	});
