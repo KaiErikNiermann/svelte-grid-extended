@@ -7,7 +7,14 @@
 import { expect } from 'vitest';
 import fc from 'fast-check';
 
-import { FIXED_SIZE, layoutProblems, mountLayout, type LayoutSpec, type MountedLayout } from './layout-harness';
+import {
+	FIXED_SIZE,
+	layoutProblems,
+	mountLayout,
+	type DragStep,
+	type LayoutSpec,
+	type MountedLayout
+} from './layout-harness';
 import { findGridSize } from '../../src/lib/utils/breakpoints';
 import type { Breakpoints, Collision, GridSize } from '../../src/lib/types';
 
@@ -26,7 +33,18 @@ export type Op =
 	| { kind: 'containerResize' }
 	| { kind: 'width'; width: number }
 	/** Several changes in the same tick, before any effect runs. */
-	| { kind: 'batch'; ops: SimpleOp[] };
+	| { kind: 'batch'; ops: SimpleOp[] }
+	/** A hostile drag: wild pointer jumps, optionally many per tick, with page changes between them. */
+	| { kind: 'dragWild'; pick: number; fast: boolean; steps: WildStep[] };
+
+/** One step of a hostile drag. */
+type WildStep =
+	| { kind: 'move'; dx: number; dy: number }
+	| { kind: 'op'; op: SimpleOp }
+	/** The page removes the item being dragged. */
+	| { kind: 'removeDragged' }
+	/** The page switches the collision mode mid-drag; it is switched back after the drop. */
+	| { kind: 'flip'; to: Collision };
 
 export type ScenarioConfig = {
 	collision: Collision;
@@ -63,9 +81,32 @@ function simpleOpArb(config: ScenarioConfig): fc.Arbitrary<SimpleOp> {
 	);
 }
 
+function wildStepArb(config: ScenarioConfig): fc.Arbitrary<WildStep> {
+	// Fractional cells, far outside the grid on every side.
+	const coordinate = fc.double({ min: -6, max: 9, noNaN: true });
+	return fc.oneof(
+		{ weight: 4, arbitrary: fc.record({ kind: fc.constant('move' as const), dx: coordinate, dy: coordinate }) },
+		{ weight: 2, arbitrary: fc.record({ kind: fc.constant('op' as const), op: simpleOpArb(config) }) },
+		{ weight: 1, arbitrary: fc.constant({ kind: 'removeDragged' as const }) },
+		{
+			weight: 1,
+			arbitrary: fc.record({
+				kind: fc.constant('flip' as const),
+				to: fc.constantFrom<Collision>('none', 'push', 'compress', 'shift')
+			})
+		}
+	);
+}
+
 export function opArb(config: ScenarioConfig): fc.Arbitrary<Op> {
 	const simple = simpleOpArb(config);
 	return fc.oneof(
+		fc.record({
+			kind: fc.constant('dragWild' as const),
+			pick,
+			fast: fc.boolean(),
+			steps: fc.array(wildStepArb(config), { minLength: 1, maxLength: 8 })
+		}),
 		simple,
 		fc.record({ kind: fc.constant('drag' as const), pick, dx: cell, dy: cell }),
 		fc.record({
@@ -161,6 +202,28 @@ function applySimple(run: Run, op: SimpleOp): void {
 	}
 }
 
+async function dragWild(run: Run, id: string, op: Extract<Op, { kind: 'dragWild' }>): Promise<void> {
+	const { component } = run.mounted;
+	const steps = op.steps.map((step): DragStep => {
+		switch (step.kind) {
+			case 'move': {
+				return [step.dx, step.dy];
+			}
+			case 'op': {
+				return () => applySimple(run, step.op);
+			}
+			case 'removeDragged': {
+				return () => component.remove(id);
+			}
+			case 'flip': {
+				return () => component.setGrid({ collision: step.to });
+			}
+		}
+	});
+	await run.mounted.dragSteps(id, steps, { fast: op.fast });
+	component.setGrid({ collision: run.config.collision });
+}
+
 function resizeContainer(run: Run, width: number): void {
 	if (run.config.breakpointCols) run.cols = findGridSize(run.config.breakpointCols, width, BREAKPOINTS);
 	run.resizeTo(width, run.rows === Infinity ? 1000 : run.rows * run.mounted.pitch);
@@ -175,6 +238,10 @@ async function apply(run: Run, op: Op): Promise<void> {
 		}
 		case 'dragPath': {
 			if (target) await run.mounted.dragPath(target.id, op.path);
+			break;
+		}
+		case 'dragWild': {
+			if (target) await dragWild(run, target.id, op);
 			break;
 		}
 		case 'resize': {
