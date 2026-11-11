@@ -1,38 +1,39 @@
 {
 	"env": {
-		"host": "29a2a2cd77ea",
+		"host": "5d8a862209e5",
 		"cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
 		"cores": 8,
 		"node": "v24.18.1",
-		"chromium": "151.0.7922.34",
-		"commit": "70f7cb4",
-		"dirty": true
+		"browser": "chromium",
+		"browserVersion": "151.0.7922.34",
+		"commit": "bf7cf28",
+		"dirty": false
 	},
 	"runs": 10,
 	"scenarios": {
 		"many-small-none": {
 			"readyMs": {
-				"median": 827.2,
-				"mad": 6.9,
-				"min": 815.3,
-				"max": 851.5,
-				"slack": 82.7,
+				"median": 840.6,
+				"mad": 6.1,
+				"min": 820.3,
+				"max": 852,
+				"slack": 84.1,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 661.6,
-				"mad": 5.4,
-				"min": 648.3,
-				"max": 678,
-				"slack": 66.2,
+				"median": 667.7,
+				"mad": 3.8,
+				"min": 652.8,
+				"max": 680.3,
+				"slack": 66.8,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 66.4,
+				"median": 68.9,
 				"mad": 0,
-				"min": 66.4,
-				"max": 66.4,
-				"slack": 6.6,
+				"min": 68.9,
+				"max": 68.9,
+				"slack": 6.9,
 				"runs": 10
 			},
 			"slowFrames": {
@@ -54,76 +55,34 @@
 		},
 		"many-small-push": {
 			"readyMs": {
-				"median": 826.1,
-				"mad": 8.8,
-				"min": 812.1,
-				"max": 1041,
-				"slack": 82.6,
+				"median": 889.8,
+				"mad": 7.7,
+				"min": 880.2,
+				"max": 913.5,
+				"slack": 89,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 660.2,
-				"mad": 7.3,
-				"min": 648.7,
-				"max": 708.7,
-				"slack": 66,
+				"median": 717.8,
+				"mad": 5.6,
+				"min": 707,
+				"max": 727.7,
+				"slack": 71.8,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 66.4,
+				"median": 68.9,
 				"mad": 0,
-				"min": 66.4,
-				"max": 66.4,
-				"slack": 6.6,
+				"min": 68.9,
+				"max": 68.9,
+				"slack": 6.9,
 				"runs": 10
 			},
 			"slowFrames": {
 				"median": 0,
 				"mad": 0,
 				"min": 0,
-				"max": 1,
-				"slack": 3,
-				"runs": 10
-			},
-			"frameP95Ms": {
-				"median": 16.8,
-				"mad": 0,
-				"min": 16.7,
-				"max": 16.8,
-				"slack": 5,
-				"runs": 10
-			}
-		},
-		"many-small-compress": {
-			"readyMs": {
-				"median": 902.7,
-				"mad": 10,
-				"min": 884.8,
-				"max": 977.2,
-				"slack": 90.3,
-				"runs": 10
-			},
-			"scriptMs": {
-				"median": 735.8,
-				"mad": 7,
-				"min": 724.5,
-				"max": 759.2,
-				"slack": 73.6,
-				"runs": 10
-			},
-			"heapMiB": {
-				"median": 66.4,
-				"mad": 0,
-				"min": 66.4,
-				"max": 66.5,
-				"slack": 6.6,
-				"runs": 10
-			},
-			"slowFrames": {
-				"median": 0,
-				"mad": 0,
-				"min": 0,
-				"max": 1,
+				"max": 0,
 				"slack": 3,
 				"runs": 10
 			},
@@ -136,36 +95,36 @@
 				"runs": 10
 			}
 		},
-		"few-large-none": {
+		"many-small-compress": {
 			"readyMs": {
-				"median": 2255.3,
-				"mad": 20.7,
-				"min": 2211.3,
-				"max": 2298.3,
-				"slack": 225.5,
+				"median": 914.8,
+				"mad": 5.5,
+				"min": 905.5,
+				"max": 1079.2,
+				"slack": 91.5,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 2093.8,
-				"mad": 21,
-				"min": 2050.4,
-				"max": 2130.3,
-				"slack": 209.4,
+				"median": 742.5,
+				"mad": 3,
+				"min": 727.5,
+				"max": 760.4,
+				"slack": 74.2,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 64.2,
+				"median": 68.9,
 				"mad": 0,
-				"min": 64.1,
-				"max": 64.2,
-				"slack": 6.4,
+				"min": 68.9,
+				"max": 69,
+				"slack": 6.9,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 1,
-				"mad": 0.5,
+				"median": 0,
+				"mad": 0,
 				"min": 0,
-				"max": 6,
+				"max": 0,
 				"slack": 3,
 				"runs": 10
 			},
@@ -178,36 +137,78 @@
 				"runs": 10
 			}
 		},
-		"few-large-compress": {
+		"few-large-none": {
 			"readyMs": {
-				"median": 2519.6,
-				"mad": 3.7,
-				"min": 2507.2,
-				"max": 2605.1,
-				"slack": 252,
+				"median": 2256.5,
+				"mad": 22.8,
+				"min": 2232.2,
+				"max": 2401.7,
+				"slack": 225.7,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 2361.8,
-				"mad": 6.6,
-				"min": 2350.2,
-				"max": 2446.5,
-				"slack": 236.2,
+				"median": 2097.8,
+				"mad": 20.5,
+				"min": 2064.6,
+				"max": 2233.5,
+				"slack": 209.8,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 64.2,
+				"median": 66.7,
 				"mad": 0,
-				"min": 64.2,
-				"max": 64.2,
-				"slack": 6.4,
+				"min": 66.6,
+				"max": 66.7,
+				"slack": 6.7,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 2,
+				"mad": 1,
+				"min": 0,
+				"max": 6,
+				"slack": 4,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 16.7,
+				"mad": 0,
+				"min": 16.7,
+				"max": 16.8,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"few-large-compress": {
+			"readyMs": {
+				"median": 2557.5,
+				"mad": 16.2,
+				"min": 2516.1,
+				"max": 2684.6,
+				"slack": 255.7,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 2398.2,
+				"mad": 11.8,
+				"min": 2357.8,
+				"max": 2418.8,
+				"slack": 239.8,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 66.6,
+				"mad": 0,
+				"min": 66.6,
+				"max": 66.7,
+				"slack": 6.7,
 				"runs": 10
 			},
 			"slowFrames": {
 				"median": 1,
 				"mad": 1,
 				"min": 0,
-				"max": 4,
+				"max": 3,
 				"slack": 4,
 				"runs": 10
 			},
@@ -222,26 +223,26 @@
 		},
 		"one-huge-none": {
 			"readyMs": {
-				"median": 994.7,
-				"mad": 19.6,
-				"min": 971.1,
-				"max": 1079.2,
-				"slack": 99.5,
+				"median": 1009.9,
+				"mad": 11.2,
+				"min": 982.5,
+				"max": 1245.3,
+				"slack": 101,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 928.7,
-				"mad": 19.4,
-				"min": 907.4,
-				"max": 985.6,
-				"slack": 92.9,
+				"median": 945.6,
+				"mad": 11.1,
+				"min": 917,
+				"max": 1065.9,
+				"slack": 94.6,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 11.3,
+				"median": 11.7,
 				"mad": 0,
-				"min": 11.3,
-				"max": 11.4,
+				"min": 11.7,
+				"max": 11.8,
 				"slack": 2,
 				"runs": 10
 			},
@@ -264,34 +265,34 @@
 		},
 		"many-small-fluid": {
 			"readyMs": {
-				"median": 780.4,
-				"mad": 7.4,
-				"min": 764.6,
-				"max": 803.8,
-				"slack": 78,
+				"median": 784.9,
+				"mad": 3.2,
+				"min": 779.1,
+				"max": 816.6,
+				"slack": 78.5,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 602.6,
-				"mad": 3.4,
-				"min": 593.8,
-				"max": 609.3,
-				"slack": 60.3,
+				"median": 612.7,
+				"mad": 5.8,
+				"min": 603.9,
+				"max": 625,
+				"slack": 61.3,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 66.4,
+				"median": 68.9,
 				"mad": 0,
-				"min": 66.4,
-				"max": 66.4,
-				"slack": 6.6,
+				"min": 68.9,
+				"max": 68.9,
+				"slack": 6.9,
 				"runs": 10
 			},
 			"slowFrames": {
 				"median": 0,
 				"mad": 0,
 				"min": 0,
-				"max": 0,
+				"max": 1,
 				"slack": 3,
 				"runs": 10
 			},
@@ -306,77 +307,77 @@
 		},
 		"scroll-slow-cpu": {
 			"readyMs": {
-				"median": 3080.1,
-				"mad": 24.9,
-				"min": 3054.8,
-				"max": 3150.8,
-				"slack": 308,
+				"median": 3134.9,
+				"mad": 28.6,
+				"min": 3084.3,
+				"max": 3191.7,
+				"slack": 313.5,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 2475.8,
-				"mad": 15.8,
-				"min": 2455.2,
-				"max": 2524.3,
-				"slack": 247.6,
+				"median": 2500.5,
+				"mad": 24.8,
+				"min": 2461.5,
+				"max": 2589.1,
+				"slack": 250,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 66.4,
+				"median": 68.9,
 				"mad": 0,
-				"min": 66.4,
-				"max": 66.4,
-				"slack": 6.6,
+				"min": 68.9,
+				"max": 68.9,
+				"slack": 6.9,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 10,
-				"mad": 3,
-				"min": 4,
-				"max": 15,
-				"slack": 12,
+				"median": 11.5,
+				"mad": 1.5,
+				"min": 7,
+				"max": 23,
+				"slack": 6,
 				"runs": 10
 			},
 			"frameP95Ms": {
 				"median": 16.8,
 				"mad": 0,
 				"min": 16.8,
-				"max": 16.8,
+				"max": 33.3,
 				"slack": 5,
 				"runs": 10
 			}
 		},
 		"drag-large-push": {
 			"readyMs": {
-				"median": 187.8,
-				"mad": 2.6,
-				"min": 184.1,
-				"max": 199.7,
+				"median": 211.9,
+				"mad": 4.7,
+				"min": 204.6,
+				"max": 231.2,
 				"slack": 25,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 137,
-				"mad": 0.9,
-				"min": 134.1,
-				"max": 146.2,
+				"median": 158.3,
+				"mad": 2.2,
+				"min": 154.6,
+				"max": 172.5,
 				"slack": 25,
 				"runs": 10
 			},
 			"heapMiB": {
-				"median": 5.1,
+				"median": 5.2,
 				"mad": 0,
-				"min": 5.1,
-				"max": 5.1,
+				"min": 5.2,
+				"max": 5.2,
 				"slack": 2,
 				"runs": 10
 			},
 			"dragMs": {
-				"median": 1757.8,
-				"mad": 10.2,
-				"min": 1707.4,
-				"max": 1789.8,
-				"slack": 175.8,
+				"median": 1760.2,
+				"mad": 16.4,
+				"min": 1724.2,
+				"max": 1846.2,
+				"slack": 176,
 				"runs": 10
 			},
 			"slowFrames": {
@@ -398,18 +399,18 @@
 		},
 		"drag-large-shift": {
 			"readyMs": {
-				"median": 238,
-				"mad": 2.1,
-				"min": 230,
-				"max": 262,
+				"median": 236.9,
+				"mad": 1,
+				"min": 232.4,
+				"max": 242.3,
 				"slack": 25,
 				"runs": 10
 			},
 			"scriptMs": {
-				"median": 183.8,
-				"mad": 1.9,
-				"min": 179,
-				"max": 192.9,
+				"median": 182.6,
+				"mad": 1,
+				"min": 179.2,
+				"max": 191.3,
 				"slack": 25,
 				"runs": 10
 			},
@@ -422,27 +423,27 @@
 				"runs": 10
 			},
 			"dragMs": {
-				"median": 2051.2,
-				"mad": 17.5,
-				"min": 1999.1,
-				"max": 2093.2,
-				"slack": 205.1,
+				"median": 2056.5,
+				"mad": 28.3,
+				"min": 1961.7,
+				"max": 2101,
+				"slack": 205.7,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 5.5,
-				"mad": 0.5,
+				"median": 7,
+				"mad": 1,
 				"min": 4,
-				"max": 8,
-				"slack": 3,
+				"max": 9,
+				"slack": 4,
 				"runs": 10
 			},
 			"frameP95Ms": {
-				"median": 25,
-				"mad": 8.3,
+				"median": 33.3,
+				"mad": 0.1,
 				"min": 16.8,
 				"max": 33.4,
-				"slack": 33,
+				"slack": 5,
 				"runs": 10
 			}
 		}
