@@ -220,6 +220,7 @@
 		if (gridParams.collision === 'shift') startShift();
 		window.addEventListener('pointermove', move);
 		window.addEventListener('pointerup', gestureEnd);
+		window.addEventListener('pointercancel', cancelGesture);
 	}
 
 	function move(event: PointerEvent) {
@@ -447,6 +448,21 @@
 		window.removeEventListener('pointermove', move);
 		window.removeEventListener('pointermove', resize);
 		window.removeEventListener('pointerup', gestureEnd);
+		window.removeEventListener('pointercancel', cancelGesture);
+	}
+
+	/**
+	 * The browser took the pointer away (a touch turned into a scroll, the OS claimed the
+	 * gesture): nothing is dropped, and items that made way for a shift drag go back. The
+	 * browser releases pointer capture itself after pointercancel.
+	 */
+	function cancelGesture() {
+		removeGestureListeners();
+		if (!active) return;
+		previewItem = { ...item };
+		abortShift();
+		active = false;
+		gridParams.updateGrid();
 	}
 
 	// RESIZE ITEM LOGIC
@@ -480,6 +496,7 @@
 		initialSize = { width, height };
 		window.addEventListener('pointermove', resize);
 		window.addEventListener('pointerup', gestureEnd);
+		window.addEventListener('pointercancel', cancelGesture);
 	}
 
 	function resize(event: PointerEvent) {

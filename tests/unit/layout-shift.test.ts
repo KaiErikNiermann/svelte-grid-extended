@@ -174,6 +174,23 @@ describe('shift collision under hostile input', () => {
 		expect(at(grid, 'n')).toEqual({ x: 0, y: 0 });
 	});
 
+	test('a cancelled pointer ends the drag without a drop and puts items that made way back', async () => {
+		const grid = await mountShift([item('a', 0, 0), item('b', 1, 0), item('c', 2, 0)]);
+		await grid.dragSteps('a', [
+			[0.7, 0],
+			[1, 0],
+			() => {
+				window.dispatchEvent(new MouseEvent('pointercancel', { bubbles: true }));
+			},
+			[3, 3]
+		]);
+
+		expect(grid.component.snapshot()).toEqual([item('a', 0, 0), item('b', 1, 0), item('c', 2, 0)]);
+		grid.component.add(item('n', 1, 1));
+		await grid.settle();
+		expect(at(grid, 'n')).toEqual({ x: 1, y: 1 });
+	});
+
 	test('a press without a move changes nothing and releases the drag target', async () => {
 		const grid = await mountShift([item('a', 0, 0), item('b', 1, 0)]);
 		await grid.dragSteps('a', []);
