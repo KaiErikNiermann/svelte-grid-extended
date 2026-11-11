@@ -7,11 +7,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import { highlight } from './tooling/highlight.ts';
+import { rehypeTableScroll } from './tooling/rehype-table-scroll.ts';
 
 const mdsvexOptions: MdsvexOptions = {
 	extensions: ['.md', '.svx'],
 	highlight: { highlighter: highlight },
-	rehypePlugins: [rehypeSlug]
+	rehypePlugins: [rehypeSlug, rehypeTableScroll]
 };
 
 // SvelteKit wants `paths.base` to be empty or root-relative; BASE_PATH comes from the deploy
