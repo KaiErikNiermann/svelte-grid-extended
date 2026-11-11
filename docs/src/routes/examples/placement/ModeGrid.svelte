@@ -122,7 +122,7 @@
 	}
 </script>
 
-<div class="flex flex-col gap-2 min-w-0 h-full">
+<div class="mode-grid">
 	<code class="text-sm font-semibold">{mode}</code>
 	<div class="flex flex-wrap gap-2">
 		{#each scenario.actions ?? [] as action (action.label)}
@@ -136,13 +136,11 @@
 		{/each}
 		<button class="btn btn-sm btn-outline" onclick={reset}>Reset</button>
 	</div>
-	{#if expect}<p class="text-sm text-muted-foreground">Expect: {expect}</p>{/if}
-	<p class="font-mono text-xs">
-		{items.map((it) => `${it.id} (${it.x ?? '-'}, ${it.y ?? '-'}) ${it.w}x${it.h}`).join(' · ')}
-		{#if overlapping}<span class="text-red-600 dark:text-red-400"> · overlapping</span>{/if}
+	<!-- Always present, so every card has the same rows to line up with its neighbours. -->
+	<p class="text-sm text-muted-foreground">
+		{#if expect}Expect: {expect}{/if}
 	</p>
-	<p class="font-mono text-xs min-h-4">{note}</p>
-	<div class="demo-panel mt-auto" onpointerdowncapture={onPress}>
+	<div class="demo-panel" onpointerdowncapture={onPress}>
 		<div
 			class="grid-slot"
 			bind:this={slot}
@@ -176,4 +174,24 @@
 			{/key}
 		</div>
 	</div>
+	<!-- Below the grid: these change during a drag, and above it they would move the grid. -->
+	<p class="font-mono text-xs">
+		{items.map((it) => `${it.id} (${it.x ?? '-'}, ${it.y ?? '-'}) ${it.w}x${it.h}`).join(' · ')}
+		{#if overlapping}<span class="text-red-600 dark:text-red-400"> · overlapping</span>{/if}
+	</p>
+	<p class="font-mono text-xs min-h-4">{note}</p>
 </div>
+
+<style>
+	/* The card's six rows (mode, buttons, expectation, grid, readout, note) are rows of the parent
+	   grid, so cards side by side line up row by row and every grid starts at the same height.
+	   A grid that grows mid-drag then grows downwards; anchored to the bottom, it grew upwards
+	   and carried the dragged item away from the pointer. Without subgrid the cards just stack. */
+	.mode-grid {
+		display: grid;
+		grid-row: span 6;
+		grid-template-rows: subgrid;
+		row-gap: 0.5rem;
+		min-inline-size: 0;
+	}
+</style>

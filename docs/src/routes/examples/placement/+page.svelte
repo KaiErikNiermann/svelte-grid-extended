@@ -238,7 +238,7 @@
 	<h1>Placement Scenarios</h1>
 	<p>
 		Each case has a fixed id, so it can be referred to directly, for example "P2 in push looks
-		wrong". The readout above each grid shows every item's position and size, and flags overlaps.
+		wrong". The readout below each grid shows every item's position and size, and flags overlaps.
 	</p>
 </div>
 
@@ -301,9 +301,8 @@
 		grid-column: 1 / -1;
 	}
 
-	/* Fills the card, so each grid can sit at the bottom and grids in one row line up. */
+	/* Each mode's card spans six of these rows (see ModeGrid), so cards in one row line up. */
 	.modes {
-		flex: 1;
 		display: grid;
 		gap: 1.5rem;
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
