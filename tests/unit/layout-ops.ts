@@ -155,6 +155,11 @@ type Run = {
 	unsettled: boolean;
 	/** During a batch, the items that had registered before it; only they can be targeted. */
 	registered?: Set<string>;
+	/**
+	 * Set once the layout changed in the middle of a drag. In `none` mode the drop then may land
+	 * on an item that appeared under it, and overlapping it is the intended outcome.
+	 */
+	changedMidDrag: boolean;
 };
 
 function chosen(run: Run, index: number): LayoutSpec | undefined {
@@ -212,7 +217,10 @@ async function dragWild(run: Run, id: string, op: Extract<Op, { kind: 'dragWild'
 				return [step.dx, step.dy];
 			}
 			case 'op': {
-				return () => applySimple(run, step.op);
+				return () => {
+					run.changedMidDrag = true;
+					return applySimple(run, step.op);
+				};
 			}
 			case 'removeDragged': {
 				return () => component.remove(id);
@@ -328,7 +336,16 @@ export async function runScenario(
 	const cols = config.breakpointCols ?? 4;
 	const itemSize = config.cell ? { width: config.cell, height: config.cell } : FIXED_SIZE.itemSize;
 	const mounted = mountLayout({ grid: { cols, rows, collision, gap: config.gap ?? 0, itemSize }, items: [] });
-	const run: Run = { mounted, config, cols: 4, rows: fixedRows, nextId: 0, resizeTo, unsettled: false };
+	const run: Run = {
+		mounted,
+		config,
+		cols: 4,
+		rows: fixedRows,
+		nextId: 0,
+		resizeTo,
+		unsettled: false,
+		changedMidDrag: false
+	};
 	await mounted.settle();
 	if (config.breakpointCols) {
 		resizeContainer(run, 1024);
@@ -343,7 +360,8 @@ export async function runScenario(
 					collision,
 					cols: run.cols,
 					rows: fixedRows,
-					allowOverlap: withPatches && collision === 'none'
+					// none overlaps whatever the app or a mid-drag change puts in its way.
+					allowOverlap: collision === 'none' && (withPatches || run.changedMidDrag)
 				}).filter((p) => avoidable(p, items, run.cols, fixedRows)),
 				...(collision === 'compress' ? compressProblems(items) : [])
 			];

@@ -12,6 +12,32 @@ const noneFixedRows: ScenarioConfig = { collision: 'none', rows: 6, withPatches:
 
 const cases: { name: string; config: ScenarioConfig; ops: Op[] }[] = [
 	{
+		// Settled 2026-11-11: none overlaps, so the drop lands on n. Only a real pointer reached it
+		// (its half-cell move snaps to the next row in Chromium, not in jsdom).
+		name: 'in none mode a drag drops onto an item added under it mid-drag, overlapping it',
+		config: noneFixedRows,
+		ops: [
+			{
+				kind: 'batch',
+				ops: [
+					{ kind: 'addFree', w: 3, h: 3 },
+					{ kind: 'addUnplaced', w: 1, h: 1 }
+				]
+			},
+			{
+				kind: 'dragWild',
+				pick: 251_135_785,
+				fast: false,
+				steps: [
+					{ kind: 'move', dx: 0, dy: 0.499_999_961_853_027_25 },
+					{ kind: 'op', op: { kind: 'addUnplaced', w: 2, h: 1 } },
+					{ kind: 'op', op: { kind: 'addFree', w: 1, h: 1 } }
+				]
+			},
+			{ kind: 'drag', pick: 0, dx: 0, dy: 0 }
+		]
+	},
+	{
 		name: 'an item left overlapping in a full grid moves once more columns free a cell',
 		config: noneFixedRows,
 		ops: [
