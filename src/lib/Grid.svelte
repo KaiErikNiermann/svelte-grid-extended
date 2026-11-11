@@ -233,7 +233,10 @@
 		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
 		const moved = !positioned || box.x !== item.x || box.y !== item.y;
 		if (!moved && collision !== 'push') return assignBox(item, box);
-		const changed = assignBox(item, relocateIfColliding(item, box, Object.values(items), limits()));
+		const others = Object.values(items);
+		// The common push case, an item declared on a free cell, costs one scan and no tracking.
+		if (!moved && !hasCollisions({ ...item, ...box }, others)) return assignBox(item, box);
+		const changed = assignBox(item, relocateIfColliding(item, box, others, limits()));
 		trackPlacement(item);
 		return changed;
 	}
