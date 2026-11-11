@@ -1,12 +1,12 @@
 {
 	"env": {
-		"host": "aedf70941939",
+		"host": "29a2a2cd77ea",
 		"cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
 		"cores": 8,
 		"node": "v24.18.1",
 		"chromium": "151.0.7922.34",
-		"commit": "77021a2",
-		"dirty": false
+		"commit": "70f7cb4",
+		"dirty": true
 	},
 	"runs": 10,
 	"scenarios": {
@@ -393,6 +393,56 @@
 				"min": 16.7,
 				"max": 16.8,
 				"slack": 5,
+				"runs": 10
+			}
+		},
+		"drag-large-shift": {
+			"readyMs": {
+				"median": 238,
+				"mad": 2.1,
+				"min": 230,
+				"max": 262,
+				"slack": 25,
+				"runs": 10
+			},
+			"scriptMs": {
+				"median": 183.8,
+				"mad": 1.9,
+				"min": 179,
+				"max": 192.9,
+				"slack": 25,
+				"runs": 10
+			},
+			"heapMiB": {
+				"median": 5.2,
+				"mad": 0,
+				"min": 5.2,
+				"max": 5.2,
+				"slack": 2,
+				"runs": 10
+			},
+			"dragMs": {
+				"median": 2051.2,
+				"mad": 17.5,
+				"min": 1999.1,
+				"max": 2093.2,
+				"slack": 205.1,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 5.5,
+				"mad": 0.5,
+				"min": 4,
+				"max": 8,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 25,
+				"mad": 8.3,
+				"min": 16.8,
+				"max": 33.4,
+				"slack": 33,
 				"runs": 10
 			}
 		}

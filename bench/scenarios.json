@@ -53,5 +53,11 @@
 		"why": "dragging one item across a 200-item push grid, which pushes items on every move",
 		"page": { "grids": 1, "items": 200, "collision": "push" },
 		"measure": ["load", "drag"]
+	},
+	{
+		"name": "drag-large-shift",
+		"why": "the same drag in shift mode, which recomputes the layout around the drag from its start snapshot on every move",
+		"page": { "grids": 1, "items": 200, "collision": "shift" },
+		"measure": ["load", "drag"]
 	}
 ]
