@@ -17,7 +17,7 @@ import {
 	type MountedLayout
 } from '../unit/layout-harness';
 import {
-	RETAINED_AFTER_PRESS,
+	RETAINED_GRIDS,
 	canForceGc,
 	canMeasureHeap,
 	collectGarbage,
@@ -142,10 +142,13 @@ async function heapAfterRound(): Promise<number> {
 // Firefox cannot force a collection from a page, so these run in jsdom and Chromium only;
 // see canForceGc in stress-utils.ts for the measurements behind that.
 describe.skipIf(!canForceGc)('garbage collection', () => {
-	test('destroyed grids and their items are released', async () => {
-		const refs: WeakRef<Element>[] = [];
-		for (let g = 0; g < 30; g++) refs.push(...(await mountAndDestroy(g)));
-		expect(await stillReachable(refs)).toHaveLength(0);
+	test('destroyed grids and their items do not accumulate', async () => {
+		const grids: WeakRef<Element>[][] = [];
+		for (let g = 0; g < 30; g++) grids.push(await mountAndDestroy(g));
+		const alive = await stillReachable(grids.flat());
+		// Count whole grids: one kept grid holds its 12 items too. See RETAINED_GRIDS.
+		const aliveGrids = grids.filter((refs) => refs.some((ref) => alive.includes(ref)));
+		expect(aliveGrids.length).toBeLessThanOrEqual(RETAINED_GRIDS);
 	});
 
 	test('a grid the test keeps reachable is reported as still reachable', async () => {
@@ -162,9 +165,9 @@ describe.skipIf(!canForceGc)('garbage collection', () => {
 	test.each(MODES)('grids destroyed mid-drag do not accumulate (%s)', async (collision) => {
 		const refs: WeakRef<Element>[] = [];
 		for (let g = 0; g < 6; g++) refs.push(await destroyMidDrag(collision));
-		// A leak would keep all six; see RETAINED_AFTER_PRESS for the one Chromium keeps.
+		// A leak would keep all six; see RETAINED_GRIDS for the one Chromium keeps.
 		const alive = await stillReachable(refs);
-		expect(alive.length).toBeLessThanOrEqual(RETAINED_AFTER_PRESS);
+		expect(alive.length).toBeLessThanOrEqual(RETAINED_GRIDS);
 	});
 
 	test.skipIf(!canMeasureHeap)(

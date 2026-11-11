@@ -78,14 +78,19 @@ async function forgetLastPointerTarget(): Promise<void> {
 }
 
 /**
- * How many destroyed grids an environment may keep after a pointer press, however many were
- * destroyed. Chromium keeps one: the target of a pointer event Svelte delegated stays
- * reachable through a currentTarget getter that V8 keeps in PointerEvent's shared shape (heap
- * snapshot: NativeContext -> PointerEvent template -> Map -> DescriptorArray -> AccessorPair
- * -> getter -> the item), and neither a later script event nor a later real press elsewhere
- * reliably replaced it. One element per page is not a leak; a leak keeps every grid.
+ * How many destroyed grids an engine may keep, however many were destroyed. Chromium keeps one
+ * through V8 object shapes that outlive the objects that made them (heap snapshots,
+ * 2026-11-11), neither a leak in the library:
+ * - the target of a pointer event Svelte delegated, through the currentTarget getter Svelte
+ *   defines on the event (NativeContext -> PointerEvent template -> Map -> DescriptorArray ->
+ *   AccessorPair -> getter -> the item);
+ * - the latest test fixture, through the getters on the object Svelte's legacy component API
+ *   returns to testing-library (legacy_api -> FeedbackVector -> AllocationSite -> Map ->
+ *   DescriptorArray -> `get add` -> controller -> the grid).
+ * Which one is kept depends on which objects V8 saw first, so a check allows one grid and fails
+ * when they accumulate: a planted leak keeps every grid.
  */
-export const RETAINED_AFTER_PRESS = IN_JSDOM ? 0 : 1;
+export const RETAINED_GRIDS = IN_JSDOM ? 0 : 1;
 
 /**
  * Runs full collections until finalisation has had a chance to run: gc() from Node's
