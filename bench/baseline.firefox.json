@@ -1,37 +1,37 @@
 {
 	"env": {
-		"host": "cbcc8ab8f59d",
+		"host": "2b3b58d91727",
 		"cpu": "Intel(R) Core(TM) i7-7700K CPU @ 4.20GHz",
 		"cores": 8,
 		"node": "v24.18.1",
 		"browser": "firefox",
 		"browserVersion": "153.0",
-		"commit": "bf7cf28",
+		"commit": "26e8749",
 		"dirty": true
 	},
 	"runs": 10,
 	"scenarios": {
 		"many-small-none": {
 			"readyMs": {
-				"median": 1657.5,
-				"mad": 11,
-				"min": 1446,
-				"max": 1974,
-				"slack": 165.8,
+				"median": 1470.5,
+				"mad": 8.5,
+				"min": 1452,
+				"max": 1707,
+				"slack": 147.1,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 3,
-				"mad": 1,
+				"median": 0,
+				"mad": 0,
 				"min": 0,
-				"max": 5,
-				"slack": 4,
+				"max": 0,
+				"slack": 3,
 				"runs": 10
 			},
 			"frameP95Ms": {
 				"median": 17.2,
 				"mad": 0,
-				"min": 17.1,
+				"min": 17.2,
 				"max": 17.2,
 				"slack": 5,
 				"runs": 10
@@ -39,115 +39,11 @@
 		},
 		"many-small-push": {
 			"readyMs": {
-				"median": 1729.5,
-				"mad": 7,
-				"min": 1547,
-				"max": 1796,
-				"slack": 173,
-				"runs": 10
-			},
-			"slowFrames": {
-				"median": 1,
-				"mad": 1,
-				"min": 0,
-				"max": 7,
-				"slack": 4,
-				"runs": 10
-			},
-			"frameP95Ms": {
-				"median": 17.2,
-				"mad": 0,
-				"min": 17.1,
-				"max": 17.2,
-				"slack": 5,
-				"runs": 10
-			}
-		},
-		"many-small-compress": {
-			"readyMs": {
-				"median": 1735,
-				"mad": 9,
-				"min": 1527,
-				"max": 1810,
-				"slack": 173.5,
-				"runs": 10
-			},
-			"slowFrames": {
-				"median": 1.5,
-				"mad": 1.5,
-				"min": 0,
-				"max": 4,
-				"slack": 6,
-				"runs": 10
-			},
-			"frameP95Ms": {
-				"median": 17.2,
-				"mad": 0,
-				"min": 17.1,
-				"max": 17.2,
-				"slack": 5,
-				"runs": 10
-			}
-		},
-		"few-large-none": {
-			"readyMs": {
-				"median": 4304,
-				"mad": 79,
-				"min": 4089,
-				"max": 5317,
-				"slack": 430.4,
-				"runs": 10
-			},
-			"slowFrames": {
-				"median": 16,
-				"mad": 3,
-				"min": 12,
-				"max": 24,
-				"slack": 12,
-				"runs": 10
-			},
-			"frameP95Ms": {
-				"median": 33.2,
-				"mad": 0.1,
-				"min": 17.2,
-				"max": 33.3,
-				"slack": 5,
-				"runs": 10
-			}
-		},
-		"few-large-compress": {
-			"readyMs": {
-				"median": 4611.5,
-				"mad": 41,
-				"min": 4358,
-				"max": 4886,
-				"slack": 461.2,
-				"runs": 10
-			},
-			"slowFrames": {
-				"median": 18,
-				"mad": 2,
-				"min": 8,
-				"max": 23,
-				"slack": 8,
-				"runs": 10
-			},
-			"frameP95Ms": {
-				"median": 33.3,
-				"mad": 0,
-				"min": 17.2,
-				"max": 33.3,
-				"slack": 5,
-				"runs": 10
-			}
-		},
-		"one-huge-none": {
-			"readyMs": {
-				"median": 2045,
-				"mad": 31.5,
-				"min": 2000,
-				"max": 2339,
-				"slack": 204.5,
+				"median": 1554,
+				"mad": 8.5,
+				"min": 1531,
+				"max": 1636,
+				"slack": 155.4,
 				"runs": 10
 			},
 			"slowFrames": {
@@ -167,27 +63,131 @@
 				"runs": 10
 			}
 		},
-		"many-small-fluid": {
+		"many-small-compress": {
 			"readyMs": {
-				"median": 1601,
-				"mad": 8,
-				"min": 1397,
-				"max": 1732,
-				"slack": 160.1,
+				"median": 1537.5,
+				"mad": 10.5,
+				"min": 1526,
+				"max": 1594,
+				"slack": 153.8,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 1.5,
-				"mad": 0.5,
+				"median": 0,
+				"mad": 0,
 				"min": 0,
-				"max": 6,
+				"max": 0,
 				"slack": 3,
 				"runs": 10
 			},
 			"frameP95Ms": {
 				"median": 17.2,
 				"mad": 0,
-				"min": 17.1,
+				"min": 17.2,
+				"max": 17.2,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"few-large-none": {
+			"readyMs": {
+				"median": 4225,
+				"mad": 34.5,
+				"min": 4183,
+				"max": 4310,
+				"slack": 422.5,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 4,
+				"mad": 1.5,
+				"min": 1,
+				"max": 6,
+				"slack": 6,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 17.2,
+				"mad": 0,
+				"min": 17.2,
+				"max": 17.2,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"few-large-compress": {
+			"readyMs": {
+				"median": 4491.5,
+				"mad": 27,
+				"min": 4412,
+				"max": 4577,
+				"slack": 449.2,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 2.5,
+				"mad": 0.5,
+				"min": 0,
+				"max": 8,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 17.2,
+				"mad": 0,
+				"min": 17.2,
+				"max": 17.2,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"one-huge-none": {
+			"readyMs": {
+				"median": 2013,
+				"mad": 8.5,
+				"min": 1984,
+				"max": 2026,
+				"slack": 201.3,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 0,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 17.2,
+				"mad": 0,
+				"min": 17.2,
+				"max": 17.2,
+				"slack": 5,
+				"runs": 10
+			}
+		},
+		"many-small-fluid": {
+			"readyMs": {
+				"median": 1416,
+				"mad": 17,
+				"min": 1394,
+				"max": 1468,
+				"slack": 141.6,
+				"runs": 10
+			},
+			"slowFrames": {
+				"median": 0,
+				"mad": 0,
+				"min": 0,
+				"max": 1,
+				"slack": 3,
+				"runs": 10
+			},
+			"frameP95Ms": {
+				"median": 17.2,
+				"mad": 0,
+				"min": 17.2,
 				"max": 17.2,
 				"slack": 5,
 				"runs": 10
@@ -195,26 +195,26 @@
 		},
 		"drag-large-push": {
 			"readyMs": {
-				"median": 340,
-				"mad": 11.5,
-				"min": 325,
-				"max": 388,
-				"slack": 46,
+				"median": 333,
+				"mad": 7.5,
+				"min": 321,
+				"max": 348,
+				"slack": 33.3,
 				"runs": 10
 			},
 			"dragMs": {
-				"median": 1644,
-				"mad": 14.5,
-				"min": 1623,
-				"max": 1669,
-				"slack": 164.4,
+				"median": 1671,
+				"mad": 25.5,
+				"min": 1641,
+				"max": 1740,
+				"slack": 167.1,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 0,
-				"mad": 0,
+				"median": 0.5,
+				"mad": 0.5,
 				"min": 0,
-				"max": 2,
+				"max": 3,
 				"slack": 3,
 				"runs": 10
 			},
@@ -222,41 +222,41 @@
 				"median": 17.2,
 				"mad": 0,
 				"min": 17.2,
-				"max": 17.2,
+				"max": 17.3,
 				"slack": 5,
 				"runs": 10
 			}
 		},
 		"drag-large-shift": {
 			"readyMs": {
-				"median": 351.5,
-				"mad": 8.5,
-				"min": 340,
-				"max": 368,
-				"slack": 35.2,
+				"median": 358,
+				"mad": 4.5,
+				"min": 345,
+				"max": 369,
+				"slack": 35.8,
 				"runs": 10
 			},
 			"dragMs": {
-				"median": 1784.5,
-				"mad": 16,
-				"min": 1737,
-				"max": 1918,
-				"slack": 178.5,
+				"median": 1788,
+				"mad": 43,
+				"min": 1733,
+				"max": 1913,
+				"slack": 178.8,
 				"runs": 10
 			},
 			"slowFrames": {
-				"median": 5.5,
-				"mad": 0.5,
-				"min": 4,
+				"median": 6,
+				"mad": 1,
+				"min": 3,
 				"max": 8,
-				"slack": 3,
+				"slack": 4,
 				"runs": 10
 			},
 			"frameP95Ms": {
-				"median": 33.3,
+				"median": 33.2,
 				"mad": 0.1,
 				"min": 17.2,
-				"max": 34.1,
+				"max": 33.4,
 				"slack": 5,
 				"runs": 10
 			}
