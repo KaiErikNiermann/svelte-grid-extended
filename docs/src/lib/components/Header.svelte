@@ -1,10 +1,19 @@
 <script lang="ts">
-	import { Menu, X } from 'lucide-svelte';
+	import { Menu, Search, X } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import Sidebar from './Sidebar.svelte';
+	import SearchPalette from './SearchPalette.svelte';
 	import { resolve } from '$app/paths';
 
 	let mobileMenuOpen = $state(false);
+	let palette: SearchPalette | undefined = $state();
+	// The palette opens on Ctrl+K, or Cmd+K on a Mac; the hint names the one that applies.
+	let shortcutKey = $state('Ctrl');
+
+	onMount(() => {
+		if (/Mac|iPhone|iPad/.test(navigator.userAgent)) shortcutKey = 'Cmd';
+	});
 
 	function toggleMobileMenu() {
 		mobileMenuOpen = !mobileMenuOpen;
@@ -36,7 +45,19 @@
 			<span class="text-primary">Svelte 5 Grid</span>
 		</a>
 
-		<div class="flex-1"></div>
+		<button
+			type="button"
+			class="search-trigger"
+			onclick={() => palette?.open()}
+			aria-label="Search the docs"
+			aria-keyshortcuts="Control+K Meta+K"
+		>
+			<Search class="h-4 w-4 shrink-0" aria-hidden="true" />
+			<span class="truncate">Search</span>
+			<kbd>{shortcutKey} K</kbd>
+		</button>
+
+		<div class="hidden flex-1 md:block"></div>
 
 		<nav class="hidden md:flex items-center gap-6 text-sm">
 			<a href={docsPath} class="text-muted-foreground hover:text-foreground transition-colors"
@@ -93,3 +114,5 @@
 		</div>
 	{/if}
 </header>
+
+<SearchPalette bind:this={palette} />
