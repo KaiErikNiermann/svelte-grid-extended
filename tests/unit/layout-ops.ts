@@ -155,11 +155,6 @@ type Run = {
 	unsettled: boolean;
 	/** During a batch, the items that had registered before it; only they can be targeted. */
 	registered?: Set<string>;
-	/**
-	 * Set once the layout changed in the middle of a drag. In `none` mode the drop then may land
-	 * on an item that appeared under it, and overlapping it is the intended outcome.
-	 */
-	changedMidDrag: boolean;
 };
 
 function chosen(run: Run, index: number): LayoutSpec | undefined {
@@ -217,10 +212,7 @@ async function dragWild(run: Run, id: string, op: Extract<Op, { kind: 'dragWild'
 				return [step.dx, step.dy];
 			}
 			case 'op': {
-				return () => {
-					run.changedMidDrag = true;
-					return applySimple(run, step.op);
-				};
+				return () => applySimple(run, step.op);
 			}
 			case 'removeDragged': {
 				return () => component.remove(id);
@@ -343,8 +335,7 @@ export async function runScenario(
 		rows: fixedRows,
 		nextId: 0,
 		resizeTo,
-		unsettled: false,
-		changedMidDrag: false
+		unsettled: false
 	};
 	await mounted.settle();
 	if (config.breakpointCols) {
@@ -360,8 +351,8 @@ export async function runScenario(
 					collision,
 					cols: run.cols,
 					rows: fixedRows,
-					// none overlaps whatever the app or a mid-drag change puts in its way.
-					allowOverlap: collision === 'none' && (withPatches || run.changedMidDrag)
+					// none keeps the overlaps the app sets with props; a drag never makes one.
+					allowOverlap: collision === 'none' && withPatches
 				}).filter((p) => avoidable(p, items, run.cols, fixedRows)),
 				...(collision === 'compress' ? compressProblems(items) : [])
 			];

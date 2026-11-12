@@ -12,9 +12,10 @@ const noneFixedRows: ScenarioConfig = { collision: 'none', rows: 6, withPatches:
 
 const cases: { name: string; config: ScenarioConfig; ops: Op[] }[] = [
 	{
-		// Settled 2026-11-11: none overlaps, so the drop lands on n. Only a real pointer reached it
-		// (its half-cell move snaps to the next row in Chromium, not in jsdom).
-		name: 'in none mode a drag drops onto an item added under it mid-drag, overlapping it',
+		// none: an item added under the outline mid-drag sends the drop back to a free cell
+		// (PR #9, P2). Only a real pointer reached it: its half-cell move snaps to the next row
+		// in Chromium, not in jsdom.
+		name: 'in none mode a drag steps off an item added under it mid-drag',
 		config: noneFixedRows,
 		ops: [
 			{

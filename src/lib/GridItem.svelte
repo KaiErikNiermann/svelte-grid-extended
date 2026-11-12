@@ -3,7 +3,7 @@
 
 	import { coordinate2size, calcPosition, snapOnMove, snapOnResize, type SnapGridParams } from './utils/item';
 	import { blockingRow, hasCollisions, getCollisions, getAvailablePosition } from './utils/grid';
-	import { assignBox, parseCoordinate, parseSize } from './utils/placement';
+	import { assignBox, parseCoordinate, parseSize, type Box } from './utils/placement';
 	import { displaceStep, type DragState, type Placed } from './utils/displace';
 	import { leftPress, waitsForPress } from './utils/press';
 
@@ -196,6 +196,7 @@
 	function initInteraction(event: PointerEvent) {
 		active = true;
 		gestureStart = { x: previewItem.x, y: previewItem.y, w: previewItem.w, h: previewItem.h };
+		trail = [gestureStart];
 		const at = pointerInGrid(event);
 		initialPointerPosition.left = at.left;
 		initialPointerPosition.top = at.top;
@@ -225,6 +226,52 @@
 		itemRef.releasePointerCapture(event.pointerId);
 		gridParams.updateGrid();
 	}
+
+	// NONE MODE: THE LAYOUT WINS
+
+	/**
+	 * In `none` mode, the boxes the preview took during this gesture, oldest first; the first is
+	 * where the gesture started. A drag or resize never takes an occupied cell, and when the app
+	 * puts an item under the preview mid-gesture (adds one, moves one by its props), the preview
+	 * steps back along this trail to the last box that is still free. The new item stays where
+	 * the app put it: none never moves another item.
+	 */
+	let trail: Box[] = [];
+
+	function boxOf(it: Box): Box {
+		return { x: it.x, y: it.y, w: it.w, h: it.h };
+	}
+
+	/** Moves the preview to `next` when nothing else is there. */
+	function takeIfFree(next: LayoutItem) {
+		if (hasCollisions(next, Object.values(gridParams.items))) return;
+		previewItem = next;
+		const last = trail.at(-1);
+		const box = boxOf(next);
+		if (!last || last.x !== box.x || last.y !== box.y || last.w !== box.w || last.h !== box.h) trail.push(box);
+	}
+
+	/**
+	 * Steps the preview back to the latest free box on its trail. When even the start is taken,
+	 * the preview returns there anyway, so the drop keeps the item where it is: that overlap
+	 * came from the app, which none mode allows.
+	 */
+	function retreatToFree(others: LayoutItem[]) {
+		let at = trail.length - 1;
+		while (at > 0 && hasCollisions({ ...previewItem, ...trail[at] }, others)) at--;
+		const back = trail[at] ?? gestureStart;
+		trail.length = at + 1;
+		previewItem = { ...previewItem, ...back };
+	}
+
+	$effect(() => {
+		if (!active || gridParams.collision !== 'none') return;
+		// Tracks the items and the fields the check reads, so it runs again when another item is
+		// added, moved or resized into the preview. The preview itself only ever moves to free boxes.
+		const others = Object.values(gridParams.items);
+		const preview = untrack(() => previewItem);
+		if (hasCollisions(preview, others)) untrack(() => retreatToFree(others));
+	});
 
 	// MOVE ITEM LOGIC
 
@@ -272,9 +319,7 @@
 		if (gridParams.collision === 'shift') {
 			moveWithShift(newX, newY);
 		} else if (gridParams.collision === 'none') {
-			if (!hasCollisions({ ...previewItem, x: newX, y: newY }, Object.values(gridParams.items))) {
-				previewItem = { ...previewItem, x: newX, y: newY };
-			}
+			takeIfFree({ ...previewItem, x: newX, y: newY });
 		} else {
 			movePreviewWithCollisions(newX, newY);
 		}
@@ -626,9 +671,7 @@
 		const snapParams = gridParams as SnapGridParams;
 		const { w: newW, h: newH } = snapOnResize(width, height, previewItem, snapParams);
 		if (gridParams.collision === 'none') {
-			if (!hasCollisions({ ...previewItem, w: newW, h: newH }, Object.values(gridParams.items))) {
-				previewItem = { ...previewItem, w: newW, h: newH };
-			}
+			takeIfFree({ ...previewItem, w: newW, h: newH });
 		} else {
 			resizePreviewWithCollisions(newW, newH);
 		}

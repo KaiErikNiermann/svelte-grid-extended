@@ -107,6 +107,8 @@ export type MountedLayout = {
 	 */
 	hold: (selector: string, dx: number, dy: number) => Promise<HeldPointer>;
 	drawn: () => Record<string, { x: number; y: number; w: number; h: number }>;
+	/** The drag or resize outline, in cells, or undefined when no gesture shows one. */
+	preview: () => { x: number; y: number; w: number; h: number } | undefined;
 	gridElement: () => HTMLElement;
 };
 
@@ -341,6 +343,10 @@ export function mountLayout(options: {
 					return [id, toCells(left, top, width, height)];
 				})
 			),
+		preview: () => {
+			const el = container.querySelector<HTMLElement>('.pv');
+			return el ? toCells(el.style.left, el.style.top, el.style.width, el.style.height) : undefined;
+		},
 		gridElement: () => container.querySelector<HTMLElement>('.svelte-grid-extended')!
 	};
 }
