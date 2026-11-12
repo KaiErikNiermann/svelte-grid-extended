@@ -98,7 +98,7 @@
 			steps:
 				'Press on a, drag it to another cell and keep holding. One second after the press, n is added under the outline. Then release.',
 			expect: {
-				none: 'n appears under the outline and a drops onto it.',
+				none: 'n appears under the outline, and the outline steps back to the last free cell a passed (its own cell if there is none). a drops there; n stays where it was added.',
 				push: 'a already sits in the cell it is dragged to, so n takes the first free cell.',
 				compress: 'n is compressed in below a.',
 				shift:
@@ -135,7 +135,7 @@
 			steps:
 				'Press on a, drag it to another cell and keep holding. One second after the press, b is moved under the outline. Then release.',
 			expect: {
-				none: 'b moves under the outline and a drops onto it.',
+				none: 'b moves under the outline, and the outline steps back to the last free cell a passed (its own cell if there is none). a drops there; b stays where it was moved.',
 				push: 'b lands on a and pushes it away; the drop then puts a where it was heading and pushes b to the first free cell, so the two swap.',
 				compress:
 					'b lands on a and pushes it away; the drop then puts a where it was heading and pushes b to the first free cell, as in push.',

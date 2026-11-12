@@ -19,7 +19,7 @@ With `push` and `compress`, this covers every way an item can end up on another 
 
 ### None (Default)
 
-Setting `collision="none"` allows items to overlap freely. This is the default behavior.
+Setting `collision="none"` never moves an item the user is not dragging or resizing. This is the default behavior.
 
 ```svelte twoslash
 <script lang="ts">
@@ -32,9 +32,15 @@ Setting `collision="none"` allows items to overlap freely. This is the default b
 </Grid>
 ```
 
+**Behavior:**
+
+- A drag or resize never takes a cell another item covers: the outline stays at the last free cell
+- An item the app adds or moves under the outline mid-drag stays where it was put, and the outline steps back to the last free cell it passed (the item's own place if there is none); the drop lands there. The same holds for a resize
+- Positions and sizes set through props are applied as given, so the app can place items over each other
+
 **Use cases:**
 
-- When overlap is acceptable or desired
+- When the app places items, overlaps included, and arranging one must never move the others
 - For simpler use cases without dynamic rearrangement
 - When you want full control over item positioning
 
@@ -115,12 +121,12 @@ The <a href={placementPath}>placement scenarios</a> show each of these rules, an
 
 ## Comparison
 
-| Mode       | Overlap | Auto-arrange | Best for                         |
-| ---------- | ------- | ------------ | -------------------------------- |
-| `none`     | Yes     | No           | Simple layouts, manual control   |
-| `push`     | No      | Pushes down  | Dashboard widgets, kanban boards |
-| `compress` | No      | Fills gaps   | Compact layouts, masonry-style   |
-| `shift`    | No      | Makes way    | Home-screen style rearranging    |
+| Mode       | Overlap    | Auto-arrange | Best for                         |
+| ---------- | ---------- | ------------ | -------------------------------- |
+| `none`     | From props | No           | Simple layouts, manual control   |
+| `push`     | No         | Pushes down  | Dashboard widgets, kanban boards |
+| `compress` | No         | Fills gaps   | Compact layouts, masonry-style   |
+| `shift`    | No         | Makes way    | Home-screen style rearranging    |
 
 ## Example: Push Collision
 

@@ -114,10 +114,10 @@
 		if (scenario.duringDrag === 'add') {
 			const id = freshId(items);
 			items = [...items, { id, x, y, w: 1, h: 1 }];
-			note = `${id} was added at (${x}, ${y}), under the outline. Release now.`;
+			note = `${id} was added at (${x}, ${y}), the cell the outline was on. Release now.`;
 		} else {
 			items = items.map((it) => (it.id === 'b' ? { ...it, x, y } : it));
-			note = `b was moved to (${x}, ${y}), under the outline. Release now.`;
+			note = `b was moved to (${x}, ${y}), the cell the outline was on. Release now.`;
 		}
 	}
 </script>
