@@ -30,8 +30,8 @@ import {
 } from './stress-utils';
 
 const harness = useLayoutHarness();
-// Measured on 2026-11-10 (3 runs): the heap rises 0.2 MiB while the JIT warms up, then the
-// last 6 rounds (120 grids) grow 0.1 MiB at most. A 2 KiB-per-grid leak would add 0.23 MiB.
+// Measured on 2026-11-12 (8 runs), compiled code left out (see heapUsed): the last 6 rounds
+// (120 grids) grow 0.1 MiB at most. A planted 2 KiB-per-grid leak grew 0.2 MiB and failed.
 const HEAP_GROWTH_BOUND = 0.2 * 2 ** 20;
 const listeners = trackWindowListeners();
 const pointerListeners = () => listeners.live('pointermove', 'pointerup');

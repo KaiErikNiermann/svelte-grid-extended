@@ -6,8 +6,20 @@ import { afterEach, beforeEach } from 'vitest';
 
 import { IN_JSDOM, item, type LayoutSpec } from '../unit/layout-harness';
 
-type NodeProcess = { stderr: { write: (s: string) => void }; memoryUsage: () => { heapUsed: number } };
+type HeapSpace = { space_name: string; space_used_size: number };
+type NodeProcess = {
+	stderr: { write: (s: string) => void };
+	getBuiltinModule: (id: 'node:v8') => { getHeapSpaceStatistics: () => HeapSpace[] };
+};
 const node = (globalThis as { process?: NodeProcess }).process;
+
+/**
+ * V8's spaces for compiled code and bytecode. The JIT keeps compiling and re-tiering functions
+ * long after a test warms up: between round 8 and round 30 of the heap test (2026-11-12, heap
+ * snapshot diff) the heap grew 375 KiB, of which 290 KiB was code and bytecode and no app
+ * object, closure or DOM node grew. Counting it made the flatness check fail at random.
+ */
+const CODE_SPACES = /^(code|trusted|shared_trusted)(_large_object)?_space$/;
 /** Chromium's heap figures; precise only with --enable-precise-memory-info (vitest.config.ts). */
 const chromeMemory = (performance as { memory?: { usedJSHeapSize: number } }).memory;
 /** gc() from Node's --expose-gc or Chromium's --js-flags=--expose-gc; Firefox has none. */
@@ -25,9 +37,15 @@ export const canForceGc = gc !== undefined;
 /** Writes a measurement where vitest shows it next to the test. */
 export const report = (line: string) => (node ? node.stderr.write(`${line}\n`) : console.log(line));
 
-/** Heap in use, or undefined where the page cannot read it (Firefox). */
+/**
+ * Heap in use, or undefined where the page cannot read it (Firefox). In Node it leaves out
+ * compiled code (see CODE_SPACES), which is not something a test can leak.
+ */
 export function heapUsed(): number | undefined {
-	if (node) return node.memoryUsage().heapUsed;
+	if (node) {
+		const spaces = node.getBuiltinModule('node:v8').getHeapSpaceStatistics();
+		return spaces.filter((s) => !CODE_SPACES.test(s.space_name)).reduce((sum, s) => sum + s.space_used_size, 0);
+	}
 	return chromeMemory?.usedJSHeapSize;
 }
 export const canMeasureHeap = heapUsed() !== undefined;
