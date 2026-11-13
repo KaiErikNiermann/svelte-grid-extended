@@ -59,6 +59,16 @@
 	#svelte {
 		height: 100%;
 	}
+
+	/* The open mobile menu holds the page still. A drag on its backdrop would otherwise scroll
+	   the page, and in Firefox for Android that hides the dynamic toolbar: while it slides away,
+	   fixed boxes keep their old height and the bottom strip shows the page unblurred. 1024px is
+	   the lg breakpoint, where the menu gives way to the sidebar. */
+	@media (width < 1024px) {
+		html:has([aria-controls='mobile-nav'][aria-expanded='true']) {
+			overflow: hidden;
+		}
+	}
 }
 
 @layer components {
