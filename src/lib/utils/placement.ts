@@ -1,6 +1,7 @@
 import type { LayoutItem } from '../types';
 import { getAvailablePosition, getCollisions, hasCollisions } from './grid';
 import { clamp } from './item';
+import { nearestFree, overlaps } from './displace';
 
 export type Limits = { maxCols: number; maxRows: number };
 export type Box = Pick<LayoutItem, 'x' | 'y' | 'w' | 'h'>;
@@ -80,4 +81,28 @@ export function relocateIfColliding(item: LayoutItem, box: Box, items: LayoutIte
 	if (!hasCollisions(candidate, items)) return box;
 	const free = getAvailablePosition(candidate, items, limits.maxCols, limits.maxRows);
 	return free ? { ...box, ...free } : box;
+}
+
+/**
+ * Places a batch of items that joined together, each with a preferred box, around `others`
+ * that stay put. Every item whose box is free takes it first, in batch order, so an item that
+ * has to move cannot take a cell another item of the batch asked for. The rest then take the
+ * free cell nearest their box, or keep it when the grid has none. Returns one box per item.
+ */
+export function placePreferred(batch: readonly LayoutItem[], others: readonly LayoutItem[], limits: Limits): Box[] {
+	const taken: Box[] = [...others];
+	const kept = batch.map((item) => {
+		const free = !taken.some((t) => overlaps(item, t));
+		if (free) taken.push(item);
+		return free;
+	});
+	return batch.map((item, i) => {
+		const box = { x: item.x, y: item.y, w: item.w, h: item.h };
+		if (kept[i]) return box;
+		const cell = nearestFree(box, box, taken, { cols: limits.maxCols, rows: limits.maxRows });
+		if (!cell) return box;
+		const placed = { ...box, ...cell };
+		taken.push(placed);
+		return placed;
+	});
 }

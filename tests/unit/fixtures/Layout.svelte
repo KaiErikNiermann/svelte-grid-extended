@@ -61,6 +61,7 @@
 				max={it.max}
 				movable={it.movable}
 				resizable={it.resizable}
+				placement={it.placement}
 				class={`it it-${it.id}`}
 				previewClass={`pv pv-${it.id}`}
 				onchange={() => onchange?.(it.id)}

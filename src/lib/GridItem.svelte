@@ -20,6 +20,7 @@
 		max,
 		movable = true,
 		resizable = true,
+		placement = 'exact',
 		class: classes,
 		activeClass,
 		previewClass,
@@ -67,6 +68,7 @@
 		item.max = max;
 		item.movable = movable;
 		item.resizable = resizable;
+		item.placement = placement;
 		const next = { x, y, w, h };
 		untrack(() => syncBox(next));
 	});

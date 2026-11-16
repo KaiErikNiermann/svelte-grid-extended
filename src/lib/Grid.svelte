@@ -27,6 +27,7 @@
 		assignBox,
 		clampToLimits,
 		hasPosition,
+		placePreferred,
 		pushAside,
 		relocateIfColliding,
 		type Box,
@@ -230,6 +231,8 @@
 		if (compressQueued) return;
 		compressQueued = true;
 		queueMicrotask(() => {
+			// `preferred` items of this tick take their cells before compress packs around them.
+			if (pending.length > 0) placePending();
 			compressQueued = false;
 			if (!destroyed && autoCompress && collision === 'compress') _controller._internalCompress(items);
 		});
@@ -299,12 +302,19 @@
 	 * another item. In push mode a new item declared on an occupied cell also moves to the first
 	 * free cell, rather than pushing the items already there; compress resolves the overlap by
 	 * compressing, and `none` allows it. Otherwise an item that fits is left exactly as given.
-	 * Returns whether the item changed, so its bindings can be updated.
+	 * An item whose `placement` is `preferred` is only clamped here and placed with the rest of
+	 * its tick by `placePending`. Returns whether the item changed, so its bindings can be
+	 * updated.
 	 */
 	function placeNewItem(item: LayoutItem): boolean {
 		const positioned = hasPosition(item);
 		const box = clampToLimits(positioned ? item : { ...item, x: 0, y: 0 }, limits());
 		const moved = !positioned || box.x !== item.x || box.y !== item.y;
+		if (positioned && item.placement === 'preferred' && collision !== 'shift') {
+			pending.push(item);
+			if (pending.length === 1) queueMicrotask(placePending);
+			return assignBox(item, box);
+		}
 		if (collision === 'shift') {
 			const changed = assignBox(item, moved || overlapsTaken({ ...item, ...box }) ? nearestFreeBox(item, box) : box);
 			trackPlacement(item);
@@ -317,6 +327,30 @@
 		const changed = assignBox(item, relocateIfColliding(item, box, others, limits()));
 		trackPlacement(item);
 		return changed;
+	}
+
+	// `preferred` items that joined in this tick. Items mounted by one change register one by
+	// one, so placing each at once let an item that had to move take the cell a later one
+	// asked for. The microtask runs after the whole mount, before the browser paints.
+	let pending: LayoutItem[] = [];
+
+	/** Places the `preferred` items that joined together: asked-for free cells first, then the rest. */
+	function placePending(): void {
+		const batch = pending.filter((it) => items[it.id] === it);
+		pending = [];
+		if (destroyed || batch.length === 0) return;
+		const others = Object.values(items).filter((it) => !batch.includes(it));
+		const boxes = placePreferred(batch, others, limits());
+		let moved = false;
+		for (const [i, it] of batch.entries()) {
+			const box = boxes[i];
+			if (box && assignBox(it, box)) {
+				moved = true;
+				it.invalidate();
+			}
+			trackPlacement(it);
+		}
+		if (!moved) updateGrid();
 	}
 
 	/** The item whose drag or resize runs now; the grid's layout logic assumes one at a time. */

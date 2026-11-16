@@ -1,4 +1,4 @@
-import type { Size } from '../../../src/lib/types';
+import type { Placement, Size } from '../../../src/lib/types';
 
 /** One item as the layout fixture holds it; `x`/`y` may be missing to test auto-placement. */
 export type LayoutSpec = {
@@ -11,4 +11,5 @@ export type LayoutSpec = {
 	max?: Size;
 	movable?: boolean;
 	resizable?: boolean;
+	placement?: Placement;
 };

@@ -26,10 +26,13 @@ import { GridItem } from '@appulsauce/svelte-grid';
 | `max`             | `{ w: number, h: number } \| undefined` | `undefined`      | Maximum size constraints. If undefined, no max limit.                              |
 | `movable`         | `boolean`                               | `true`           | Whether the item can be dragged.                                                   |
 | `resizable`       | `boolean`                               | `true`           | Whether the item can be resized.                                                   |
+| `placement`       | `'exact' \| 'preferred'`                | `'exact'`        | How `x`/`y` are read when the item joins on an occupied cell; see below.           |
 | `onchange`        | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when this item changes.                                                   |
 | `onpreviewchange` | `(detail: LayoutChangeDetail) => void`  | `undefined`      | Callback when the preview position changes during drag.                            |
 
 Positions and sizes are whole grid cells. A fractional value is rounded, a size is at least 1, and a value that is not a finite number (`NaN`, `Infinity`) is ignored: before the item joins the grid it gets the first free cell (or a size of 1), and afterwards it keeps its current value. An item placed outside a grid with fixed `cols` or `rows` is moved inside it. When the grid changes a value this way, the bound prop is updated to match.
+
+With `placement="preferred"`, `x`/`y` are a preferred position: when the item joins the grid it takes them if they are free, and otherwise goes to the free cell nearest them, leaving the other items where they are. Items that join in the same tick, such as a group revealed at once, are placed together: every item whose cell is free gets it first, and the rest then take the nearest cells left, so no two share a cell and a moved item never takes a cell another one asked for. This is meant for `collision="none"`, where the default `exact` keeps the given cell and the item overlaps whatever is there. Push mode honours it too, in place of moving the item to the first free cell in reading order; shift mode always moves a new item to the nearest free cell and ignores it. Only joining reads it: a later change of `x`/`y` is applied as the mode applies it. In a grid with fixed `cols` and `rows` and no free cell, the item keeps its position until a cell frees up.
 
 ## Style Props
 

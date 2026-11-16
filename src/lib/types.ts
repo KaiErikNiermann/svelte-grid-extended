@@ -8,6 +8,8 @@ export type LayoutItem = Size &
 		max?: Size;
 		movable: boolean;
 		resizable: boolean;
+		/** How registration treats `x`/`y` on an occupied cell; see `GridItemProps.placement`. */
+		placement?: Placement;
 		invalidate: () => void;
 	};
 
@@ -76,6 +78,12 @@ export type LayoutChangeDetail = {
 
 export type Collision = 'none' | 'push' | 'compress' | 'shift';
 
+/**
+ * How a new item's `x`/`y` are read when they land on an occupied cell: `exact` keeps them
+ * (in `none` mode the items overlap), `preferred` moves the item to the nearest free cell.
+ */
+export type Placement = 'exact' | 'preferred';
+
 export type GridController = {
 	/** The grid's current settings and items. */
 	gridParams: GridParams;
@@ -130,6 +138,17 @@ export type GridItemProps = {
 	min?: Size;
 	/** Largest size a resize can reach, in cells; no limit when left out. */
 	max?: Size;
+	/**
+	 * How `x`/`y` are read when the item joins the grid on an occupied cell. `exact` keeps
+	 * them, so in `none` mode the item overlaps what is there. `preferred` keeps them when the
+	 * cell is free and otherwise moves the item to the free cell nearest it, leaving the other
+	 * items where they are. Items that join in the same tick are placed together: each one
+	 * whose cell is free gets it first, so a group revealed at once keeps every free saved
+	 * cell. Only joining reads it; a later change of `x`/`y` is applied as the mode applies it.
+	 * Shift mode always moves a new item to the nearest free cell, so it ignores this.
+	 * @default 'exact'
+	 */
+	placement?: Placement;
 	/**
 	 * Whether the item can be dragged.
 	 * @default true
