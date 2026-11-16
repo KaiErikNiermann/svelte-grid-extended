@@ -205,6 +205,44 @@
 					enabled: (items) => items.some((it) => it.id === 'b')
 				}
 			]
+		},
+		{
+			id: 'P8',
+			title: 'Revealing items with saved positions',
+			steps:
+				'Click "Reveal g1, g2 (preferred)", then "Hide g1, g2" and "Reveal g1, g2 (exact)" to compare. g1 was saved at (1, 0), under a; g2 at (2, 0), which is free.',
+			expect: {
+				none: 'preferred: g2 gets its saved cell (2, 0); g1 takes the free cell nearest its own, (0, 1), and a stays put. exact: g1 overlaps a.',
+				push: 'preferred: as in none, g2 at (2, 0) and g1 at (0, 1). exact: g1 takes the first free cell, (2, 0), and pushes g2 on to (3, 0).',
+				compress:
+					'preferred: as in none, g2 at (2, 0) and g1 at (0, 1). exact: g1 is compressed in below a, at (1, 1).',
+				shift:
+					'Shift ignores placement and moves each new item to the nearest free cell in turn: g1 takes (2, 0) and g2 moves on to (3, 0).'
+			},
+			modes: ALL,
+			cols: 4,
+			items: [cell('a', 0, 0, 2, 1)],
+			actions: [
+				{
+					label: 'Reveal g1, g2 (preferred)',
+					apply: (items) => [
+						...items,
+						{ ...cell('g1', 1, 0), placement: 'preferred' },
+						{ ...cell('g2', 2, 0), placement: 'preferred' }
+					],
+					enabled: (items) => !items.some((it) => it.id.startsWith('g'))
+				},
+				{
+					label: 'Reveal g1, g2 (exact)',
+					apply: (items) => [...items, cell('g1', 1, 0), cell('g2', 2, 0)],
+					enabled: (items) => !items.some((it) => it.id.startsWith('g'))
+				},
+				{
+					label: 'Hide g1, g2',
+					apply: (items) => items.filter((it) => !it.id.startsWith('g')),
+					enabled: (items) => items.some((it) => it.id.startsWith('g'))
+				}
+			]
 		}
 	];
 

@@ -1,6 +1,13 @@
-import type { Collision } from '@appulsauce/svelte-grid';
+import type { Collision, Placement } from '@appulsauce/svelte-grid';
 
-export type Spec = { id: string; x?: number; y?: number; w: number; h: number };
+export type Spec = {
+	id: string;
+	x?: number;
+	y?: number;
+	w: number;
+	h: number;
+	placement?: Placement;
+};
 
 /** A button that changes the layout the way an app would: through the items it renders. */
 export type Action = {

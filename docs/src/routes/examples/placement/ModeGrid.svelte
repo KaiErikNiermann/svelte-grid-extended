@@ -164,6 +164,7 @@
 							bind:y={it.y}
 							bind:w={it.w}
 							bind:h={it.h}
+							placement={it.placement}
 							class="grid-demo-item"
 							onpreviewchange={({ item }) => onPreview(it.id, item)}
 						>
