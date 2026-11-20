@@ -114,7 +114,7 @@
 	}
 
 	.callout {
-		@apply rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm leading-6;
+		@apply rounded-lg bg-primary/10 px-4 py-3 text-sm leading-6;
 	}
 
 	.callout a {
@@ -288,7 +288,7 @@
 }
 
 .prose blockquote {
-	@apply border-l-4 border-primary/60 bg-primary/5 px-4 py-3 rounded-r-lg italic my-5 text-muted-foreground;
+	@apply my-5 rounded-lg bg-primary/10 px-4 py-3 text-sm not-italic text-foreground;
 }
 
 /* Tables sit in a wrapper that scrolls sideways (rehype-table-scroll), as code blocks do. Below
