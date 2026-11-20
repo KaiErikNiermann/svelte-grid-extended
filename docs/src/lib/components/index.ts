@@ -6,3 +6,4 @@ export { default as CodeBlock } from './CodeBlock.svelte';
 export { default as CodeCopyEnhancer } from './CodeCopyEnhancer.svelte';
 export { default as SearchPalette } from './SearchPalette.svelte';
 export { default as TwoslashEnhancer } from './TwoslashEnhancer.svelte';
+export { default as Note } from './Note.svelte';

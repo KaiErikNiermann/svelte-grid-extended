@@ -113,8 +113,16 @@
 		@apply hidden;
 	}
 
+	.note {
+		@apply flex flex-col gap-2 rounded-md bg-primary/[0.12] px-4 py-3 text-sm;
+	}
+
+	.note[data-tone='warn'] {
+		@apply bg-amber-500/[0.12];
+	}
+
 	.callout {
-		@apply rounded-lg bg-primary/10 px-4 py-3 text-sm leading-6;
+		@apply note;
 	}
 
 	.callout a {
@@ -288,7 +296,7 @@
 }
 
 .prose blockquote {
-	@apply my-5 rounded-lg bg-primary/10 px-4 py-3 text-sm not-italic text-foreground;
+	@apply note my-5;
 }
 
 /* Tables sit in a wrapper that scrolls sideways (rehype-table-scroll), as code blocks do. Below
