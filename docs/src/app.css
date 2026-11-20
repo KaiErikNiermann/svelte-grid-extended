@@ -255,6 +255,10 @@
 	@apply text-primary underline underline-offset-4 hover:text-primary/80 transition-colors;
 }
 
+.prose a.link-card {
+	@apply no-underline;
+}
+
 .prose code:not(pre code) {
 	@apply bg-muted/70 border border-border/60 px-1.5 py-0.5 rounded text-sm font-mono;
 }
