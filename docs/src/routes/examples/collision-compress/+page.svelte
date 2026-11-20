@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
-	import { CodeBlock } from '#lib/components/index.ts';
+	import { CodeBlock, Note } from '#lib/components/index.ts';
 	import { scriptClose } from '#lib/snippet-utils.ts';
 
 	let items = $state([
@@ -64,9 +64,9 @@ ${scriptClose}
 
 <div class="mt-6 prose">
 	<h3>Code</h3>
-	<blockquote>
-		<strong>Tip:</strong> Use <code>autoCompress={'{'}false{'}'}</code> to disable automatic
-		compression and call <code>controller.compress()</code> manually.
-	</blockquote>
+	<Note type="tip">
+		Use <code>autoCompress={'{'}false{'}'}</code> to disable automatic compression and call
+		<code>controller.compress()</code> manually.
+	</Note>
 </div>
 <CodeBlock class="mt-3" lang="svelte" code={exampleCode} />

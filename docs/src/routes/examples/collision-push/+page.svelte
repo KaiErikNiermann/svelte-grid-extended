@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Grid, { GridItem } from '@appulsauce/svelte-grid';
-	import { CodeBlock } from '#lib/components/index.ts';
+	import { CodeBlock, Note } from '#lib/components/index.ts';
 	import { scriptClose } from '#lib/snippet-utils.ts';
 
 	let items = $state([
@@ -64,9 +64,10 @@ ${scriptClose}
 
 <div class="mt-6 prose">
 	<h3>Code</h3>
-	<blockquote>
-		<strong>Note:</strong> When using <code>collision="push"</code>, <code>rows</code> is
-		automatically set to <code>0</code> (infinite), so <code>itemSize.height</code> must be provided.
-	</blockquote>
+	<Note>
+		When using <code>collision="push"</code>, <code>rows</code> is automatically set to
+		<code>0</code>
+		(infinite), so <code>itemSize.height</code> must be provided.
+	</Note>
 </div>
 <CodeBlock class="mt-3" lang="svelte" code={exampleCode} />
