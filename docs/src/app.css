@@ -93,7 +93,7 @@
 	}
 
 	.icon-button {
-		@apply inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background transition-colors hover:bg-accent hover:text-accent-foreground;
+		@apply inline-flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground;
 	}
 
 	.demo-panel {
@@ -118,7 +118,15 @@
 	}
 
 	.search-trigger {
-		@apply ms-4 inline-flex h-9 min-w-0 max-w-64 flex-1 items-center gap-2 rounded-md border border-border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground;
+		@apply inline-flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md border border-border bg-muted/40 ps-2.5 pe-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:w-64 md:flex-none;
+	}
+
+	.nav-links {
+		@apply items-center gap-4 text-sm;
+	}
+
+	.nav-links a {
+		@apply text-muted-foreground transition-colors hover:text-foreground;
 	}
 
 	.search-trigger kbd {

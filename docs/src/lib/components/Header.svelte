@@ -36,10 +36,10 @@
 	<div
 		class="absolute inset-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pointer-events-none"
 	></div>
-	<div class="relative container flex h-14 items-center px-4 md:px-6">
+	<div class="relative flex h-14 items-center gap-3 px-4 md:px-6">
 		<button
 			onclick={toggleMobileMenu}
-			class="mr-2 icon-button lg:hidden"
+			class="icon-button lg:hidden"
 			aria-label="Toggle menu"
 			aria-expanded={mobileMenuOpen}
 			aria-controls="mobile-nav"
@@ -54,9 +54,14 @@
 		<!-- On a phone the name gives way to the grid glyph (the favicon), so the search field
 		     keeps its width; the glyph's alt text keeps the link's name. -->
 		<a href={homePath} class="flex shrink-0 items-center gap-2 font-semibold">
-			<img src={asset('favicon.svg')} alt="Svelte 5 Grid" class="h-8 w-8 sm:hidden" />
-			<span class="hidden text-primary sm:inline">Svelte 5 Grid</span>
+			<img src={asset('favicon.svg')} alt="Svelte 5 Grid" class="size-6" />
+			<span class="hidden text-primary sm:inline" aria-hidden="true">Svelte 5 Grid</span>
 		</a>
+
+		<nav class="nav-links ms-auto hidden md:flex">
+			<a href={docsPath}>Docs</a>
+			<a href={examplesPath}>Examples</a>
+		</nav>
 
 		<button
 			type="button"
@@ -70,43 +75,32 @@
 			<kbd>{shortcutKey} K</kbd>
 		</button>
 
-		<div class="hidden flex-1 md:block"></div>
+		<ThemeToggle />
 
-		<nav class="hidden md:flex items-center gap-6 text-sm">
-			<a href={docsPath} class="text-muted-foreground hover:text-foreground transition-colors"
-				>Docs</a
+		<a
+			href="https://github.com/KaiErikNiermann/svelte-grid-extended"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="icon-button"
+			aria-label="GitHub"
+			title="GitHub repository"
+		>
+			<svg
+				class="h-4 w-4"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
 			>
-			<a href={examplesPath} class="text-muted-foreground hover:text-foreground transition-colors"
-				>Examples</a
-			>
-		</nav>
-
-		<div class="flex items-center gap-2 ml-4">
-			<a
-				href="https://github.com/KaiErikNiermann/svelte-grid-extended"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="icon-button"
-				aria-label="GitHub"
-			>
-				<svg
-					class="h-4 w-4"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<path
-						d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
-					/>
-					<path d="M9 18c-4.51 2-5-2-7-2" />
-				</svg>
-			</a>
-			<ThemeToggle />
-		</div>
+				<path
+					d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+				/>
+				<path d="M9 18c-4.51 2-5-2-7-2" />
+			</svg>
+		</a>
 	</div>
 
 	<!-- Mobile menu -->
