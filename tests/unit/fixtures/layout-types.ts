@@ -12,4 +12,6 @@ export type LayoutSpec = {
 	movable?: boolean;
 	resizable?: boolean;
 	placement?: Placement;
+	/** Renders a 30px header at the top of the item, a child to click or drag by. */
+	header?: boolean;
 };

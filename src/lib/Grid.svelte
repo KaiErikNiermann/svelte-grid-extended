@@ -121,11 +121,21 @@
 		 * How long, in milliseconds, a finger or pen has to be held on an item before a drag
 		 * starts, so that a swipe across the grid still scrolls the page. A finger that moves
 		 * during the wait scrolls instead. `0` drags at once, and the items then cannot be used
-		 * to scroll. A mouse always drags at once, and so does a touch on a handle with
-		 * `touch-action: none`, such as the default resize handle.
+		 * to scroll. A mouse never waits, and neither does a touch on a handle with
+		 * `touch-action: none`, such as the default resize handle: those start once they pass
+		 * the `dragThreshold`.
 		 * @default 300
 		 */
 		touchDelay?: number;
+		/**
+		 * How far, in CSS pixels, the pointer has to move from where it was pressed before a drag
+		 * or resize starts. A press and release that moves less is an ordinary click, so a
+		 * header that is both clickable and used to drag the item works. A drag that did start
+		 * ends without a click. `0` starts the gesture at the press. A finger held for the
+		 * `touchDelay` starts at once, since the wait already told it apart from a tap.
+		 * @default 4
+		 */
+		dragThreshold?: number;
 		/** Bind to it (`bind:controller`) for `getFirstAvailablePosition` and `compress`. */
 		controller?: GridControllerType;
 		/** Called when any item's position or size changes. */
@@ -156,6 +166,7 @@
 		autoCompress = true,
 		skipOffscreen = true,
 		touchDelay = 300,
+		dragThreshold = 4,
 		controller = $bindable(),
 		onchange,
 		children
@@ -487,6 +498,7 @@
 		debug,
 		collision,
 		touchDelay,
+		dragThreshold,
 		claimGesture,
 		releaseGesture,
 		registerItem,

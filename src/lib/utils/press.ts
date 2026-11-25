@@ -31,7 +31,14 @@ export function waitsForPress(event: PointerEvent, delay: number): boolean {
 	return touchLike && delay > 0 && canPanFrom(event.target instanceof Element ? event.target : null);
 }
 
-/** Whether the pointer has moved further than the press tolerance from where it went down. */
-export function leftPress(start: { x: number; y: number }, event: PointerEvent): boolean {
-	return Math.hypot(event.clientX - start.x, event.clientY - start.y) > PRESS_TOLERANCE_PX;
+/**
+ * Whether the pointer has moved further than `tolerance` CSS pixels from where it went down:
+ * $\sqrt{(x - x_0)^2 + (y - y_0)^2} > \text{tolerance}$.
+ */
+export function leftPress(
+	start: { x: number; y: number },
+	event: PointerEvent,
+	tolerance: number = PRESS_TOLERANCE_PX
+): boolean {
+	return Math.hypot(event.clientX - start.x, event.clientY - start.y) > tolerance;
 }

@@ -65,7 +65,11 @@
 				class={`it it-${it.id}`}
 				previewClass={`pv pv-${it.id}`}
 				onchange={() => onchange?.(it.id)}
-			/>
+			>
+				{#if it.header}
+					<div class={`hd hd-${it.id}`} style="height: 30px;">{it.id}</div>
+				{/if}
+			</GridItem>
 		{/each}
 	</Grid>
 {/if}

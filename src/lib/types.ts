@@ -58,6 +58,8 @@ export type GridParams = {
 	collision: Collision;
 	/** How long, in ms, a finger or pen is held on an item before its drag starts; 0 starts at once. */
 	touchDelay: number;
+	/** How far, in CSS px, a press has to move before its drag or resize starts; 0 starts at once. */
+	dragThreshold: number;
 	/** Takes the grid's one gesture slot for `id`; false while another item's gesture runs. */
 	claimGesture: (id: string) => boolean;
 	/** Frees the gesture slot if `id` holds it. */

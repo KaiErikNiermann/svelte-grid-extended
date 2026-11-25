@@ -282,7 +282,7 @@
 	const _movable = $derived(!gridParams.readOnly && movable);
 
 	function moveStart(event: PointerEvent) {
-		beginGesture(event, startMove);
+		beginGesture(event, startMove, move);
 	}
 
 	function startMove(event: PointerEvent) {
@@ -502,43 +502,76 @@
 
 	/** The pointer that owns the current gesture or press. */
 	let gesturePointer: number | undefined;
-	/** A touch held down on the item, not yet long enough to start its gesture. */
-	let press = $state.raw<{ x: number; y: number; timer: ReturnType<typeof setTimeout> } | undefined>();
+	/**
+	 * A press on the item whose gesture has not started yet: a touch held for the `touchDelay`
+	 * (`timer` set), or a press that has not moved past the `dragThreshold` (no `timer`).
+	 */
+	let press = $state.raw<
+		| {
+				x: number;
+				y: number;
+				timer: ReturnType<typeof setTimeout> | undefined;
+				down: PointerEvent;
+				start: (event: PointerEvent) => void;
+				follow: (event: PointerEvent) => void;
+		  }
+		| undefined
+	>();
 
 	/**
 	 * Starts a drag or resize for a primary-button press. A finger or pen on a part of the item
 	 * the page could scroll from first has to be held still for the grid's `touchDelay`, so a
-	 * swipe across the grid still scrolls the page.
+	 * swipe across the grid still scrolls the page. Any other press starts once it has moved past
+	 * the grid's `dragThreshold`, so a press and release stays a click.
+	 *
+	 * `start` sets the gesture up from the press; `follow` handles each move after that.
 	 */
-	function beginGesture(event: PointerEvent, start: (event: PointerEvent) => void) {
+	function beginGesture(
+		event: PointerEvent,
+		start: (event: PointerEvent) => void,
+		follow: (event: PointerEvent) => void
+	) {
 		if (event.button !== 0 || active || press) return;
 		event.stopPropagation();
 		if (!gridParams.claimGesture(item.id)) return;
 		gesturePointer = event.pointerId;
 		window.addEventListener('pointerup', gestureEnd);
 		window.addEventListener('pointercancel', cancelGesture);
-		if (!waitsForPress(event, gridParams.touchDelay)) {
+		const waits = waitsForPress(event, gridParams.touchDelay);
+		if (!waits && gridParams.dragThreshold <= 0) {
 			start(event);
 			return;
 		}
-		press = {
-			x: event.clientX,
-			y: event.clientY,
-			timer: setTimeout(() => {
-				endPress();
-				start(event);
-			}, gridParams.touchDelay)
-		};
+		const timer = waits
+			? setTimeout(() => {
+					endPress();
+					start(event);
+				}, gridParams.touchDelay)
+			: undefined;
+		press = { x: event.clientX, y: event.clientY, timer, down: event, start, follow };
 		window.addEventListener('pointermove', pressMove);
 	}
 
-	/** A finger that moves away during the press is a swipe: the browser gets to scroll. */
+	/**
+	 * A finger that moves away while it is held is a swipe: the browser gets to scroll. A press
+	 * that passes the drag threshold starts its gesture from where it went down, then takes this
+	 * move, so the item does not lag behind the pointer by the threshold.
+	 */
 	function pressMove(event: PointerEvent) {
-		if (event.pointerId === gesturePointer && press && leftPress(press, event)) stopGesture();
+		if (event.pointerId !== gesturePointer || !press) return;
+		if (press.timer !== undefined) {
+			if (leftPress(press, event)) stopGesture();
+			return;
+		}
+		if (!leftPress(press, event, gridParams.dragThreshold)) return;
+		const { down, start, follow } = press;
+		endPress();
+		start(down);
+		follow(event);
 	}
 
 	function endPress() {
-		if (press) clearTimeout(press.timer);
+		if (press?.timer !== undefined) clearTimeout(press.timer);
 		press = undefined;
 		window.removeEventListener('pointermove', pressMove);
 	}
@@ -632,7 +665,7 @@
 	const _resizable = $derived(!gridParams.readOnly && item.resizable);
 
 	function resizeStart(event: PointerEvent) {
-		beginGesture(event, startResize);
+		beginGesture(event, startResize, resize);
 	}
 
 	function startResize(event: PointerEvent) {
@@ -760,7 +793,7 @@
 	class:non-active-default={!active}
 	onpointerdown={_movable && !hasMoveHandle ? moveStart : undefined}
 	oncontextmenu={holdMenu}
-	data-holding={press ? '' : undefined}
+	data-holding={press?.timer === undefined ? undefined : ''}
 	style={`position: absolute; left:${left}px; top:${top}px; width: ${width}px; height: ${height}px; 
 			${_movable && !hasMoveHandle ? 'cursor: move;' : ''} ${touchAction} user-select: none;
 			-webkit-user-select: none; -webkit-touch-callout: none;

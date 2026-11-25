@@ -25,6 +25,7 @@ describe('GridController firstAvailablePosition', () => {
 		debug: false,
 		collision: 'none',
 		touchDelay: 0,
+		dragThreshold: 0,
 		claimGesture: () => true,
 		releaseGesture: () => {
 			/* .. */
