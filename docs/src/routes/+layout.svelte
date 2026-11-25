@@ -16,7 +16,7 @@
 	<Header />
 	<div class="flex-1 flex gap-10 px-4 md:px-6">
 		<aside
-			class="hidden lg:block w-64 shrink-0 sticky top-14 self-start h-[calc(100dvh-3.5rem)] py-8"
+			class="hidden lg:block w-64 shrink-0 sticky top-14 self-start h-[calc(100dvh-3.5rem)] py-8 pe-4 border-e border-border"
 		>
 			<div class="h-full min-h-0 overflow-y-auto overscroll-contain pr-2">
 				<Sidebar />
