@@ -120,6 +120,21 @@ describe.skipIf(IN_JSDOM)('clicks on a draggable header', () => {
 		expect(grid.drawn().a).toEqual({ x: 0, y: 0, w: 1, h: 1 });
 	});
 
+	test('a drag by the header ends without a click', async () => {
+		const grid = mountLayout({
+			grid: { cols: 4, dragThreshold: THRESHOLD, ...FIXED_SIZE },
+			items: [{ ...item('a', 0, 0), header: true }]
+		});
+		await grid.settle();
+		const clicks = countClicks(grid, 'a');
+		const held = await grid.hold('.it-a .hd-a', 1, 0);
+		await held.move(0, 0);
+		await held.release();
+
+		expect(grid.drawn().a).toEqual({ x: 0, y: 0, w: 1, h: 1 });
+		expect(clicks.item()).toBe(0);
+	});
+
 	test('the click after a drag is the only one swallowed', async () => {
 		const grid = mountLayout({
 			grid: { cols: 4, dragThreshold: THRESHOLD, ...FIXED_SIZE },

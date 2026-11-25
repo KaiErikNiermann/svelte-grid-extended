@@ -605,8 +605,27 @@
 	/** Pointerup for a move or a resize: both end the same way. A press released early is a tap. */
 	function gestureEnd(event: PointerEvent) {
 		if (event.pointerId !== gesturePointer || event.button !== 0) return;
-		if (active) endInteraction(event);
+		if (active) {
+			endInteraction(event);
+			swallowClick();
+		}
 		stopGesture();
+	}
+
+	/**
+	 * Stops the click the browser sends after the pointerup that ended a drag or resize, so a
+	 * drag by a clickable part of the item is not also a click on it. The browser dispatches
+	 * that click in the same task as the pointerup; if none comes, the listener is dropped
+	 * before any later click.
+	 */
+	function swallowClick() {
+		window.addEventListener('click', swallow, { capture: true, once: true });
+		setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0);
+	}
+
+	function swallow(event: MouseEvent) {
+		event.stopPropagation();
+		event.preventDefault();
 	}
 
 	function stopListening() {
