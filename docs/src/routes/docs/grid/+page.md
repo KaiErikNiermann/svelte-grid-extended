@@ -27,6 +27,7 @@ import Grid from '@appulsauce/svelte-grid';
 | `autoCompress`  | `boolean`                                   | `true`      | Auto compress items when programmatically changing them. Only works with 'compress' collision.                                                           |
 | `skipOffscreen` | `boolean`                                   | `true`      | Let the browser skip rendering the grid while it is away from the viewport. Turn it off for items that draw outside the grid; see Pages With Many Grids. |
 | `touchDelay`    | `number`                                    | `300`       | How long, in milliseconds, a finger or pen is held on an item before its drag starts. `0` drags at once. See Touch Screens.                              |
+| `dragThreshold` | `number`                                    | `4`         | How far, in pixels, a press has to move before its drag or resize starts; a shorter press is a click. `0` starts at the press. See Clicks And Drags.     |
 | `onchange`      | `(detail: LayoutChangeDetail) => void`      | `undefined` | Callback when any item changes position or size.                                                                                                         |
 | `class`         | `string`                                    | `undefined` | CSS class for the grid container.                                                                                                                        |
 | `style`         | `string`                                    | `undefined` | Inline styles for the grid container.                                                                                                                    |
@@ -100,9 +101,21 @@ The property also brings paint containment, which has two effects while it is on
 </Grid>
 ```
 
+## Clicks And Drags
+
+A press on an item starts its drag only once the pointer has moved more than `dragThreshold` pixels (4 by default) from where it went down. A press and release that moves less is an ordinary click, so a part of an item can be clicked and dragged by: a header that selects its card on click and moves it on drag, as in the Custom Handles example. A drag that did start ends without a click, so a click handler on the item does not also run after every drag. The same holds for resize handles.
+
+`dragThreshold={0}` starts the drag at the press, as earlier versions always did, and then no press on an item counts as a click. A finger held for the `touchDelay` starts its drag at once, since the wait has already told it apart from a tap.
+
+```svelte
+<Grid cols={10} dragThreshold={8}>
+	<!-- A press must move 8px before a drag starts -->
+</Grid>
+```
+
 ## Touch Screens
 
-On a touch screen a grid can fill the whole screen, so a finger on an item must still be able to scroll the page. A finger or pen therefore has to be held still on an item for `touchDelay` milliseconds (300 by default) before its drag starts; the item is then shown as active and follows the finger. A finger that moves before then scrolls the page as usual, and a quick tap does nothing. A mouse always drags at once. While the finger is held, before the drag starts, the item has a `data-holding` attribute, so a page can show that the press is being counted, as the Touch example does with a bar that fills over `touchDelay`.
+On a touch screen a grid can fill the whole screen, so a finger on an item must still be able to scroll the page. A finger or pen therefore has to be held still on an item for `touchDelay` milliseconds (300 by default) before its drag starts; the item is then shown as active and follows the finger. A finger that moves before then scrolls the page as usual, and a quick tap does nothing. A mouse never waits; it starts once it moves past the `dragThreshold` (see below). While the finger is held, before the drag starts, the item has a `data-holding` attribute, so a page can show that the press is being counted, as the Touch example does with a bar that fills over `touchDelay`.
 
 Some parts of an item start at the first touch, because the browser could not scroll from them anyway: the default resize handle, and any handle of your own with `touch-action: none` (see Customization). While a drag runs, the page does not scroll or zoom under it, and a second finger neither moves the dragged item nor starts a drag on another item of the same grid.
 

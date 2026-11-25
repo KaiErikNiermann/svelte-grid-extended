@@ -25,6 +25,18 @@ By default, the entire item is draggable. Use the `moveHandle` snippet to restri
 </GridItem>
 ```
 
+A handle can take clicks as well. A press only starts a drag once it has moved past the grid's `dragThreshold`, so an `onclick` on the handle runs for a plain click and not at the end of a drag (see Clicks And Drags on the Grid page):
+
+```svelte
+<GridItem x={0} y={0}>
+	{#snippet moveHandle({ moveStart })}
+		<div class="cursor-move touch-none" onpointerdown={moveStart} onclick={() => select(id)}>
+			Drag to move, click to select
+		</div>
+	{/snippet}
+</GridItem>
+```
+
 ## Custom Resize Handle
 
 Replace the default resize handle with your own. As with a move handle, `touch-action: none` lets a finger resize at once:
